@@ -1049,6 +1049,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/uuid", [\
+        ["npm:9.0.0", {\
+          "packageLocation": "./.yarn/cache/@types-uuid-npm-9.0.0-979023c16f-59ae56d954.zip/node_modules/@types/uuid/",\
+          "packageDependencies": [\
+            ["@types/uuid", "npm:9.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/vinyl", [\
         ["npm:2.0.7", {\
           "packageLocation": "./.yarn/cache/@types-vinyl-npm-2.0.7-975445872b-8e6e341860.zip/node_modules/@types/vinyl/",\
@@ -7151,13 +7160,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@fastify/cookie", "npm:8.3.0"],\
             ["@fastify/websocket", "npm:7.1.2"],\
             ["@types/node", "npm:18.11.18"],\
+            ["@types/uuid", "npm:9.0.0"],\
             ["@types/ws", "npm:8.5.4"],\
             ["fastify", "npm:4.11.0"],\
             ["nodemon", "npm:2.0.20"],\
             ["prettier", "npm:2.8.3"],\
             ["shared", "workspace:shared"],\
             ["ts-node", "virtual:5e2e00b31e527ff544c90eb3e3e3e977a366e52a6e25602d03686a4c9a155eee4d7b92ccdea0b04275344f5b2189eb629d123eb4cc6e1b883b42aea6d965568d#npm:10.9.1"],\
-            ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"]\
+            ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"],\
+            ["uuid", "npm:9.0.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -8172,6 +8183,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/uuid-npm-8.3.2-eca0baba53-5575a8a75c.zip/node_modules/uuid/",\
           "packageDependencies": [\
             ["uuid", "npm:8.3.2"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:9.0.0", {\
+          "packageLocation": "./.yarn/cache/uuid-npm-9.0.0-46c41e3e43-8dd2c83c43.zip/node_modules/uuid/",\
+          "packageDependencies": [\
+            ["uuid", "npm:9.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
