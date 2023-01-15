@@ -45,6 +45,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@yarnpkg/sdks", "npm:3.0.0-rc.35"],\
             ["concurrently", "npm:7.6.0"],\
+            ["fastify", "npm:4.11.0"],\
             ["prettier", "npm:2.8.3"],\
             ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"]\
           ],\
@@ -5402,6 +5403,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["multiplayer", "workspace:."],\
             ["@yarnpkg/sdks", "npm:3.0.0-rc.35"],\
             ["concurrently", "npm:7.6.0"],\
+            ["fastify", "npm:4.11.0"],\
             ["prettier", "npm:2.8.3"],\
             ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"]\
           ],\

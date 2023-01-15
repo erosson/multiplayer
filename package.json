@@ -8,13 +8,14 @@
     "shared"
   ],
   "scripts": {
-    "start": "concurrently -k \"yarn:start:*\"",
+    "start": "concurrently -k \"yarn:start:*\" -c magenta,cyan",
     "start:server": "yarn workspace server start",
     "start:www": "yarn workspace www serve"
   },
   "devDependencies": {
     "@yarnpkg/sdks": "^3.0.0-rc.35",
     "concurrently": "^7.6.0",
+    "fastify": "^4.11.0",
     "prettier": "^2.8.3",
     "typescript": "^4.9.4"
   }

@@ -4,15 +4,15 @@ import { default as FastifyCookie } from "@fastify/cookie";
 import "shared";
 
 const app: FastifyInstance = Fastify({ logger: true });
-// app.register(FastifyCookie);
+app.register(FastifyCookie);
 app.register(FastifyWebsocket);
 app.register(async function (fastify) {
   fastify.get(
     "/",
-    // @ts-ignore
     { websocket: true },
     (connection: SocketStream, req: FastifyRequest): void => {
       console.log("client connected");
+      req.cookies;
       connection.socket.on("message", (message: Buffer) => {
         console.log("client message", message.toString());
         // message.toString() === 'hi from client'
