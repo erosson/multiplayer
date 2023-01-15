@@ -2,9 +2,9 @@ import "shared";
 
 console.log("Hello World!");
 
-const ws = new WebSocket(
-  "wss://3000-erosson-multiplayer-pde2ydj4486.ws-us82.gitpod.io"
-);
+// TODO productionify this. it works on gitpod
+const wsUrl = `wss://${document.location.hostname.replace(/^8080-/, '3000-')}`
+const ws = new WebSocket(wsUrl);
 ws.onopen = (ev) => {
   console.log("ws open");
   ws.send("hello from client");
