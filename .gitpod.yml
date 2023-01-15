@@ -1,0 +1,7 @@
+tasks:
+  - command: yarn start
+
+vscode:
+  extensions:
+    - arcanis.vscode-zipfs
+    - esbenp.prettier-vscode
