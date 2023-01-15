@@ -21,7 +21,10 @@ app.addHook("preHandler", (req, res, done) => {
   const allowedPaths = new Set(["/auth/guest"]);
   if (allowedPaths.has(req.routerPath)) {
     // TODO productionify
-    const origin = `https://8080-${process.env.GITPOD_WORKSPACE_ID}.${process.env.GITPOD_WORKSPACE_CLUSTER_HOST}`;
+    const origin = `${process.env.GITPOD_WORKSPACE_URL?.replace(
+      "https://",
+      "https://8080-"
+    )}`;
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Methods", "GET");
     res.header("Access-Control-Allow-Credentials", true);

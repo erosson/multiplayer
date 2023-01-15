@@ -4,9 +4,10 @@ console.log("Hello World!");
 
 async function main() {
   // TODO productionify this. it works on gitpod
-  const hostname = document.location.hostname.replace(/^8080-/, "3000-");
-  const authUrl = `https://${hostname}/auth/guest`;
-  const wsUrl = `wss://${hostname}/ws`;
+  const server = process.env["SERVER_URL"];
+  console.log(server);
+  const authUrl = `${server}/auth/guest`;
+  const wsUrl = `${server.replace(/^http/, "ws")}/ws`;
   // sets httpOnly session cookie
   const res = await fetch(authUrl, { credentials: "include" });
   console.log(await res.json());
