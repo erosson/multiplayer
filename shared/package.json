@@ -1,0 +1,9 @@
+{
+  "name": "shared",
+  "packageManager": "yarn@3.3.1",
+  "main": "src/main.ts",
+  "devDependencies": {
+    "prettier": "^2.8.3",
+    "typescript": "^4.9.4"
+  }
+}

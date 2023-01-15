@@ -1,0 +1,21 @@
+{
+  "name": "multiplayer",
+  "packageManager": "yarn@3.3.1",
+  "private": true,
+  "workspaces": [
+    "server",
+    "www",
+    "shared"
+  ],
+  "scripts": {
+    "start": "concurrently -k \"yarn:start:*\"",
+    "start:server": "yarn workspace server start",
+    "start:www": "yarn workspace www serve"
+  },
+  "devDependencies": {
+    "@yarnpkg/sdks": "^3.0.0-rc.35",
+    "concurrently": "^7.6.0",
+    "prettier": "^2.8.3",
+    "typescript": "^4.9.4"
+  }
+}
