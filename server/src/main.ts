@@ -4,6 +4,7 @@ import Fastify, {
   FastifyReply,
 } from "fastify";
 import FastifyWebsocket, { SocketStream } from "@fastify/websocket";
+import type { WebSocket } from "ws";
 import FastifyCookie from "@fastify/cookie";
 import { v4 as uuidv4 } from "uuid";
 import "shared";
@@ -70,6 +71,7 @@ app.register(async function (fastify) {
     "/ws",
     { websocket: true },
     (connection: SocketStream, req: FastifyRequest): void => {
+      const socket: WebSocket = connection.socket;
       const session = req.cookies[SESSION_COOKIE_KEY];
       if (!session) {
         console.log("sessionless client rejected");
@@ -77,10 +79,18 @@ app.register(async function (fastify) {
         return;
       }
       console.log("client connected", session);
-      connection.socket.on("message", (message: Buffer) => {
+      socket.on("message", (message: Buffer) => {
         console.log("client message", message.toString());
         // message.toString() === 'hi from client'
-        connection.socket.send(`hi from server ${message.toString()}`);
+        socket.send(`hi from server ${message.toString()}`);
+      });
+
+      const interval = setInterval(
+        () => socket.send(JSON.stringify({ type: "tick", now: Date.now() })),
+        16.5
+      );
+      socket.on("close", () => {
+        clearInterval(interval);
       });
     }
   );
