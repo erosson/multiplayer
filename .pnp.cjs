@@ -24,6 +24,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:shared"\
       },\
       {\
+        "name": "protoc",\
+        "reference": "workspace:vendor/protoc"\
+      },\
+      {\
         "name": "www",\
         "reference": "workspace:www"\
       }\
@@ -32,6 +36,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
     "fallbackExclusionList": [\
       ["multiplayer", ["workspace:."]],\
+      ["protoc", ["workspace:vendor/protoc"]],\
       ["server", ["workspace:server"]],\
       ["shared", ["workspace:shared"]],\
       ["www", ["workspace:www"]]\
@@ -666,6 +671,59 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@protobuf-ts/plugin", [\
+        ["npm:2.8.2", {\
+          "packageLocation": "./.yarn/cache/@protobuf-ts-plugin-npm-2.8.2-8380e853a4-4f8a00e143.zip/node_modules/@protobuf-ts/plugin/",\
+          "packageDependencies": [\
+            ["@protobuf-ts/plugin", "npm:2.8.2"],\
+            ["@protobuf-ts/plugin-framework", "npm:2.8.2"],\
+            ["@protobuf-ts/protoc", "npm:2.8.2"],\
+            ["@protobuf-ts/runtime", "npm:2.8.2"],\
+            ["@protobuf-ts/runtime-rpc", "npm:2.8.2"],\
+            ["typescript", "patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@protobuf-ts/plugin-framework", [\
+        ["npm:2.8.2", {\
+          "packageLocation": "./.yarn/cache/@protobuf-ts-plugin-framework-npm-2.8.2-f85c779486-1dfb39a10c.zip/node_modules/@protobuf-ts/plugin-framework/",\
+          "packageDependencies": [\
+            ["@protobuf-ts/plugin-framework", "npm:2.8.2"],\
+            ["@protobuf-ts/runtime", "npm:2.8.2"],\
+            ["typescript", "patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@protobuf-ts/protoc", [\
+        ["npm:2.8.2", {\
+          "packageLocation": "./.yarn/cache/@protobuf-ts-protoc-npm-2.8.2-caacfc6ea3-b06f64aa47.zip/node_modules/@protobuf-ts/protoc/",\
+          "packageDependencies": [\
+            ["@protobuf-ts/protoc", "npm:2.8.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@protobuf-ts/runtime", [\
+        ["npm:2.8.2", {\
+          "packageLocation": "./.yarn/cache/@protobuf-ts-runtime-npm-2.8.2-20b60672bb-ab322e832b.zip/node_modules/@protobuf-ts/runtime/",\
+          "packageDependencies": [\
+            ["@protobuf-ts/runtime", "npm:2.8.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@protobuf-ts/runtime-rpc", [\
+        ["npm:2.8.2", {\
+          "packageLocation": "./.yarn/cache/@protobuf-ts-runtime-rpc-npm-2.8.2-822032535b-a75847f34e.zip/node_modules/@protobuf-ts/runtime-rpc/",\
+          "packageDependencies": [\
+            ["@protobuf-ts/runtime-rpc", "npm:2.8.2"],\
+            ["@protobuf-ts/runtime", "npm:2.8.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@sindresorhus/is", [\
         ["npm:4.6.0", {\
           "packageLocation": "./.yarn/cache/@sindresorhus-is-npm-4.6.0-7cad05c55e-83839f13da.zip/node_modules/@sindresorhus/is/",\
@@ -963,6 +1021,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/prop-types", [\
+        ["npm:15.7.5", {\
+          "packageLocation": "./.yarn/cache/@types-prop-types-npm-15.7.5-2aa48aa177-5b43b8b154.zip/node_modules/@types/prop-types/",\
+          "packageDependencies": [\
+            ["@types/prop-types", "npm:15.7.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/qs", [\
         ["npm:6.9.7", {\
           "packageLocation": "./.yarn/cache/@types-qs-npm-6.9.7-4a3e6ca0d0-7fd6f9c250.zip/node_modules/@types/qs/",\
@@ -977,6 +1044,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-range-parser-npm-1.2.4-23d797fbde-b7c0dfd508.zip/node_modules/@types/range-parser/",\
           "packageDependencies": [\
             ["@types/range-parser", "npm:1.2.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/react", [\
+        ["npm:18.0.26", {\
+          "packageLocation": "./.yarn/cache/@types-react-npm-18.0.26-d708995a34-b62f0ea3cd.zip/node_modules/@types/react/",\
+          "packageDependencies": [\
+            ["@types/react", "npm:18.0.26"],\
+            ["@types/prop-types", "npm:15.7.5"],\
+            ["@types/scheduler", "npm:0.16.2"],\
+            ["csstype", "npm:3.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/react-dom", [\
+        ["npm:18.0.10", {\
+          "packageLocation": "./.yarn/cache/@types-react-dom-npm-18.0.10-97fe360927-ff8282d500.zip/node_modules/@types/react-dom/",\
+          "packageDependencies": [\
+            ["@types/react-dom", "npm:18.0.10"],\
+            ["@types/react", "npm:18.0.26"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -996,6 +1085,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-retry-npm-0.12.0-e4e6294a2c-61a072c763.zip/node_modules/@types/retry/",\
           "packageDependencies": [\
             ["@types/retry", "npm:0.12.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/scheduler", [\
+        ["npm:0.16.2", {\
+          "packageLocation": "./.yarn/cache/@types-scheduler-npm-0.16.2-ba3a7d8c68-b6b4dcfeae.zip/node_modules/@types/scheduler/",\
+          "packageDependencies": [\
+            ["@types/scheduler", "npm:0.16.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -2798,6 +2896,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/cssesc-npm-3.0.0-15ec56f86f-f8c4ababff.zip/node_modules/cssesc/",\
           "packageDependencies": [\
             ["cssesc", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["csstype", [\
+        ["npm:3.1.1", {\
+          "packageLocation": "./.yarn/cache/csstype-npm-3.1.1-3857baf48b-1f7b4f5fdd.zip/node_modules/csstype/",\
+          "packageDependencies": [\
+            ["csstype", "npm:3.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -6458,6 +6565,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["protoc", [\
+        ["workspace:vendor/protoc", {\
+          "packageLocation": "./vendor/protoc/",\
+          "packageDependencies": [\
+            ["protoc", "workspace:vendor/protoc"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
       ["proxy-addr", [\
         ["npm:2.0.7", {\
           "packageLocation": "./.yarn/cache/proxy-addr-npm-2.0.7-dae6552872-29c6990ce9.zip/node_modules/proxy-addr/",\
@@ -6589,7 +6705,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/react-dom-virtual-eb188689a4/0/cache/react-dom-npm-18.2.0-dd675bca1c-7d323310be.zip/node_modules/react-dom/",\
           "packageDependencies": [\
             ["react-dom", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:18.2.0"],\
-            ["@types/react", null],\
+            ["@types/react", "npm:18.0.26"],\
             ["loose-envify", "npm:1.4.0"],\
             ["react", "npm:18.2.0"],\
             ["scheduler", "npm:0.23.0"]\
@@ -7168,7 +7284,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["shared", "workspace:shared"],\
             ["ts-node", "virtual:5e2e00b31e527ff544c90eb3e3e3e977a366e52a6e25602d03686a4c9a155eee4d7b92ccdea0b04275344f5b2189eb629d123eb4cc6e1b883b42aea6d965568d#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"],\
-            ["uuid", "npm:9.0.0"]\
+            ["uuid", "npm:9.0.0"],\
+            ["ws", "virtual:2f76a58e85baf0eb58388eadb60303efacffebd8603db71391ed9edacc7832384dd230474afd65f69de3c7c28d02152052370f245d9e4347ddb50a30b8855ca2#npm:8.12.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -7222,6 +7339,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./shared/",\
           "packageDependencies": [\
             ["shared", "workspace:shared"],\
+            ["@protobuf-ts/plugin", "npm:2.8.2"],\
+            ["@protobuf-ts/runtime", "npm:2.8.2"],\
             ["prettier", "npm:2.8.3"],\
             ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"]\
           ],\
@@ -8037,6 +8156,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["typescript", [\
+        ["patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=3bd3d3", {\
+          "packageLocation": "./.yarn/cache/typescript-patch-7ad1c7f5d0-dc7141ab55.zip/node_modules/typescript/",\
+          "packageDependencies": [\
+            ["typescript", "patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954", {\
           "packageLocation": "./.yarn/cache/typescript-patch-7bc527fc0a-1caaea6cb7.zip/node_modules/typescript/",\
           "packageDependencies": [\
@@ -8641,6 +8767,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./www/",\
           "packageDependencies": [\
             ["www", "workspace:www"],\
+            ["@types/react", "npm:18.0.26"],\
+            ["@types/react-dom", "npm:18.0.10"],\
             ["@webpack-cli/generators", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:3.0.1"],\
             ["css-loader", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:6.7.3"],\
             ["html-webpack-plugin", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:5.5.0"],\

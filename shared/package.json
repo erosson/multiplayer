@@ -2,8 +2,15 @@
   "name": "shared",
   "packageManager": "yarn@3.3.1",
   "main": "src/main.ts",
+  "scripts": {
+    "build": "rm -rf dist && mkdir dist && ../vendor/protoc/protoc/bin/protoc --ts_out dist/ --proto_path src/count src/count/count.proto"
+  },
   "devDependencies": {
+    "@protobuf-ts/plugin": "^2.8.2",
     "prettier": "^2.8.3",
     "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@protobuf-ts/runtime": "^2.8.2"
   }
 }

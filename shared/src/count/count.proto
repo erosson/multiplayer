@@ -1,0 +1,28 @@
+syntax = "proto3";
+package mp.count;
+import "google/protobuf/duration.proto";
+
+message Incr {}
+message Decr {}
+message Tick { google.protobuf.Duration elapsed = 1; }
+message Input {
+  oneof input {
+    Tick tick = 1;
+    Incr incr = 2;
+    Decr decr = 3;
+  }
+}
+message Action {
+  oneof action {
+    Tick tick = 1;
+    Incr incr = 2;
+    Decr decr = 3;
+  }
+}
+
+message State {
+  google.protobuf.Duration elapsed = 1;
+  int32 value = 2;
+}
+
+// service Game { rpc update(stream Input) returns (stream Action); }

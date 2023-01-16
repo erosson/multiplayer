@@ -5,3 +5,4 @@ vscode:
   extensions:
     - arcanis.vscode-zipfs
     - esbenp.prettier-vscode
+    - zxh404.vscode-proto3
