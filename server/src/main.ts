@@ -1,15 +1,10 @@
-import Fastify, {
-  FastifyRequest,
-  FastifyInstance,
-  FastifyReply,
-} from "fastify";
+import Fastify, { FastifyRequest, FastifyInstance } from "fastify";
 import FastifyWebsocket, { SocketStream } from "@fastify/websocket";
-import type { WebSocket } from "ws";
 import FastifyCookie from "@fastify/cookie";
-import { v4 as uuidv4 } from "uuid";
+import * as Session from "./session";
+import * as Hello from "./hello";
+import * as Count from "./count";
 import "shared";
-
-const SESSION_COOKIE_KEY = "session";
 
 const app: FastifyInstance = Fastify({ logger: false });
 app.register(FastifyCookie, {
@@ -38,62 +33,12 @@ app.addHook("preHandler", (req, res, done) => {
 });
 
 app.register(async function (fastify) {
-  fastify.get("/auth/guest", (req: FastifyRequest, res: FastifyReply): void => {
-    const opts = {
-      path: "/",
-      signed: true,
-      httpOnly: true,
-      secure: true,
-    };
-
-    const raw = req.cookies[SESSION_COOKIE_KEY];
-    if (raw) {
-      const session = req.unsignCookie(raw);
-      if (session.valid) {
-        const value = session.renew;
-        if (session.renew && session.value) {
-          res.setCookie(SESSION_COOKIE_KEY, session.value, opts);
-          res.send({ status: "RENEW" });
-          return;
-        } else {
-          res.send({ status: "VALID" });
-          return;
-        }
-      }
-    }
-    res.setCookie(SESSION_COOKIE_KEY, uuidv4(), opts);
-    res.send({ status: "CREATED" });
-    return;
-  });
+  fastify.get("/auth/guest", Session.ensure);
 });
-app.register(async function (fastify) {
-  fastify.get(
-    "/ws",
-    { websocket: true },
-    (connection: SocketStream, req: FastifyRequest): void => {
-      const socket: WebSocket = connection.socket;
-      const session = req.cookies[SESSION_COOKIE_KEY];
-      if (!session) {
-        console.log("sessionless client rejected");
-        connection.end();
-        return;
-      }
-      console.log("client connected", session);
-      socket.on("message", (message: Buffer) => {
-        console.log("client message", message.toString());
-        // message.toString() === 'hi from client'
-        socket.send(`hi from server ${message.toString()}`);
-      });
 
-      const interval = setInterval(
-        () => socket.send(JSON.stringify({ type: "tick", now: Date.now() })),
-        16.5
-      );
-      socket.on("close", () => {
-        clearInterval(interval);
-      });
-    }
-  );
+app.register(async function (fastify) {
+  fastify.get("/hello", { websocket: true }, Hello.handler);
+  fastify.get("/count", { websocket: true }, Count.createHandler());
 });
 
 app.listen({ port: 3000 }, (err) => {

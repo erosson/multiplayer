@@ -3,9 +3,9 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noImplicitAny": true,
-    "module": "es6",
+    "module": "es2020",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es2020",
     "jsx": "react",
     "lib": ["DOM", "ES2015"],
     "allowJs": true

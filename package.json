@@ -8,7 +8,8 @@
     "shared"
   ],
   "scripts": {
-    "start": "concurrently -k \"yarn:start:*\" -c magenta,cyan",
+    "start": "yarn prepare && concurrently -k \"yarn:start:*\" -c magenta,cyan",
+    "prepare": "yarn workspace shared build",
     "start:server": "yarn workspace server start",
     "start:www": "yarn workspace www serve"
   },

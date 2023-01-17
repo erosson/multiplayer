@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.3.1",
   "main": "src/main.ts",
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && ../vendor/protoc/protoc/bin/protoc --ts_out dist/ --proto_path src/count src/count/count.proto"
+    "build": "rm -rf dist && mkdir dist && ../vendor/protoc/protoc/bin/protoc --ts_out dist/ --proto_path src/count src/count/count.proto && echo proto build successful"
   },
   "devDependencies": {
     "@protobuf-ts/plugin": "^2.8.2",
