@@ -17,6 +17,7 @@ export const input = {
     });
   },
 };
+
 export const action = {
   tick(): Proto.Action {
     return Proto.Action.create({
