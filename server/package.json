@@ -2,7 +2,8 @@
   "name": "server",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "start": "nodemon src/main.ts"
+    "start": "nodemon src/main.ts",
+    "build": "echo noop"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

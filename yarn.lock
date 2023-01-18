@@ -5538,14 +5538,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protoc@workspace:vendor/protoc":
-  version: 0.0.0-use.local
-  resolution: "protoc@workspace:vendor/protoc"
-  bin:
-    protoc: ./protoc/bin/protoc
-  languageName: unknown
-  linkType: soft
-
 "proxy-addr@npm:^2.0.7, proxy-addr@npm:~2.0.7":
   version: 2.0.7
   resolution: "proxy-addr@npm:2.0.7"

@@ -33,17 +33,18 @@ app.addHook("preHandler", (req, res, done) => {
 });
 
 app.register(async function (fastify) {
+  fastify.get("/", (req, reply) => {
+    reply.send({ hello: "world" });
+  });
   fastify.get("/auth/guest", Session.ensure);
-});
-
-app.register(async function (fastify) {
   fastify.get("/hello", { websocket: true }, Hello.handler);
   fastify.get("/count", { websocket: true }, Count.createHandler());
 });
 
-app.listen({ port: 3000 }, (err) => {
+app.listen({ port: 3000, host: "0.0.0.0" }, (err, address) => {
   if (err) {
     app.log.error(err);
     process.exit(1);
   }
+  console.log(`listening on ${address}`);
 });

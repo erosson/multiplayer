@@ -24,10 +24,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:shared"\
       },\
       {\
-        "name": "protoc",\
-        "reference": "workspace:vendor/protoc"\
-      },\
-      {\
         "name": "www",\
         "reference": "workspace:www"\
       }\
@@ -36,7 +32,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
     "fallbackExclusionList": [\
       ["multiplayer", ["workspace:."]],\
-      ["protoc", ["workspace:vendor/protoc"]],\
       ["server", ["workspace:server"]],\
       ["shared", ["workspace:shared"]],\
       ["www", ["workspace:www"]]\
@@ -6563,15 +6558,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["retry", "npm:0.12.0"]\
           ],\
           "linkType": "HARD"\
-        }]\
-      ]],\
-      ["protoc", [\
-        ["workspace:vendor/protoc", {\
-          "packageLocation": "./vendor/protoc/",\
-          "packageDependencies": [\
-            ["protoc", "workspace:vendor/protoc"]\
-          ],\
-          "linkType": "SOFT"\
         }]\
       ]],\
       ["proxy-addr", [\
