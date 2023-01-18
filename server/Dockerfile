@@ -50,5 +50,4 @@ COPY --from=server_build /app/server /app/server
 COPY --from=shared_build /app/shared /app/shared
 
 EXPOSE 3000
-ENTRYPOINT ["sh"]
 CMD ["/usr/local/bin/yarn","workspace","server","start"]
