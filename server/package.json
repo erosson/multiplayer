@@ -5,7 +5,8 @@
     "start": "nodemon src/main.ts",
     "build": "echo noop",
     "docker": "docker build -t erosson/multiplayer -f Dockerfile ..",
-    "docker:run": "docker run -p 3000:3000 -it erosson/multiplayer"
+    "docker:run": "docker run -p 3000:3000 -it erosson/multiplayer",
+    "docker:ghcr": "docker run -p 3000:3000 ghcr.io/erosson/multiplayer:main"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
