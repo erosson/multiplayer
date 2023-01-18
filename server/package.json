@@ -3,7 +3,9 @@
   "packageManager": "yarn@3.3.1",
   "scripts": {
     "start": "nodemon src/main.ts",
-    "build": "echo noop"
+    "build": "echo noop",
+    "docker": "docker build -t erosson/multiplayer -f Dockerfile ..",
+    "docker:run": "docker run -p 3000:3000 -it erosson/multiplayer"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
