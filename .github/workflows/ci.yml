@@ -51,7 +51,7 @@ jobs:
           target: server
           push: true
           #tags: ${{ steps.meta.outputs.tags }}
-          tags: erosson/multiplayer:server
+          tags: ghcr.io/erosson/multiplayer/server:main
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push Docker image - www
@@ -60,5 +60,5 @@ jobs:
           context: .
           target: www
           push: true
-          tags: erosson/multiplayer:www
+          tags: ghcr.io/erosson/multiplayer/www:main
           labels: ${{ steps.meta.outputs.labels }}
