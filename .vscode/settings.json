@@ -9,5 +9,6 @@
   "editor.formatOnSave": true,
   "vs-kubernetes": {
     "vs-kubernetes.kubectl-path.linux": "vendor/bin/kubectl"
-  }
+  },
+  "vsdocker.imageUser": "ghcr.io/erosson"
 }
