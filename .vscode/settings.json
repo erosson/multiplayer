@@ -8,6 +8,6 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.formatOnSave": true,
   "vs-kubernetes": {
-    "vs-kubernetes.kubectl-path": "vendor/bin/kubectl"
+    "vs-kubernetes.kubectl-path.linux": "vendor/bin/kubectl"
   }
 }
