@@ -3,8 +3,7 @@ tasks:
   # to update KUBE_CONFIG: `gp env KUBE_CONFIG=$(base64 -w 0 new-config-file.yaml)`
   # https://gitpod.io/variables
   # https://github.com/erosson/multiplayer/settings/secrets/actions
-  - command: mkdir $HOME/.kube && echo $KUBE_CONFIG | base64 -di > $HOME/.kube/config || true
-
+  - command: mkdir -p $HOME/.kube && echo $KUBE_CONFIG | base64 -di > $HOME/.kube/config || true
   - command: yarn start
 
 vscode:
@@ -12,3 +11,4 @@ vscode:
     - arcanis.vscode-zipfs
     - esbenp.prettier-vscode
     - zxh404.vscode-proto3
+    - ms-kubernetes-tools.vscode-kubernetes-tools

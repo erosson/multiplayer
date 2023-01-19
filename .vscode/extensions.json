@@ -2,6 +2,7 @@
   "recommendations": [
     "arcanis.vscode-zipfs",
     "esbenp.prettier-vscode",
-    "zxh404.vscode-proto3"
+    "zxh404.vscode-proto3",
+    "ms-kubernetes-tools.vscode-kubernetes-tools"
   ]
 }
