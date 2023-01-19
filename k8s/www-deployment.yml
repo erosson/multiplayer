@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: www-deployment
+  name: www
   # namespace: hugo-site
 spec:
   # need 3 pods for reliability, but I'm still learning, and also a cheapass
