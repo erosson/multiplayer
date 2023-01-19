@@ -72,5 +72,5 @@ jobs:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
       - run: |
           source ./vendor/bashrc
-          kubectl diff -f k8s
+          kubectl diff -f k8s || true
           kubectl apply -f k8s
