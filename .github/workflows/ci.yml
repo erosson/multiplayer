@@ -51,7 +51,9 @@ jobs:
           target: server
           push: true
           #tags: ${{ steps.meta.outputs.tags }}
-          tags: ghcr.io/erosson/multiplayer/server:main
+          tags: |
+            ghcr.io/erosson/multiplayer/server:latest
+            ghcr.io/erosson/multiplayer/server:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push Docker image - www
@@ -60,7 +62,9 @@ jobs:
           context: .
           target: www
           push: true
-          tags: ghcr.io/erosson/multiplayer/www:main
+          tags: |
+            ghcr.io/erosson/multiplayer/www:latest
+            ghcr.io/erosson/multiplayer/www:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
       
       - run: ./vendor/config-kube.sh

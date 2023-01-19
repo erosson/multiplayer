@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: www
-        image: ghcr.io/erosson/multiplayer/www:main
+        image: ghcr.io/erosson/multiplayer/www:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

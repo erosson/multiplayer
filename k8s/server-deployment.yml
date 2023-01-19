@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: server
-        image: ghcr.io/erosson/multiplayer/server:main
+        image: ghcr.io/erosson/multiplayer/server:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
