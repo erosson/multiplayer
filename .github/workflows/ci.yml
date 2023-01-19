@@ -74,3 +74,5 @@ jobs:
           source ./vendor/bashrc
           kubectl diff -f k8s || true
           kubectl apply -f k8s
+          kubectl rollout restart deployment/server
+          kubectl rollout restart deployment/www
