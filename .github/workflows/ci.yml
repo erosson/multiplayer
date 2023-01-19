@@ -62,3 +62,11 @@ jobs:
           push: true
           tags: ghcr.io/erosson/multiplayer/www:main
           labels: ${{ steps.meta.outputs.labels }}
+      
+      - run: ./vendor/config-kube.sh
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      - run: |
+          source ./vendor/bashrc
+          kubectl diff -f k8s
+          kubectl apply -f k8s

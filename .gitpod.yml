@@ -4,8 +4,9 @@ tasks:
   # https://gitpod.io/variables
   # https://github.com/erosson/multiplayer/settings/secrets/actions
   - before: |
-      mkdir -p $HOME/.kube && echo $KUBE_CONFIG | base64 -di > $HOME/.kube/config || true
-      echo "source $PWD/vendor/path.sh" >> ~/.bashrc
+      ./vendor/config_kube.sh || true
+      source ./vendor/bashrc
+      echo "source $PWD/vendor/bashrc" >> ~/.bashrc
     command: yarn start
 
 vscode:

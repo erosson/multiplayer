@@ -2,22 +2,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: server-deployment
+  name: www-deployment
   # namespace: hugo-site
 spec:
   # need 3 pods for reliability, but I'm still learning, and also a cheapass
   replicas: 1
   selector:
     matchLabels:
-      app: server
+      app: www
   template:
     metadata:
       labels:
-        app: server
+        app: www
     spec:
       containers:
-      - name: server
-        image: ghcr.io/erosson/multiplayer:main
+      - name: www
+        image: ghcr.io/erosson/multiplayer/www:main
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - containerPort: 80
