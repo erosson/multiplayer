@@ -34,7 +34,7 @@ app.addHook("preHandler", (req, res, done) => {
 
 app.register(async function (fastify) {
   fastify.get("/", (req, reply) => {
-    reply.send({ hello: "world" });
+    reply.send({ hello: "world!" });
   });
   fastify.get("/auth/guest", Session.ensure);
   fastify.get("/hello", { websocket: true }, Hello.handler);
