@@ -35,17 +35,21 @@ FROM shared_build as server_build
 COPY server server
 RUN yarn workspace server build
 
-#FROM shared_build as www_build
-#
-#COPY www www
-#RUN yarn workspace www build
+FROM shared_build as www_build
+
+COPY www www
+RUN yarn workspace www build
+
+# after building, `www` is static html
+# https://hub.docker.com/_/nginx
+FROM nginx as www
+COPY --from=www_build /app/www/dist /usr/share/nginx/html
 
 # back to the production alpine container
-FROM dependencies
+FROM dependencies as server
 
 ENV NODE_ENV production
 
-#COPY --from=www_build /app/www/dist /app/www/dist
 COPY --from=server_build /app/server /app/server
 COPY --from=shared_build /app/shared /app/shared
 

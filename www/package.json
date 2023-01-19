@@ -1,6 +1,18 @@
 {
   "name": "www",
   "packageManager": "yarn@3.3.1",
+  "scripts": {
+    "build": "webpack --mode=production --node-env=production",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "serve": "webpack serve",
+    "start": "yarn serve",
+    "docker": "docker buildx build -t erosson/multiplayer/www --target www ..",
+    "docker:buildrun": "yarn docker && yarn docker:run",
+    "docker:run": "docker run -p 8080:80 -it erosson/multiplayer/www",
+    "docker:ghcr": "docker run -p 8080:80 ghcr.io/erosson/multiplayer/www:main"
+  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -21,12 +33,5 @@
     "webpack-dev-server": "^4.11.1"
   },
   "version": "1.0.0",
-  "description": "My webpack project",
-  "scripts": {
-    "build": "webpack --mode=production --node-env=production",
-    "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production",
-    "watch": "webpack --watch",
-    "serve": "webpack serve"
-  }
+  "description": "My webpack project"
 }
