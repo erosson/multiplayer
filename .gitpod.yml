@@ -3,8 +3,10 @@ tasks:
   # to update KUBE_CONFIG: `gp env KUBE_CONFIG=$(base64 -w 0 new-config-file.yaml)`
   # https://gitpod.io/variables
   # https://github.com/erosson/multiplayer/settings/secrets/actions
-  - command: mkdir -p $HOME/.kube && echo $KUBE_CONFIG | base64 -di > $HOME/.kube/config || true
-  - command: yarn start
+  - before: |
+      mkdir -p $HOME/.kube && echo $KUBE_CONFIG | base64 -di > $HOME/.kube/config || true
+      echo "source $PWD/vendor/path.sh" >> ~/.bashrc
+    command: yarn start
 
 vscode:
   extensions:
