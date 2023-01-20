@@ -76,9 +76,11 @@ jobs:
       # kubernetes docs say not to use `:latest` in production, but I just want
       # kubernetes to match what's in git without changing the config files or
       # versioning every time. Maybe I don't fully understand kubernetes yet?
-      - run: |
-          source ./vendor/bashrc
-          kubectl diff -f k8s || true
-          kubectl apply -f k8s
-          kubectl rollout restart deployment/server
-          kubectl rollout restart deployment/www
+      #
+      # moved to github.com/erosson/kubernetes
+      #- run: |
+      #    source ./vendor/bashrc
+      #    kubectl diff -f k8s || true
+      #    kubectl apply -f k8s
+      #    kubectl rollout restart deployment/server
+      #    kubectl rollout restart deployment/www
