@@ -8,7 +8,7 @@
     "watch": "webpack --watch",
     "serve": "webpack serve",
     "start": "yarn serve",
-    "docker": "docker buildx build -t erosson/multiplayer/www --target www ..",
+    "docker": "docker buildx build -t ghcr.io/erosson/multiplayer/www:latest --target server ..",
     "docker:buildrun": "yarn docker && yarn docker:run",
     "docker:run": "docker run -p 8080:80 -it erosson/multiplayer/www",
     "docker:ghcr": "docker run -p 8080:80 ghcr.io/erosson/multiplayer/www:main"
