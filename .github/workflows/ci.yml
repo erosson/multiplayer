@@ -67,6 +67,20 @@ jobs:
             ghcr.io/erosson/multiplayer/www:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
       
+  write-k8s:
+    # this triggers a deploy via argocd
+    runs-on: ubuntu-latest
+    needs: [build-and-push-image]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: https://github.com/erosson/kubernetes.git
+      - run: |
+          ./patch-image.sh packages/erosson/multiplayer/server.yml ghcr.io/erosson/multiplayer/server ${{ github.sha }}
+          ./patch-image.sh packages/erosson/multiplayer/www.yml ghcr.io/erosson/multiplayer/www ${{ github.sha }}
+          ./commit-image.sh erosson/multiplayer ${{ github.sha }}
+
+
       #- run: ./vendor/config-kube.sh
       #  env:
       #    KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
