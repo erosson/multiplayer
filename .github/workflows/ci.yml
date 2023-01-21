@@ -67,9 +67,9 @@ jobs:
             ghcr.io/erosson/multiplayer/www:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
       
-      - run: ./vendor/config-kube.sh
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      #- run: ./vendor/config-kube.sh
+      #  env:
+      #    KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
       # deploy the new, changed docker image - the `:latest` tag. Restarting
       # with `imagePullPolicy: always` seems to work.
       #
