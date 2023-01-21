@@ -1,0 +1,61 @@
+# https://www.linode.com/docs/guides/how-to-deploy-a-static-site-on-linode-kubernetes-engine/#next-steps
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-multiplayer-www
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: test-multiplayer-www
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-multiplayer-www
+  # namespace: hugo-site
+spec:
+  # need 3 pods for reliability, but I'm still learning, and also a cheapass
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-multiplayer-www
+  template:
+    metadata:
+      labels:
+        app: test-multiplayer-www
+    spec:
+      containers:
+      - name: test-multiplayer-www
+        image: ghcr.io/erosson/multiplayer/www:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-multiplayer-www
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/hostname: test-multiplayer.erosson.org
+    # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+spec:
+  tls:
+    - secretName: test-multiplayer-www-tls
+      hosts:
+        - test-multiplayer.erosson.org
+  rules:
+  - host: test-multiplayer.erosson.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: test-multiplayer-www
+            port:
+              number: 80
