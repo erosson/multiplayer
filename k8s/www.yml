@@ -42,7 +42,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     external-dns.alpha.kubernetes.io/hostname: test-multiplayer.erosson.org
     # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt
 spec:
   tls:
     - secretName: test-multiplayer-www-tls
