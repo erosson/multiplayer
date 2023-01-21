@@ -79,6 +79,7 @@ jobs:
           ./patch-image.sh packages/erosson/multiplayer/server.yml ghcr.io/erosson/multiplayer/server ${{ github.sha }}
           ./patch-image.sh packages/erosson/multiplayer/www.yml ghcr.io/erosson/multiplayer/www ${{ github.sha }}
           ./commit-image.sh erosson/multiplayer ${{ github.sha }}
+          git push
 
 
       #- run: ./vendor/config-kube.sh
