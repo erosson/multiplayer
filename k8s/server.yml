@@ -40,16 +40,16 @@ metadata:
   name: test-multiplayer-server
   annotations:
     kubernetes.io/ingress.class: nginx
-    external-dns.alpha.kubernetes.io/hostname: test-multiplayer.erosson.org
+    external-dns.alpha.kubernetes.io/hostname: api.test-multiplayer.erosson.org
     # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   tls:
     - secretName: test-multiplayer-server-tls
       hosts:
-        - test-multiplayer.erosson.org
+        - api.test-multiplayer.erosson.org
   rules:
-  - host: test-multiplayer.erosson.org
+  - host: api.test-multiplayer.erosson.org
     http:
       paths:
       - pathType: Prefix
