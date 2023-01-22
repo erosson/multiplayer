@@ -7,21 +7,20 @@ export interface InputEnv extends Partial<Env> {
   GITPOD_WORKSPACE_CLUSTER_HOST?: string;
 }
 function gen(env: InputEnv): Env {
-  let SERVER_URL: string;
-  let SOCKET_URL: string;
-  if (env.GITPOD_WORKSPACE_ID && env.GITPOD_WORKSPACE_CLUSTER_HOST) {
-    const hostname = `3000-${env.GITPOD_WORKSPACE_ID}.${env.GITPOD_WORKSPACE_CLUSTER_HOST}`;
-    SERVER_URL = env.SERVER_URL ?? `https://${hostname}`;
-    SOCKET_URL = env.SOCKET_URL ?? `wss://${hostname}`;
-  } else {
-    const hostname = "localhost:3000";
-    SERVER_URL = env.SERVER_URL ?? `http://${hostname}`;
-    SOCKET_URL = env.SOCKET_URL ?? `ws://${hostname}`;
+  let { SERVER_URL, SOCKET_URL } = env;
+  if (SERVER_URL == null || SOCKET_URL == null) {
+    if (env.GITPOD_WORKSPACE_ID && env.GITPOD_WORKSPACE_CLUSTER_HOST) {
+      const hostname = `3000-${env.GITPOD_WORKSPACE_ID}.${env.GITPOD_WORKSPACE_CLUSTER_HOST}`;
+      SERVER_URL = SERVER_URL ?? `https://${hostname}`;
+      SOCKET_URL = SOCKET_URL ?? `wss://${hostname}`;
+    } else {
+      const hostname = "localhost:3000";
+      SERVER_URL = SERVER_URL ?? `http://${hostname}`;
+      SOCKET_URL = SOCKET_URL ?? `ws://${hostname}`;
+    }
   }
   return { SERVER_URL, SOCKET_URL };
 }
-
-const _fetchedEnv = fetch("/env/www-env.json");
 
 // There are multiple ways we can load our env:
 // * In production, `/env/www-env.json` is mounted, and we fetch it
@@ -29,9 +28,9 @@ const _fetchedEnv = fetch("/env/www-env.json");
 //   * if config is directly in the env, use it
 //   * if we're in gitpod, generate config from that
 //   * if nothing's defined, try to use localhost/default urls
-async function _env(): Promise<Env> {
+export async function get(): Promise<Env> {
   try {
-    const res = await _fetchedEnv;
+    const res = await fetch("/env/www-env.json");
     if (res.status === 200) {
       const env = await res.json();
       console.log("fetched env from file", env);
@@ -52,8 +51,4 @@ async function _env(): Promise<Env> {
   const env = gen(inputEnv);
   console.log("generated env from input", { inputEnv, env });
   return env;
-}
-const __env = _env();
-export async function get(): Promise<Env> {
-  return __env;
 }
