@@ -45,8 +45,7 @@ export async function get(): Promise<Env> {
     ),
   ]);
   const inputEnv = { ...nonsecret, ...secret };
-  console.log("inputEnv", { inputEnv });
+  console.log("nonsecret inputs", { nonsecret });
   const env = gen(inputEnv);
-  console.log("env", { env });
   return env;
 }
