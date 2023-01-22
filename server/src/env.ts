@@ -35,17 +35,18 @@ function gen(env: InputEnv): Env {
 // * In dev, we also expect process.env to have env info, and generate whatever isn't there
 export async function get(): Promise<Env> {
   const [nonsecret, secret] = await Promise.all([
-    fs.readFile(`${__dirname}'/../env/server-env.json`).then(
+    fs.readFile(`${__dirname}/../env/server-env.json`).then(
       (f) => JSON.parse(f.toString()),
       () => ({})
     ),
-    fs.readFile(`${__dirname}'/../secret/server.secret.json`).then(
+    fs.readFile(`${__dirname}/../secret/server.secret.json`).then(
       (f) => JSON.parse(f.toString()),
       () => ({})
     ),
   ]);
-  const inputEnv = { ...process.env, ...nonsecret, ...secret };
+  const inputEnv = { ...nonsecret, ...secret };
+  console.log("inputEnv", { inputEnv });
   const env = gen(inputEnv);
-  console.log("env", { inputEnv, env });
+  console.log("env", { env });
   return env;
 }
