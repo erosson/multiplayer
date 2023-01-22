@@ -1,9 +1,10 @@
 import React from "react";
+import { Env } from "./env";
 
 type Tick = { type: "tick"; now: number };
 
-export default function Hello(props: { server: string }): JSX.Element {
-  const { state, error } = useSocket(props.server);
+export default function Hello(props: { env: Env }): JSX.Element {
+  const { state, error } = useSocket(props.env);
   const now = useNow();
   const [recent, setRecent] = React.useState<Date[]>([]);
   React.useEffect(() => {
@@ -52,21 +53,21 @@ function useNow() {
   return now;
 }
 
-function useSocket(server: string) {
+function useSocket(env: Env) {
   const [error, setError] = React.useState<null | Error>(null);
   const [auth, setAuth] = React.useState<null | unknown>(null);
   const [state, setState] = React.useState<Tick[]>([]);
   const [ws, setWs] = React.useState<null | WebSocket>(null);
 
   React.useEffect(() => {
-    const url = `${server}/auth/guest`;
+    const url = `${env.SERVER_URL}/auth/guest`;
     // sets httpOnly session cookie
     fetch(url, { credentials: "include" }).then(setAuth, setError);
   }, []);
 
   React.useEffect(() => {
     if (!auth) return;
-    const url = `${server.replace(/^http/, "ws")}/hello`;
+    const url = `${env.SOCKET_URL}/hello`;
     const ws = new WebSocket(url);
     setWs(ws);
     ws.onopen = (ev) => {

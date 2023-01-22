@@ -1,4 +1,4 @@
 declare interface ProcessEnv {
-  env: { SERVER_URL: string };
+  env: { [s: string]: string };
 }
 declare const process: ProcessEnv;

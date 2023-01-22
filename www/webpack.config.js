@@ -3,6 +3,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { DefinePlugin, EnvironmentPlugin } = require("webpack");
+const _ = require("lodash");
 
 const isProduction = process.env.NODE_ENV == "production";
 
@@ -32,17 +33,19 @@ const config = {
     new HtmlWebpackPlugin({
       template: "index.html",
     }),
-    new DefinePlugin({
-      "process.env.SERVER_URL": JSON.stringify(
-        !isProduction && process.env.GITPOD_WORKSPACE_URL
-          ? process.env.GITPOD_WORKSPACE_URL.replace(
-              "https://",
-              "https://3000-"
-            )
-          : // TODO production and non-gitpod values
-            ""
-      ),
-    }),
+    new DefinePlugin(
+      Object.fromEntries(
+        [
+          "SERVER_URL",
+          "SOCKET_URL",
+          "GITPOD_WORKSPACE_ID",
+          "GITPOD_WORKSPACE_CLUSTER_HOST",
+        ].map((k) => [
+          `process.env.${k}`,
+          JSON.stringify(isProduction ? null : process.env[k] ?? null),
+        ])
+      )
+    ),
 
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/

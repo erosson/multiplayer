@@ -1,13 +1,14 @@
 import React from "react";
 import * as Proto from "shared/dist/count";
 import { Duration } from "shared/dist/google/protobuf/duration";
+import { Env } from "./env";
 import * as Game from "shared/src/count/count";
 
 function send(ws: WebSocket, input: Proto.Input): void {
   ws.send(Proto.Input.toJsonString(input));
 }
-export default function Count(props: { server: string }): JSX.Element {
-  const { state, ws, error } = useSocket(props.server);
+export default function Count(props: { env: Env }): JSX.Element {
+  const { state, ws, error } = useSocket(props.env);
   return state && ws ? (
     <div>
       <h1>count</h1>
@@ -25,21 +26,21 @@ export default function Count(props: { server: string }): JSX.Element {
   );
 }
 
-function useSocket(server: string) {
+function useSocket(env: Env) {
   const [error, setError] = React.useState<null | Error>(null);
   const [auth, setAuth] = React.useState<null | unknown>(null);
   const [ws, setWs] = React.useState<null | WebSocket>(null);
   const [state, setState] = React.useState<null | Proto.State>(null);
 
   React.useEffect(() => {
-    const url = `${server}/auth/guest`;
+    const url = `${env.SERVER_URL}/auth/guest`;
     // sets httpOnly session cookie
     fetch(url, { credentials: "include" }).then(setAuth, setError);
   }, []);
 
   React.useEffect(() => {
     if (!auth) return;
-    const url = `${server.replace(/^http/, "ws")}/count`;
+    const url = `${env.SOCKET_URL}/count`;
     const ws = new WebSocket(url);
     setWs(ws);
     ws.onopen = (ev) => {

@@ -2,16 +2,29 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import Hello from "./hello";
 import Count from "./count";
+import * as Env from "./env";
 import "shared";
 
 function App(): JSX.Element {
   // TODO productionify this. it works on gitpod
-  const server = process.env["SERVER_URL"];
-  return (
+  const loader = Env.get();
+  const [env, setEnv] = React.useState<Env.Env | null>(null);
+  const [error, setError] = React.useState<Error | null>(null);
+  React.useEffect(() => {
+    loader.then(setEnv, setError);
+  }, [loader]);
+  React.useEffect(() => {
+    if (error) console.log(error);
+  }, [error]);
+  return env ? (
     <div>
-      <Hello server={server} />
-      <Count server={server} />
+      <Hello env={env} />
+      <Count env={env} />
     </div>
+  ) : error ? (
+    <pre>{error.message}</pre>
+  ) : (
+    <div>loading...</div>
   );
 }
 
