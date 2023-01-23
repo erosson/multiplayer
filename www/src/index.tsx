@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import Hello from "./hello";
 import Count from "./count";
+import Platform from "./platform";
 import * as Env from "./env";
 import "shared";
 
@@ -22,6 +23,7 @@ function App(): JSX.Element {
     <div>
       <Hello env={env} />
       <Count env={env} />
+      <Platform env={env} />
     </div>
   ) : error ? (
     <pre>{error.message}</pre>

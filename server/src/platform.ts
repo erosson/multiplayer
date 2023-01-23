@@ -3,8 +3,8 @@ import { SocketStream } from "@fastify/websocket";
 import * as Session from "./session";
 import type { WebSocket } from "ws";
 import { Duration } from "shared/dist/google/protobuf/duration";
-import * as Proto from "shared/dist/count";
-import * as Game from "shared/src/count";
+import * as Proto from "shared/dist/platform";
+import * as Game from "shared/src/platform";
 import { Timestamp } from "shared/dist/google/protobuf/timestamp";
 
 export function createHandler() {
@@ -12,7 +12,13 @@ export function createHandler() {
 
   function create(): Proto.State {
     return Proto.State.create({
-      value: 0,
+      control: Proto.ControlState.create({
+        left: false,
+        right: false,
+        up: false,
+        down: false,
+      }),
+      location: Proto.Point.create({ x: 0, y: 0 }),
       elapsed: Duration.create({ seconds: 0n, nanos: 0 }),
       started: Timestamp.fromDate(new Date()),
     });

@@ -2,7 +2,7 @@ import React from "react";
 import * as Proto from "shared/dist/count";
 import { Duration } from "shared/dist/google/protobuf/duration";
 import { Env } from "./env";
-import * as Game from "shared/src/count/count";
+import * as Game from "shared/src/count";
 
 function send(ws: WebSocket, input: Proto.Input): void {
   ws.send(Proto.Input.toJsonString(input));

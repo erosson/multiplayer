@@ -1,0 +1,44 @@
+syntax = "proto3";
+package mp.platform;
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message State {
+  google.protobuf.Duration elapsed = 1;
+  google.protobuf.Timestamp started = 2;
+  ControlState control = 3;
+  Point location = 4;
+}
+
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message ControlState {
+  bool left = 1;
+  bool right = 2;
+  bool down = 3;
+  bool up = 4;
+}
+
+message Control { ControlState control = 1; }
+message Tick { google.protobuf.Duration elapsed = 1; }
+message Reset { State state = 1; }
+
+message Input {
+  oneof input {
+    Tick tick = 2;
+    Control control = 3;
+  }
+}
+
+message Action {
+  oneof action {
+    Reset reset = 1;
+    Tick tick = 2;
+    Control control = 3;
+  }
+}
+
+// service Game { rpc update(stream Input) returns (stream Action); }

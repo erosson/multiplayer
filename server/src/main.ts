@@ -1,10 +1,10 @@
-import Fastify, { FastifyRequest, FastifyInstance } from "fastify";
-import FastifyWebsocket, { SocketStream } from "@fastify/websocket";
+import Fastify, { FastifyInstance } from "fastify";
+import FastifyWebsocket from "@fastify/websocket";
 import FastifyCookie from "@fastify/cookie";
 import * as Session from "./session";
 import * as Hello from "./hello";
 import * as Count from "./count";
-import "shared";
+import * as Platform from "./platform";
 import * as Env from "./env";
 
 async function main() {
@@ -35,6 +35,7 @@ async function main() {
     });
     fastify.get("/auth/guest", Session.ensure);
     fastify.get("/hello", { websocket: true }, Hello.handler);
+    fastify.get("/platform", { websocket: true }, Platform.createHandler());
     fastify.get("/count", { websocket: true }, Count.createHandler());
   });
 
