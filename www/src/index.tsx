@@ -3,11 +3,11 @@ import ReactDOM from "react-dom/client";
 import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
+import Swarm from "./swarm";
 import * as Env from "./env";
 import "shared";
 
 function App(): JSX.Element {
-  // TODO productionify this. it works on gitpod
   const [env, setEnv] = React.useState<Env.Env | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
   React.useEffect(() => {
@@ -21,9 +21,10 @@ function App(): JSX.Element {
   }, []);
   return env ? (
     <div>
-      <Hello env={env} />
-      <Count env={env} />
+      <Swarm env={env} />
       <Platform env={env} />
+      <Count env={env} />
+      <Hello env={env} />
     </div>
   ) : error ? (
     <pre>{error.message}</pre>

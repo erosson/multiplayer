@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "target": "es2020",
     "jsx": "react",
-    "lib": ["DOM", "ES2015"],
+    "lib": ["DOM", "ES2019"],
     "allowJs": true
   },
   "files": ["src/index.tsx", "src/global.d.ts"]
