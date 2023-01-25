@@ -66,3 +66,27 @@ export interface Require {
   unit: UnitID | UpgradeID;
   value: number;
 }
+
+/**
+ * All persistent player data
+ */
+export const Session = IO.type(
+  {
+    started: IOT.DateFromISOString,
+    reified: IOT.DateFromISOString,
+    updated: IOT.DateFromISOString,
+    units: IO.record(UnitID.codec, IO.number),
+  },
+  "Session"
+);
+export type Session = IO.TypeOf<typeof Session>;
+
+export function createSession(now?: Date): Session {
+  now = now ?? new Date();
+  return {
+    started: now,
+    reified: now,
+    updated: now,
+    units: {},
+  };
+}
