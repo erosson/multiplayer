@@ -1,4 +1,3 @@
-import { expect, test } from "@jest/globals";
 import * as P from "./polynomial";
 
 type Case = { p: P.Polynomial; t: number; o: number };

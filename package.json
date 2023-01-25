@@ -17,6 +17,7 @@
     "test:ci": "yarn build && yarn test"
   },
   "devDependencies": {
+    "@types/jest": "^29.4.0",
     "@yarnpkg/sdks": "^3.0.0-rc.35",
     "concurrently": "^7.6.0",
     "fastify": "^4.11.0",

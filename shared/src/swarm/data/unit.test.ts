@@ -1,4 +1,3 @@
-import { expect, test } from "@jest/globals";
 import * as U from "./unit";
 
 test("all unit ids are defined", () => {
