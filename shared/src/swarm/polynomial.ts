@@ -1,4 +1,4 @@
-import { sum } from "./util";
+import { sum } from "./util/math";
 
 /**
  * p[0] + (p[1] * t) + (p[2] * t^2) + (p[3] * t^3) + ...

@@ -1,4 +1,4 @@
-// import { expect, test } from "@jest/globals";
+import { expect, test } from "@jest/globals";
 import * as P from "./production";
 import { Polynomial } from "./polynomial";
 
