@@ -1,26 +1,18 @@
-import { keyBy } from "../util/schema";
-import * as S from "../schema-id";
+import { ID as ID_ } from "../schema";
 
-/**
- * All unit ids as strings
- */
-export const units = [
-  "larva",
-  "hatchery",
-  "mineral",
-  "drone",
-  "queen",
-] as const;
+export enum Unit {
+  larva = "larva",
+  hatchery = "hatchery",
+  mineral = "mineral",
+  drone = "drone",
+  queen = "queen",
+}
+export enum Upgrade {
+  todo = "",
+}
+export enum Achievement {
+  todo = "",
+}
 
-/**
- * All unit ids as string literals
- */
-export type Unit = (typeof units)[number];
-
-/**
- * All wrapped unit ids, indexed by string literal
- */
-export const Unit = keyBy(
-  units.map(S.UnitID.iso.wrap),
-  (id) => S.UnitID.iso.unwrap(id) as Unit
-);
+export type ID = ID_<typeof Unit, typeof Upgrade, typeof Achievement>;
+export const ID: ID = { Unit, Upgrade, Achievement };

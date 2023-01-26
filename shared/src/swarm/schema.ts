@@ -1,101 +1,56 @@
-import * as ID from "./schema-id";
-
 // IDs need codecs, but non-IDs don't. We're hardcoding game data, not decoding
 // from a spreadsheet or file. No real value in a spreadsheet, and simpler types
-export interface Unit {
-  id: ID.UnitID;
+export interface ID<UnitID, UpgradeID, AchievementID> {
+  Unit: UnitID;
+  Upgrade: UpgradeID;
+  Achievement: AchievementID;
+}
+export interface AnyID extends ID<any, any, any> {}
+export type UnitID<C extends AnyID> = C["Unit"][keyof C["Unit"]];
+export type UpgradeID<C extends AnyID> = C["Upgrade"][keyof C["Upgrade"]];
+export type AchievementID<C extends AnyID> =
+  C["Achievement"][keyof C["Achievement"]];
+
+export interface Unit<ID extends AnyID> {
+  id: UnitID<ID>;
   init?: number;
-  cost?: Cost[];
-  prod?: Prod[];
-  require?: Require[];
+  cost?: Cost<ID>[];
+  prod?: Prod<ID>[];
+  require?: Require<ID>[];
 }
 
-export interface Upgrade {
-  id: ID.UpgradeID;
-  cost?: Cost[];
-  require?: Require[];
+export interface Upgrade<ID extends AnyID> {
+  id: UpgradeID<ID>;
+  cost?: Cost<ID>[];
+  require?: Require<ID>[];
 }
 
-export interface Achievement {
-  id: ID.AchievementID;
-  visible: Require[];
+export interface Achievement<ID extends AnyID> {
+  id: AchievementID<ID>;
+  visible: Require<ID>[];
 }
 
-export interface Cost {
-  unit: ID.UnitID;
+export interface Cost<ID extends AnyID> {
+  unit: UnitID<ID>;
   value: number;
   factor?: number;
 }
 
-export interface Prod {
-  unit: ID.UnitID;
+export interface Prod<ID extends AnyID> {
+  unit: UnitID<ID>;
   value: number;
 }
 
-interface UnitIDType {
+interface UnitIDType<ID extends AnyID> {
   type: "unit";
-  unit: ID.UnitID;
+  unit: UnitID<ID>;
 }
-interface UpgradeIDType {
+interface UpgradeIDType<ID extends AnyID> {
   type: "upgrade";
-  upgrade: ID.UpgradeID;
+  upgrade: UpgradeID<ID>;
 }
 
-export interface Require {
-  id: UnitIDType | UpgradeIDType;
+export interface Require<ID extends AnyID> {
+  id: UnitIDType<ID> | UpgradeIDType<ID>;
   value: number;
 }
-
-/* old type codecs. probably delete these soon
-export const Cost = IO.intersection([
-  IO.type({
-    unit: UnitID.codec,
-    value: IO.number,
-  }),
-  IO.partial({
-    factor: IO.number,
-  }),
-]);
-export type Cost = IO.TypeOf<typeof Cost>;
-
-export const Prod = IO.type({
-  unit: UnitID.codec,
-  value: IO.number,
-});
-export type Prod = IO.TypeOf<typeof Prod>;
-
-export const Require = IO.type({
-  id: IO.union([UnitID.codec, UpgradeID.codec]),
-  value: IO.number,
-});
-export type Require = IO.TypeOf<typeof Require>;
-
-export const Unit = IO.intersection([
-  IO.type({
-    id: UnitID.codec,
-  }),
-  IO.partial({
-    cost: IO.array(Cost),
-    prod: IO.array(Prod),
-    require: IO.array(Require),
-  }),
-]);
-export type Unit = IO.TypeOf<typeof Unit>;
-
-export const Upgrade = IO.intersection([
-  IO.type({
-    id: UpgradeID.codec,
-  }),
-  IO.partial({
-    cost: IO.array(Cost),
-    require: IO.array(Require),
-  }),
-]);
-export type Upgrade = IO.TypeOf<typeof Upgrade>;
-
-export const Achievement = IO.type({
-  id: AchievementID.codec,
-  visible: IO.array(Require),
-});
-export type Achievement = IO.TypeOf<typeof Achievement>;
-*/

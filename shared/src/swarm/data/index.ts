@@ -1,35 +1,60 @@
 import { keyBy, tagBy } from "../util/schema";
-import * as ID from "./id";
-import * as SI from "../schema-id";
 import * as G from "./graph";
-import units from "./unit";
+import * as S from "../schema";
+import { ID } from "./id";
+import unitData from "./unit";
 
-// within this file, I trust that our data-ids match their types
-function unwrap(id: SI.UnitID): ID.Unit;
-function unwrap(id: any) {
-  return id;
+export interface Data<I extends S.AnyID> {
+  id: I;
+  unit: UnitData<I>;
 }
 
-export const Unit = {
-  list: units,
-  byId: keyBy(units, (unit) => unwrap(unit.id)),
-  byProducers: tagBy(
-    ID.units,
-    units,
-    (u) => u.prod?.map((c) => unwrap(c.unit)) ?? []
-  ),
-  producerPaths: G.producer().childPaths,
-  byCost: tagBy(
-    ID.units,
-    units,
-    (u) => u.cost?.map((c) => unwrap(c.unit)) ?? []
-  ),
-  byRequire: tagBy(
-    ID.units,
-    units,
-    (u) =>
-      u.require?.flatMap((r) =>
-        r.id.type === "unit" ? [unwrap(r.id.unit)] : []
-      ) ?? []
-  ),
-};
+export interface UnitData<I extends S.AnyID> {
+  list: readonly S.Unit<I>[];
+  byId: Record<S.UnitID<I>, S.Unit<I>>;
+  byProducers: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
+  producerPaths: Record<S.UnitID<I>, readonly G.ProducerPath<I>[]>;
+  byCost: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
+  byRequire: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
+}
+
+export interface AnyID extends Data<S.AnyID> {}
+export type UnitID<C extends AnyID> = S.UnitID<C["id"]>;
+export type UpgradeID<C extends AnyID> = S.UpgradeID<C["id"]>;
+export type AchievementID<C extends AnyID> = S.AchievementID<C["id"]>;
+
+export function baseCreate<I extends S.AnyID>(
+  id: I,
+  units: readonly S.Unit<I>[]
+): Data<I> {
+  return {
+    id,
+    unit: {
+      list: units,
+      byId: keyBy(units, (unit) => unit.id),
+      byProducers: tagBy(
+        Object.values(id.Unit),
+        units,
+        (u) => u.prod?.map((c) => c.unit) ?? []
+      ),
+      producerPaths: G.baseProducer<I>(units).childPaths,
+      byCost: tagBy(
+        Object.values(id.Unit),
+        units,
+        (u) => u.cost?.map((c) => c.unit) ?? []
+      ),
+      byRequire: tagBy(
+        Object.values(id.Unit),
+        units,
+        (u) =>
+          u.require?.flatMap((r) =>
+            r.id.type === "unit" ? [r.id.unit] : []
+          ) ?? []
+      ),
+    },
+  };
+}
+
+export function create(): Data<ID> {
+  return baseCreate(ID, unitData);
+}

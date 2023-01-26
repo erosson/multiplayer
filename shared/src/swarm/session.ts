@@ -1,28 +1,26 @@
 import * as IO from "io-ts";
 import { Newtype } from "newtype-ts";
-import * as SID from "./schema-id";
-import * as DID from "./data/id";
 import * as S from "./schema";
 import { isoCodec } from "./util/schema";
 import * as Data from "./data";
-import { ProducerPath } from "./data/graph";
 import * as Prod from "./production";
 import * as Poly from "./polynomial";
 import { product } from "./util/math";
 
-export interface Session {
+export interface Session<I extends S.AnyID> {
+  data: Data.Data<I>;
   started: Date;
   reified: ElapsedMs;
   updated: ElapsedMs;
-  unit: { [K in DID.Unit]: Unit };
+  unit: { [K in S.UnitID<I>]: Unit<I> };
 }
 
 export interface ElapsedMs
   extends Newtype<{ readonly ElapsedMs: unique symbol }, number> {}
 export const ElapsedMs = isoCodec<ElapsedMs>(IO.string);
 
-export interface Unit {
-  id: SID.UnitID;
+export interface Unit<I extends S.AnyID> {
+  id: S.UnitID<I>;
   count: number;
 }
 
@@ -40,34 +38,42 @@ export interface Unit {
 // );
 // export type Session = IO.TypeOf<typeof Session>;
 
-export function create(now?: Date): Session {
+export function create<I extends S.AnyID>(
+  data: Data.Data<I>,
+  now?: Date
+): Session<I> {
   now = now ?? new Date();
   return {
+    data,
     started: now,
     reified: ElapsedMs.iso.wrap(0),
     updated: ElapsedMs.iso.wrap(0),
     // TODO we should omit units that aren't yet in play, right?
-    unit: Object.fromEntries(Data.Unit.list.map((u) => [u.id, createUnit(u)])),
+    unit: Object.fromEntries(
+      Object.values<S.UnitID<I>>(data.id.Unit).map((id) => [id, createUnit(id)])
+    ),
   };
 }
 
-function createUnit(unit: S.Unit): Unit {
+function createUnit<I extends S.AnyID>(unit: S.Unit<I>): Unit<I> {
   return {
     id: unit.id,
     count: unit.init ?? 0,
   };
 }
 
-export function unitCount0(session: Session, id: SID.UnitID): number {
-  const id_ = SID.UnitID.iso.unwrap(id);
-  return session.unit[id_].count;
+export function unitCount0<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>
+): number {
+  return session.unit[id].count;
 }
-export function unitProduction(
-  session: Session,
-  id: SID.UnitID
+
+export function unitProduction<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>
 ): Prod.Production {
-  const id_ = SID.UnitID.iso.unwrap(id);
-  const ppaths: ProducerPath[] = Data.Unit.producerPaths[id_];
+  const ppaths = session.data.unit.producerPaths[id];
   return ppaths.map((ppath) => {
     const count = unitCount0(session, ppath.producer.id);
     const production = product(ppath.path.map((path) => path.prod.value));
@@ -75,9 +81,9 @@ export function unitProduction(
   });
 }
 
-export function unitPolynomial(
-  session: Session,
-  id: SID.UnitID
+export function unitPolynomial<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>
 ): Poly.Polynomial {
   return Prod.toPolynomial(
     unitCount0(session, id),
@@ -100,7 +106,10 @@ export function subElapsed(a: ElapsedMs, b: ElapsedMs): ElapsedMs {
   return ElapsedMs.iso.wrap(ElapsedMs.iso.unwrap(a) - ElapsedMs.iso.unwrap(b));
 }
 
-export function reifiedElapsed(session: Session, now: Date): ElapsedMs {
+export function reifiedElapsed<I extends S.AnyID>(
+  session: Session<I>,
+  now: Date
+): ElapsedMs {
   const total = toElapsed({ before: session.started, after: now });
   return subElapsed(total, session.reified);
 }
@@ -108,12 +117,16 @@ export function elapsedSeconds(a: ElapsedMs): number {
   return ElapsedMs.iso.unwrap(a) / 1000;
 }
 
-export function unitCount(session: Session, id: SID.UnitID, now: Date): number {
+export function unitCount<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>,
+  now: Date
+): number {
   return unitCountElapsed(session, id, reifiedElapsed(session, now));
 }
-export function unitCountElapsed(
-  session: Session,
-  id: SID.UnitID,
+export function unitCountElapsed<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>,
   t: ElapsedMs
 ): number {
   return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t));
@@ -123,25 +136,20 @@ export function elapsedMs(ms: number): ElapsedMs {
   return ElapsedMs.iso.wrap(ms);
 }
 
-export function reify(session: Session, now: Date): Session {
+export function reify<I extends S.AnyID>(
+  session: Session<I>,
+  now: Date
+): Session<I> {
   const reified = toElapsed({ before: session.started, after: now });
   const dt = subElapsed(reified, session.reified);
   return {
     ...session,
     reified,
     unit: Object.fromEntries(
-      Object.values(session.unit).map((u) => [
+      Object.values<Unit<I>>(session.unit).map((u) => [
         u.id,
         { ...u, count: unitCountElapsed(session, u.id, dt) },
       ])
     ),
   };
 }
-
-// export function unitProductions(
-// session: Session
-// ): Record<DID.Unit, Production> {
-// return Object.fromEntries(
-// Object.values(DID.Unit).map((id) => [id, unitProduction(session, id)])
-// ) as Record<DID.Unit, Production>;
-// }
