@@ -7,18 +7,18 @@ import { product } from "../util/math";
 import { singleSource, edgePathFromNodePath } from "graphology-shortest-path";
 import { Production, ProductionUnit } from "../production";
 
-interface ProducerGraph {
+export interface ProducerGraph {
   all: AbstractGraph<Unit, Edge>;
   childPaths: Record<ID.Unit, ProducerPath[]>;
 }
 
-interface Edge {
+export interface Edge {
   producer: Unit;
   child: Unit;
   prod: Prod;
 }
 
-interface ProducerPath {
+export interface ProducerPath {
   producer: Unit;
   child: Unit;
   path: Edge[];
@@ -58,18 +58,4 @@ export function producer(): ProducerGraph {
     })
   ) as Record<ID.Unit, ProducerPath[]>;
   return { all, childPaths };
-}
-
-export function toProduction(g: ProducerGraph, id: ID.Unit): Production {
-  return g.childPaths[id].map((ppath) => toProductionUnit(ppath));
-}
-function toProductionUnit(ppath: ProducerPath): ProductionUnit {
-  const production = product(ppath.path.map((path) => path.prod.value));
-  const count = 0; // TODO needs more context!
-  return { production, count };
-}
-export function toProductions(g: ProducerGraph): Record<ID.Unit, Production> {
-  return Object.fromEntries(
-    ID.units.map((id) => [id, toProduction(g, id)])
-  ) as Record<ID.Unit, Production>;
 }
