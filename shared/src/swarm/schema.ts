@@ -1,92 +1,101 @@
-import * as IO from "io-ts";
-import * as IOT from "io-ts-types";
-import { Iso } from "monocle-ts";
-import { Newtype, iso, CarrierOf } from "newtype-ts";
-
-interface IsoCodec<A extends Newtype<any, any>> {
-  iso: Iso<A, CarrierOf<A>>;
-  codec: IO.Type<A, CarrierOf<A>, IO.OutputOf<CarrierOf<A>>>;
-}
-function isoCodec<A extends Newtype<any, any>>(
-  wrappedCodec: IO.Type<any, any, any>
-): IsoCodec<A> {
-  return {
-    iso: iso<A>(),
-    codec: IOT.fromNewtype<A>(wrappedCodec),
-  };
-}
-
-// ID types are distinct from each other despite being strings underneath,
-// so they get newtypes and TS enforces the difference.
-// They're serialized in player saved data, so they get codecs too.
-export interface UnitID
-  extends Newtype<{ readonly UnitID: unique symbol }, string> {}
-export const UnitID = isoCodec<UnitID>(IO.string);
-
-export interface UpgradeID
-  extends Newtype<{ readonly UpgradeID: unique symbol }, string> {}
-export const UpgradeID = isoCodec<UpgradeID>(IO.string);
-
-export interface AchievementID
-  extends Newtype<{ readonly AchievementID: unique symbol }, string> {}
-export const AchievementID = isoCodec<AchievementID>(IO.string);
+import * as ID from "./schema-id";
 
 // IDs need codecs, but non-IDs don't. We're hardcoding game data, not decoding
 // from a spreadsheet or file. No real value in a spreadsheet, and simpler types
 export interface Unit {
-  id: UnitID;
+  id: ID.UnitID;
+  init?: number;
   cost?: Cost[];
   prod?: Prod[];
   require?: Require[];
 }
 
 export interface Upgrade {
-  id: UpgradeID;
+  id: ID.UpgradeID;
   cost?: Cost[];
   require?: Require[];
 }
 
 export interface Achievement {
-  id: AchievementID;
+  id: ID.AchievementID;
   visible: Require[];
 }
 
 export interface Cost {
-  unit: UnitID;
+  unit: ID.UnitID;
   value: number;
   factor?: number;
 }
 
 export interface Prod {
-  unit: UnitID;
+  unit: ID.UnitID;
   value: number;
+}
+
+interface UnitIDType {
+  type: "unit";
+  unit: ID.UnitID;
+}
+interface UpgradeIDType {
+  type: "upgrade";
+  upgrade: ID.UpgradeID;
 }
 
 export interface Require {
-  unit: UnitID | UpgradeID;
+  id: UnitIDType | UpgradeIDType;
   value: number;
 }
 
-/**
- * All persistent player data
- */
-export const Session = IO.type(
-  {
-    started: IOT.DateFromISOString,
-    reified: IOT.DateFromISOString,
-    updated: IOT.DateFromISOString,
-    units: IO.record(UnitID.codec, IO.number),
-  },
-  "Session"
-);
-export type Session = IO.TypeOf<typeof Session>;
+/* old type codecs. probably delete these soon
+export const Cost = IO.intersection([
+  IO.type({
+    unit: UnitID.codec,
+    value: IO.number,
+  }),
+  IO.partial({
+    factor: IO.number,
+  }),
+]);
+export type Cost = IO.TypeOf<typeof Cost>;
 
-export function createSession(now?: Date): Session {
-  now = now ?? new Date();
-  return {
-    started: now,
-    reified: now,
-    updated: now,
-    units: {},
-  };
-}
+export const Prod = IO.type({
+  unit: UnitID.codec,
+  value: IO.number,
+});
+export type Prod = IO.TypeOf<typeof Prod>;
+
+export const Require = IO.type({
+  id: IO.union([UnitID.codec, UpgradeID.codec]),
+  value: IO.number,
+});
+export type Require = IO.TypeOf<typeof Require>;
+
+export const Unit = IO.intersection([
+  IO.type({
+    id: UnitID.codec,
+  }),
+  IO.partial({
+    cost: IO.array(Cost),
+    prod: IO.array(Prod),
+    require: IO.array(Require),
+  }),
+]);
+export type Unit = IO.TypeOf<typeof Unit>;
+
+export const Upgrade = IO.intersection([
+  IO.type({
+    id: UpgradeID.codec,
+  }),
+  IO.partial({
+    cost: IO.array(Cost),
+    require: IO.array(Require),
+  }),
+]);
+export type Upgrade = IO.TypeOf<typeof Upgrade>;
+
+export const Achievement = IO.type({
+  id: AchievementID.codec,
+  visible: IO.array(Require),
+});
+export type Achievement = IO.TypeOf<typeof Achievement>;
+*/

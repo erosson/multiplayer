@@ -12,7 +12,7 @@
     "prepare": "yarn workspace shared build",
     "start:server": "yarn workspace server start",
     "start:www": "yarn workspace www serve",
-    "test": "yarn workspaces foreach run test",
+    "test": "jest",
     "build": "yarn workspaces foreach run build",
     "test:ci": "yarn build && yarn test"
   },
@@ -20,8 +20,11 @@
     "@types/jest": "^29.4.0",
     "@yarnpkg/sdks": "^3.0.0-rc.35",
     "concurrently": "^7.6.0",
+    "fast-check": "^3.6.2",
     "fastify": "^4.11.0",
+    "jest": "^29.4.0",
     "prettier": "^2.8.3",
+    "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
   }
 }
