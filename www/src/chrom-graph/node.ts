@@ -31,6 +31,9 @@ export function rotate(c: Coords, a: Angle): Coords {
 export function translate(a: Coords, b: Coords): Coords {
   return sumCoords([a, b]);
 }
+export function recenter(a: Coords, b: Coords): Coords {
+  return translate(a, negate(b));
+}
 export function scale(c: Coords, s: number): Coords {
   return { coords: "scale", c, s };
 }
@@ -40,22 +43,32 @@ export function rotateAbout(c: Coords, a: Angle, o: Coords): Coords {
 export function negate(c: Coords): Coords {
   return scale(c, -1);
 }
+export function mapCoords(ns: Node[], fn: (c: Coords) => Coords): Node[] {
+  return ns.map((n) => ({ ...n, coords: fn(n.coords) }));
+}
 
-export type Angle = Radians | PiRadians | Degrees;
+export type Angle = Radians | PiRadians | Degrees | ScaleAngle;
 /**
  * Radians times pi, so we can delay irrational number math
  */
 export type PiRadians = { angle: "pi-radians"; value: number };
 export type Radians = { angle: "radians"; value: number };
 export type Degrees = { angle: "degrees"; value: number };
-export function piRadians(value: number): PiRadians {
+export type ScaleAngle = { angle: "scale"; a: Angle; value: number };
+export function piRadians(value: number): Angle {
   return { angle: "pi-radians", value };
 }
-export function radians(value: number): Radians {
+export function radians(value: number): Angle {
   return { angle: "radians", value };
 }
-export function degrees(value: number): Degrees {
+export function degrees(value: number): Angle {
   return { angle: "degrees", value };
+}
+export function scaleAngle(a: Angle, value: number): Angle {
+  return { angle: "scale", a, value };
+}
+export function negateAngle(a: Angle): Angle {
+  return scaleAngle(a, -1);
 }
 
 export function toRadians(a: Angle): number {
@@ -66,6 +79,8 @@ export function toRadians(a: Angle): number {
       return a.value * Math.PI;
     case "degrees":
       return (a.value / 360) * 2 * Math.PI;
+    case "scale":
+      return toRadians(a.a) * a.value;
   }
 }
 export function toXY(c: Coords): { x: number; y: number } {

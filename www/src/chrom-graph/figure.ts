@@ -10,8 +10,17 @@ import {
   radians,
   rotateAbout,
   negate,
+  piRadians,
+  toRadians,
+  toXY,
+  mapCoords,
+  negateAngle,
+  Angle,
+  recenter,
 } from "./node";
 import { range, sum } from "shared/src/swarm/util/math";
+import { distance } from "./collide";
+import { flow, pipe } from "fp-ts/lib/function";
 
 export interface Figure {
   nodes: Node[];
@@ -89,4 +98,74 @@ export function figure5(name: string): Node[] {
     // inspecting manually, this gets us close to y-axis symmetry
     coords: rotate(n.coords, degrees(97)),
   }));
+}
+
+export function rhombus60(name: string): Node[] {
+  const o = {
+    id: `${name}-0`,
+    label: "O",
+    coords: xy(0, 0),
+  };
+  const a = {
+    id: `${name}-1`,
+    coords: polar(1, degrees(0)),
+  };
+  const b = {
+    id: `${name}-2`,
+    coords: polar(1, degrees(60)),
+  };
+  const c = {
+    id: `${name}-3`,
+    label: "C",
+    coords: translate(a.coords, b.coords),
+  };
+  return [o, a, b, c];
+}
+
+function moserSpindleAngle(): Angle {
+  // In a Moser spindle, the distance between r1c and r2c must be 1.
+  // What angle `a` do we rotate r2 to construct that? High school geometry will tell.
+  //
+  // given: r1c = (0, 0); r2c = (1, 0); r1o === r2o; o.x = 0.5
+  // find angle a
+  const r0 = rhombus60("");
+  // hypotenuse: distance between o and c
+  const hyp = distance(toXY(r0[0].coords), toXY(r0[3].coords));
+  return radians(Math.asin(0.5 / hyp));
+}
+/**
+ * Moser spindle
+ */
+export function figure7a(name: string): Node[] {
+  const r0 = rhombus60("");
+  const a = moserSpindleAngle();
+  const r1 = mapCoords(
+    rhombus60(`${name}-0`),
+    flow(
+      (c) => recenter(c, r0[3].coords),
+      (c) => rotate(c, degrees(180)),
+      (c) => rotate(c, degrees(60)),
+      (c) => rotate(c, negateAngle(a))
+    )
+  );
+  const r2 = mapCoords(
+    rhombus60(`${name}-1`),
+    flow(
+      (c) => recenter(c, r0[3].coords),
+      (c) => rotate(c, degrees(180)),
+      (c) => rotate(c, degrees(60)),
+      (c) => rotate(c, a),
+      (c) => translate(c, xy(1, 0))
+    )
+  );
+  const ret = [...r1, ...r2];
+  // to support other transforms, set point o back to the origin.
+  // also rotate it so it looks like figure 7a
+  return mapCoords(
+    ret,
+    flow(
+      (c) => recenter(c, r1[0].coords),
+      (c) => rotate(c, degrees(180))
+    )
+  );
 }

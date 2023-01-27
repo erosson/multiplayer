@@ -9573,6 +9573,7 @@ __metadata:
     "@types/sigmajs": ^1.0.28
     "@webpack-cli/generators": ^3.0.1
     css-loader: ^6.7.3
+    fp-ts: ^2.13.1
     graphology: ^0.25.1
     graphology-canvas: ^0.4.1
     graphology-layout: ^0.6.1

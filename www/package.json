@@ -14,6 +14,7 @@
     "docker:ghcr": "docker run -p 8080:80 ghcr.io/erosson/multiplayer/www:latest"
   },
   "dependencies": {
+    "fp-ts": "^2.13.1",
     "graphology": "^0.25.1",
     "graphology-canvas": "^0.4.1",
     "graphology-layout": "^0.6.1",

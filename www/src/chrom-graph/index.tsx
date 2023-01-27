@@ -33,11 +33,14 @@ function empty(): G.default {
 }
 
 function renderNode(node: N.Node): Partial<CT.NodeDisplayData> {
+  const xy = N.toXY(node.coords);
   return {
     color: node.color ?? "black",
-    label: node.label ? `${node.label} (${node.id})` : node.id,
+    label: node.label
+      ? `${node.label} (${node.id})@${JSON.stringify(xy)}`
+      : `${node.id}@${JSON.stringify(xy)}`,
     size: 5,
-    ...N.toXY(node.coords),
+    ...xy,
   };
 }
 
@@ -62,6 +65,8 @@ function loadFigure(figure: string | undefined): N.Node[] {
       return F.figure4("figure4");
     case "figure5":
       return F.figure5("figure5");
+    case "figure7a":
+      return F.figure7a("figure7a");
     default:
       return F.figure5("figure5");
   }
@@ -94,6 +99,11 @@ export default function ChromaticGraph(): JSX.Element {
           </li>
           <li>
             <Link to={Route.chromGraph("figure5")}>figure 5</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figure7a")}>
+              figure 7a (moser spindle)
+            </Link>
           </li>
         </ul>
       </nav>
