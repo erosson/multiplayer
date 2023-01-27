@@ -6,6 +6,7 @@ import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
 import SwarmGraph from "./swarm-graph";
+import ChromGraph from "./chrom-graph";
 import Nav from "./nav";
 import Route from "./route";
 import * as Env from "./env";
@@ -22,15 +23,6 @@ function App(): JSX.Element {
       }
     );
   }, []);
-  /*
-    <div>
-      <Swarm />
-      <SwarmGraph />
-      <Platform env={env} />
-      <Count env={env} />
-      <Hello env={env} />
-    </div>
-    */
   return env ? (
     <Router env={env} />
   ) : error ? (
@@ -91,6 +83,14 @@ function Router(props: { env: Env.Env }): JSX.Element {
       element: (
         <Layout>
           <SwarmGraph />
+        </Layout>
+      ),
+    },
+    {
+      path: Route.chromGraph,
+      element: (
+        <Layout>
+          <ChromGraph />
         </Layout>
       ),
     },

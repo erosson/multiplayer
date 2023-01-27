@@ -4,6 +4,7 @@ enum Route {
   count = "/count",
   platform = "/platform",
   swarm = "/swarm",
-  swarmGraph = "/swarmGraph",
+  swarmGraph = "/swarm-graph",
+  chromGraph = "/chrom-graph",
 }
 export default Route;

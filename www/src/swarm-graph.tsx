@@ -57,7 +57,7 @@ export default function SwarmProduction(): JSX.Element {
     // const context = canvas.current?.getContext("2d");
     // if (context) {
     if (canvas.current && graph) {
-      new C.Sigma(graph, canvas.current, {});
+      const render = new C.Sigma(graph, canvas.current, {});
       // C.render(graph, context, {
       // padding: 20,
       // height: 350,
@@ -65,6 +65,7 @@ export default function SwarmProduction(): JSX.Element {
       // edges: {},
       // nodes: {},
       // });
+      return () => render.kill();
     }
   }, [canvas, graph]);
   return (
