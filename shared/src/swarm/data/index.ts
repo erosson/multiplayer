@@ -13,7 +13,7 @@ export interface UnitData<I extends S.AnyID> {
   list: readonly S.Unit<I>[];
   byId: Record<S.UnitID<I>, S.Unit<I>>;
   byProducers: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
-  producerPaths: Record<S.UnitID<I>, readonly G.ProducerPath<I>[]>;
+  producerGraph: G.ProducerGraph<I>;
   byCost: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
   byRequire: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
 }
@@ -37,7 +37,7 @@ export function baseCreate<I extends S.AnyID>(
         units,
         (u) => u.prod?.map((c) => c.unit) ?? []
       ),
-      producerPaths: G.baseProducer<I>(units).childPaths,
+      producerGraph: G.producer<I>(units),
       byCost: tagBy(
         Object.values(id.Unit),
         units,

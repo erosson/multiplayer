@@ -1708,6 +1708,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/sigmajs@npm:^1.0.28":
+  version: 1.0.28
+  resolution: "@types/sigmajs@npm:1.0.28"
+  checksum: e56739e037a5ed3d31e9a4f40194aa3882e548976ad6154ceed2258718b57230058fbf820ddd43eb35ce85868cb4a1ef419a5a4e596705da193b975e3d4963a2
+  languageName: node
+  linkType: hard
+
 "@types/sockjs@npm:^0.3.33":
   version: 0.3.33
   resolution: "@types/sockjs@npm:0.3.33"
@@ -4477,6 +4484,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphology-canvas@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "graphology-canvas@npm:0.4.1"
+  dependencies:
+    graphology-layout: 0.6.0
+    graphology-utils: ^2.0.0
+  peerDependencies:
+    canvas: ^2.6.1
+    graphology-types: ">=0.20.0"
+  peerDependenciesMeta:
+    canvas:
+      optional: true
+  checksum: e527c9bd2457023e21f5603a444e9db90605c21a51ef48a5e999f6a540d84751bf6c4c087482800ed8c924f9637f6c1068bd0688c0d9d9241cd75a00c34b3223
+  languageName: node
+  linkType: hard
+
 "graphology-indices@npm:^0.17.0":
   version: 0.17.0
   resolution: "graphology-indices@npm:0.17.0"
@@ -4486,6 +4509,41 @@ __metadata:
   peerDependencies:
     graphology-types: ">=0.20.0"
   checksum: 0991c8e13f14cde017533bb432627ea1e65752c7ba2a73e4a83f91ff3e21a327f3950f11106bc9e0cfb05ede4742ae86b3ba37f46bbb5a81811da677f7074e64
+  languageName: node
+  linkType: hard
+
+"graphology-layout-forceatlas2@npm:^0.10.1":
+  version: 0.10.1
+  resolution: "graphology-layout-forceatlas2@npm:0.10.1"
+  dependencies:
+    graphology-utils: ^2.1.0
+  peerDependencies:
+    graphology-types: ">=0.19.0"
+  checksum: a2d25f056ec48b51fd1db892b4f837330d4403dc79605445bd2101d88e18292b4c077ab4f5096efde6e6c45fbe76ee22e5503025b1c0902d787ab866197a292a
+  languageName: node
+  linkType: hard
+
+"graphology-layout@npm:0.6.0":
+  version: 0.6.0
+  resolution: "graphology-layout@npm:0.6.0"
+  dependencies:
+    graphology-utils: ^2.3.0
+    pandemonium: ^1.5.0
+  peerDependencies:
+    graphology-types: ">=0.19.0"
+  checksum: 8d469594dbf081642f8f085bcb6bff31c9fac8b0f18da5390b8a0fff61aa960c391d4926b57ea611b8aa27b092d770b4100afbd1330856d0eaac6fe7a2fd8ec7
+  languageName: node
+  linkType: hard
+
+"graphology-layout@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "graphology-layout@npm:0.6.1"
+  dependencies:
+    graphology-utils: ^2.3.0
+    pandemonium: ^2.4.0
+  peerDependencies:
+    graphology-types: ">=0.19.0"
+  checksum: 5d5577c292702208e8455c241107362c3bad6c8dadb78509c0153f3bde5974fba00e94d1b4d91a6a80f39ff1075af05f90bf2b9c73267fc0650fc37291a877eb
   languageName: node
   linkType: hard
 
@@ -4522,7 +4580,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphology-utils@npm:^2.0.0, graphology-utils@npm:^2.4.2, graphology-utils@npm:^2.4.3":
+"graphology-utils@npm:^2.0.0, graphology-utils@npm:^2.1.0, graphology-utils@npm:^2.3.0, graphology-utils@npm:^2.4.2, graphology-utils@npm:^2.4.3, graphology-utils@npm:^2.5.0":
   version: 2.5.2
   resolution: "graphology-utils@npm:2.5.2"
   peerDependencies:
@@ -5923,7 +5981,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.10, lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:*, lodash@npm:^4.17.10, lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -6356,7 +6414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mnemonist@npm:^0.39.0":
+"mnemonist@npm:^0.39.0, mnemonist@npm:^0.39.2":
   version: 0.39.5
   resolution: "mnemonist@npm:0.39.5"
   dependencies:
@@ -7007,6 +7065,22 @@ __metadata:
   bin:
     pacote: lib/bin.js
   checksum: 730e2b344619daff078b1f7c085c2da3b1417f1667204384cba981409098af2375b130a6470f75ea22f09b83c00fe227143b68e50d0dd7ff972e28a697b9c1d5
+  languageName: node
+  linkType: hard
+
+"pandemonium@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "pandemonium@npm:1.5.0"
+  checksum: 7b9f8ea36354eabce91e075b88c4c521c06c377b5f32db3adb02927d6ab25ebe59f1bd7286fce968ae894ea156e0f028d45c25f2ce0fb727c6583a653a137433
+  languageName: node
+  linkType: hard
+
+"pandemonium@npm:^2.4.0":
+  version: 2.4.1
+  resolution: "pandemonium@npm:2.4.1"
+  dependencies:
+    mnemonist: ^0.39.2
+  checksum: ada32ba457a0dd3ae8eb656e381b71eae3e36a81cb18b71236fd3e1534ab48fa2243da47198647c4df60aca78cf372df8a180e65c3dcfeec4910d28956347974
   languageName: node
   linkType: hard
 
@@ -8148,6 +8222,17 @@ __metadata:
     get-intrinsic: ^1.0.2
     object-inspect: ^1.9.0
   checksum: 351e41b947079c10bd0858364f32bb3a7379514c399edb64ab3dce683933483fc63fb5e4efe0a15a2e8a7e3c436b6a91736ddb8d8c6591b0460a24bb4a1ee245
+  languageName: node
+  linkType: hard
+
+"sigma@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "sigma@npm:2.4.0"
+  dependencies:
+    "@yomguithereal/helpers": ^1.1.1
+    events: ^3.3.0
+    graphology-utils: ^2.5.0
+  checksum: c9161859bb3dc2dbff8a918e6a400cec1f75e60de9fe7fb42ecf16ddc9d3f1e8a10a372f9876c674bb9e973006e0e852cdb9b4a0e525bc08eb3a959f475f99ce
   languageName: node
   linkType: hard
 
@@ -9454,14 +9539,21 @@ __metadata:
   dependencies:
     "@types/react": ^18.0.26
     "@types/react-dom": ^18.0.10
+    "@types/sigmajs": ^1.0.28
     "@webpack-cli/generators": ^3.0.1
     css-loader: ^6.7.3
+    graphology: ^0.25.1
+    graphology-canvas: ^0.4.1
+    graphology-layout: ^0.6.1
+    graphology-layout-forceatlas2: ^0.10.1
+    graphology-types: ^0.24.7
     html-webpack-plugin: ^5.5.0
     lodash: ^4.17.21
     prettier: ^2.8.3
     react: ^18.2.0
     react-dom: ^18.2.0
     shared: "workspace:shared"
+    sigma: ^2.4.0
     style-loader: ^3.3.1
     ts-loader: ^9.4.2
     typescript: ^4.9.4

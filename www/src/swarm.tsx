@@ -18,7 +18,7 @@ const style = {
   input: { width: "5em" },
   readonlyInput: { width: "5em", border: "none" },
 };
-export default function Swarm(props: { env: Env }): JSX.Element {
+export default function Swarm(): JSX.Element {
   const [start, setStart] = React.useState(Date.now());
   const [timeMs, setTimeMs] = React.useState(0);
   const [minerals, setMinerals] = React.useState(0);

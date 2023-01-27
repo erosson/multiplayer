@@ -73,7 +73,7 @@ export function unitProduction<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>
 ): Prod.Production {
-  const ppaths = session.data.unit.producerPaths[id];
+  const ppaths = session.data.unit.producerGraph.childPaths[id];
   return ppaths.map((ppath) => {
     const count = unitCount0(session, ppath.producer.id);
     const production = product(ppath.path.map((path) => path.prod.value));

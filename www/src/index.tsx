@@ -4,6 +4,7 @@ import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
+import SwarmGraph from "./swarm-graph";
 import * as Env from "./env";
 import "shared";
 
@@ -21,7 +22,8 @@ function App(): JSX.Element {
   }, []);
   return env ? (
     <div>
-      <Swarm env={env} />
+      <Swarm />
+      <SwarmGraph />
       <Platform env={env} />
       <Count env={env} />
       <Hello env={env} />

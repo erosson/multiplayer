@@ -1,7 +1,6 @@
 import * as G from "graphology";
 import { AbstractGraph } from "graphology-types";
 import { Unit, Prod, AnyID, UnitID } from "../schema";
-import units from "./unit";
 import { singleSource, edgePathFromNodePath } from "graphology-shortest-path";
 
 export interface ProducerGraph<I extends AnyID> {
@@ -21,10 +20,7 @@ export interface ProducerPath<I extends AnyID> {
   path: Edge<I>[];
 }
 
-export function producer() {
-  return baseProducer(units);
-}
-export function baseProducer<I extends AnyID>(
+export function producer<I extends AnyID>(
   units: readonly UnitID<I>[]
 ): ProducerGraph<I> {
   const all: AbstractGraph<Unit<I>, Edge<I>> = new G.DirectedGraph({
