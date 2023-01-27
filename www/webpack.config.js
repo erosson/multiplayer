@@ -17,6 +17,7 @@ const config = {
   devServer: {
     open: true,
     host: "localhost",
+    historyApiFallback: true,
     client: {
       webSocketURL: process.env["GITPOD_WORKSPACE_URL"]
         ? {

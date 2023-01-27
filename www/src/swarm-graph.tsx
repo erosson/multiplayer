@@ -18,7 +18,9 @@ const style = {
 };
 
 export default function SwarmProduction(): JSX.Element {
-  const [graph] = React.useState(() => {
+  const [graph, setGraph] = React.useState<G.default | null>(null);
+
+  React.useEffect(() => {
     const d = S.Data.create();
     const graph = d.unit.producerGraph.all;
 
@@ -44,9 +46,10 @@ export default function SwarmProduction(): JSX.Element {
     );
     GL.circular.assign(rendered, { scale: 1 });
     forceAtlas2.assign(rendered, { iterations: 50 });
-    console.log(rendered);
-    return rendered;
-  });
+    console.log("setup graph", rendered);
+    setGraph(rendered);
+    return () => rendered.clear();
+  }, []);
 
   // const canvas = React.useRef<HTMLCanvasElement | null>(null);
   const canvas = React.useRef<HTMLDivElement | null>(null);
@@ -64,7 +67,6 @@ export default function SwarmProduction(): JSX.Element {
       // });
     }
   }, [canvas, graph]);
-  const dim = 1000;
   return (
     <div>
       <div style={style.canvas} ref={canvas}></div>

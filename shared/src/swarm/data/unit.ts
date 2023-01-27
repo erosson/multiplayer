@@ -29,5 +29,13 @@ const list: readonly S.Unit<ID>[] = [
     ],
     prod: [{ unit: Unit.drone, value: 2 }],
   },
+  {
+    id: Unit.nest,
+    cost: [
+      { unit: Unit.larva, value: 1 },
+      { unit: Unit.queen, value: 1000 },
+    ],
+    prod: [{ unit: Unit.queen, value: 3 }],
+  },
 ];
 export default list;

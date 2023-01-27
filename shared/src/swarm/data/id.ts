@@ -6,6 +6,7 @@ export enum Unit {
   mineral = "mineral",
   drone = "drone",
   queen = "queen",
+  nest = "nest",
 }
 export enum Upgrade {
   todo = "",
