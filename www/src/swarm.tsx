@@ -125,20 +125,18 @@ export default function Swarm(): JSX.Element {
                     type="number"
                     style={style.input}
                     value={prod.count}
-                    onInput={(e) =>
+                    onInput={(e) => {
+                      const value = e.currentTarget.value;
                       setProds((prods) => {
                         prods = [...prods];
-                        prods[i].count = inputInt(
-                          e.currentTarget.value,
-                          prod.count
-                        );
+                        prods[i].count = inputInt(value ?? "", prod.count);
                         if (i === prods.length - 1 && prods[i].count === 0) {
                           // remove the last element when count is 0
                           prods.pop();
                         }
                         return prods;
-                      })
-                    }
+                      });
+                    }}
                   />
                 </td>
                 <td>
@@ -146,16 +144,14 @@ export default function Swarm(): JSX.Element {
                     type="number"
                     style={style.input}
                     value={prod.production}
-                    onInput={(e) =>
+                    onInput={(e) => {
+                      const value = e.currentTarget.value;
                       setProds((prods) => {
                         prods = [...prods];
-                        prods[i].production = inputInt(
-                          e.currentTarget.value,
-                          prod.production
-                        );
+                        prods[i].production = inputInt(value, prod.production);
                         return prods;
-                      })
-                    }
+                      });
+                    }}
                   />
                 </td>
                 <td>
@@ -178,9 +174,10 @@ export default function Swarm(): JSX.Element {
                 type="number"
                 style={style.input}
                 value={0}
-                onInput={(e) =>
+                onInput={(e) => {
+                  const value = e.currentTarget.value;
                   setProds((prods) => {
-                    const count = inputInt(e.currentTarget.value, 1);
+                    const count = inputInt(value, 1);
                     return count === 0
                       ? prods
                       : prods.concat([
@@ -189,8 +186,8 @@ export default function Swarm(): JSX.Element {
                             production: 1,
                           },
                         ]);
-                  })
-                }
+                  });
+                }}
               />
             </td>
             <td>
@@ -198,9 +195,10 @@ export default function Swarm(): JSX.Element {
                 type="number"
                 style={style.input}
                 value={0}
-                onInput={(e) =>
+                onInput={(e) => {
+                  const value = e.currentTarget.value;
                   setProds((prods) => {
-                    const production = inputInt(e.currentTarget.value, 1);
+                    const production = inputInt(value, 1);
                     return production === 0
                       ? prods
                       : prods.concat([
@@ -209,8 +207,8 @@ export default function Swarm(): JSX.Element {
                             production,
                           },
                         ]);
-                  })
-                }
+                  });
+                }}
               />
             </td>
           </tr>
