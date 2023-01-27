@@ -35,7 +35,7 @@ function empty(): G.default {
 function renderNode(node: N.Node): Partial<CT.NodeDisplayData> {
   return {
     color: node.color ?? "black",
-    label: node.id,
+    label: node.label ? `${node.label} (${node.id})` : node.id,
     size: 5,
     ...N.toXY(node.coords),
   };
