@@ -6,6 +6,7 @@ import * as C from "sigma";
 import * as CT from "sigma/types";
 import * as GL from "graphology-layout";
 import { range, sum } from "shared/src/swarm/util/math";
+import { useParams } from "react-router-dom";
 // import forceAtlas2 from "graphology-layout-forceatlas2";
 
 const style = {
@@ -190,6 +191,8 @@ function figure4(name: string): { nodes: Node[]; edges: Edge[] } {
 }
 
 export default function ChromaticGraph(): JSX.Element {
+  const params = useParams();
+  console.log("figure", params);
   const graph = toGraph(figure4("figure4"));
   const canvas = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {

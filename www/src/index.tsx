@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
@@ -8,7 +8,7 @@ import Swarm from "./swarm";
 import SwarmGraph from "./swarm-graph";
 import ChromGraph from "./chrom-graph";
 import Nav from "./nav";
-import Route from "./route";
+import * as Route from "./route";
 import * as Env from "./env";
 
 function App(): JSX.Element {
@@ -31,11 +31,11 @@ function App(): JSX.Element {
     <div>loading...</div>
   );
 }
-function Layout(props: { children?: React.ReactNode }): JSX.Element {
+function Layout(props: { children?: React.ReactNode }) {
   return (
     <>
       <Nav />
-      {props.children}
+      <Outlet />
     </>
   );
 }
@@ -43,58 +43,41 @@ function Router(props: { env: Env.Env }): JSX.Element {
   // https://reactrouter.com/en/main/start/tutorial
   const router = createBrowserRouter([
     {
-      path: Route.home,
-      element: <Layout>howdy! click a demo link above</Layout>,
-    },
-    {
-      path: Route.hello,
-      element: (
-        <Layout>
-          <Hello env={props.env} />
-        </Layout>
-      ),
-    },
-    {
-      path: Route.count,
-      element: (
-        <Layout>
-          <Count env={props.env} />
-        </Layout>
-      ),
-    },
-    {
-      path: Route.platform,
-      element: (
-        <Layout>
-          <Platform env={props.env} />
-        </Layout>
-      ),
-    },
-    {
-      path: Route.swarm,
-      element: (
-        <Layout>
-          <Swarm />
-        </Layout>
-      ),
-    },
-    {
-      path: Route.swarmGraph,
-      element: (
-        <Layout>
-          <SwarmGraph />
-        </Layout>
-      ),
-    },
-    {
-      path: Route.chromGraph,
-      element: (
-        <Layout>
-          <ChromGraph />
-        </Layout>
-      ),
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          path: Route.Route.home,
+          element: <>howdy! click a demo link above</>,
+        },
+        {
+          path: Route.Route.hello,
+          element: <Hello env={props.env} />,
+        },
+        {
+          path: Route.Route.count,
+          element: <Count env={props.env} />,
+        },
+        {
+          path: Route.Route.platform,
+          element: <Platform env={props.env} />,
+        },
+        {
+          path: Route.Route.swarm,
+          element: <Swarm />,
+        },
+        {
+          path: Route.Route.swarmGraph,
+          element: <SwarmGraph />,
+        },
+        {
+          path: Route.Route.chromGraph,
+          element: <ChromGraph />,
+        },
+      ],
     },
   ]);
+
   return (
     <React.StrictMode>
       <RouterProvider router={router} />

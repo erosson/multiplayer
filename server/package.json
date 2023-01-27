@@ -6,8 +6,8 @@
     "build": "echo noop",
     "docker": "docker buildx build -t ghcr.io/erosson/multiplayer/server:latest --target server ..",
     "docker:buildrun": "yarn docker && yarn docker:run",
-    "docker:run": "docker run -p 3000:3000 -it erosson/multiplayer/server",
-    "docker:ghcr": "docker run -p 3000:3000 ghcr.io/erosson/multiplayer/server:main"
+    "docker:run": "docker run -p 3000:3000 -e COOKIE_SECRET=test -it erosson/multiplayer/server:latest",
+    "docker:ghcr": "docker run -p 3000:3000 ghcr.io/erosson/multiplayer/server:latest"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

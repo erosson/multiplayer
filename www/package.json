@@ -8,10 +8,10 @@
     "watch": "webpack --watch",
     "serve": "webpack serve",
     "start": "yarn serve",
-    "docker": "docker buildx build -t ghcr.io/erosson/multiplayer/www:latest --target server ..",
+    "docker": "docker buildx build -t ghcr.io/erosson/multiplayer/www:latest --target www ..",
     "docker:buildrun": "yarn docker && yarn docker:run",
-    "docker:run": "docker run -p 8080:80 -it erosson/multiplayer/www",
-    "docker:ghcr": "docker run -p 8080:80 ghcr.io/erosson/multiplayer/www:main"
+    "docker:run": "docker run -p 8080:80 -it ghcr.io/erosson/multiplayer/www:latest",
+    "docker:ghcr": "docker run -p 8080:80 ghcr.io/erosson/multiplayer/www:latest"
   },
   "dependencies": {
     "graphology": "^0.25.1",

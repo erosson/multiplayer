@@ -13,6 +13,8 @@ const config = {
   entry: "./src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
+    // https://stackoverflow.com/questions/51051490/react-webpack-dev-server-main-js-not-found
+    publicPath: "/",
   },
   devServer: {
     open: true,

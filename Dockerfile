@@ -44,6 +44,7 @@ RUN yarn workspace www build
 # https://hub.docker.com/_/nginx
 FROM nginx as www
 COPY --from=www_build /app/www/dist /usr/share/nginx/html
+COPY --from=www_build /app/www/src/nginx.conf /etc/nginx/conf.d/default.conf
 
 # back to the production alpine container
 FROM dependencies as server
