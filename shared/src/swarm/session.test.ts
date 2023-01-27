@@ -22,8 +22,9 @@ test("session basics: cubic count", () => {
   const session = S.create(d);
   session.unit.queen.count = 10;
   session.unit.mineral.count = 0;
-  expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 3)).toEqual([
-    0, 0, 10,
+  // expect(S.unitProduction(session, d.id.Unit.mineral)).toEqual([0, 0, 10, 0]);
+  expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
+    0, 0, 10, 0,
   ]);
   expect(S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(
     0
@@ -34,6 +35,25 @@ test("session basics: cubic count", () => {
   expect(
     S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(2000))
   ).toBe(40);
+});
+
+test("session basics: 4 count", () => {
+  const d = Data.create();
+  const session = S.create(d);
+  session.unit.nest.count = 10;
+  session.unit.mineral.count = 0;
+  expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
+    0, 0, 0, 20,
+  ]);
+  expect(S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(
+    0
+  );
+  expect(
+    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(1000))
+  ).toBe(20);
+  expect(
+    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(2000))
+  ).toBe(160);
 });
 
 test("session id types", () => {

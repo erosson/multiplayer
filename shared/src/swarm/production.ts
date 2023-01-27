@@ -16,7 +16,8 @@ export function toPolynomial(
   return [index === 0 ? c : p[index - 1].count].concat(
     r.map(
       (u, i) =>
-        (u.count * product(p.slice(i).map((cu) => cu.production))) / fact(i + 1)
+        (u.count * product(p.slice(0, i + 1).map((cu) => cu.production))) /
+        fact(i + 1)
     )
   );
 }
