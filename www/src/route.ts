@@ -8,5 +8,5 @@ export enum Route {
   chromGraph = "/chrom-graph/:figure?",
 }
 export function chromGraph(figure?: string): string {
-  return Route.chromGraph.replace("/:figure?", figure ?? "");
+  return Route.chromGraph.replace(":figure?", figure ?? "");
 }

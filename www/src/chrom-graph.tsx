@@ -6,7 +6,8 @@ import * as C from "sigma";
 import * as CT from "sigma/types";
 import * as GL from "graphology-layout";
 import { range, sum } from "shared/src/swarm/util/math";
-import { useParams } from "react-router-dom";
+import * as Route from "./route";
+import { Link, useParams } from "react-router-dom";
 // import forceAtlas2 from "graphology-layout-forceatlas2";
 
 const style = {
@@ -190,10 +191,22 @@ function figure4(name: string): { nodes: Node[]; edges: Edge[] } {
   return { edges, nodes };
 }
 
+function loadGraph(figure: string | undefined) {
+  switch (figure) {
+    case "figure1":
+      return figure1("figure1");
+    case "figure2":
+      return figure2("figure2");
+    case "figure4":
+      return figure4("figure4");
+    default:
+      return figure4("figure4");
+  }
+}
+
 export default function ChromaticGraph(): JSX.Element {
   const params = useParams();
-  console.log("figure", params);
-  const graph = toGraph(figure4("figure4"));
+  const graph = toGraph(loadGraph(params.figure));
   const canvas = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     if (canvas.current) {
@@ -201,5 +214,22 @@ export default function ChromaticGraph(): JSX.Element {
       return () => render.kill();
     }
   }, [canvas, graph]);
-  return <div style={style.canvas} ref={canvas}></div>;
+  return (
+    <div>
+      <nav>
+        <ul>
+          <li>
+            <Link to={Route.chromGraph("figure1")}>figure 1</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figure2")}>figure 2</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figure4")}>figure 4</Link>
+          </li>
+        </ul>
+      </nav>
+      <div style={style.canvas} ref={canvas}></div>
+    </div>
+  );
 }
