@@ -231,9 +231,20 @@ export function figureW(name: string): Node[] {
 
 export function figure8(name: string): Node[] {
   // "The 1345-vertex graph shown in Figure 8 is the union of W with six translates of it in which the origin is mapped to a vertex of H"
+  const w0 = figureW(`${name}-$$I$$`);
+  // Our dead-simple collision detection takes O(number-of-nodes^2) time, so
+  // multiple collision-detection/duplicate-filtering passes during node gen
+  // is dramatically faster.
+  // Before adding this one: "node generation in 47ms, collision detection (edges/duplicates) in 11295ms"
+  // After adding this one: "node generation in 340ms, collision detection (edges/duplicates) in 2383ms"
+  // TODO: this won't be enough for the 20k-node final result, I think. Probably going to need bucketing.
+  // And even then, rendering will be slow!
+  const wCollide = C.collide(w0);
   return figure1("")
     .map((o, i) => {
-      return mapCoords(figureW(`${name}-${i}`), (c) => translate(c, o.coords));
+      return mapCoords(wCollide.fig.nodes, (c) => translate(c, o.coords)).map(
+        (n) => ({ ...n, id: n.id.replace("$$I$$", `${i}`) })
+      );
     })
     .flat();
 }
