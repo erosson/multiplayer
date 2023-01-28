@@ -76,7 +76,7 @@ function loadFigure(figure: string | undefined): N.Node[] {
     case "figure8":
       return F.figure8("figure8");
     default:
-      return F.figure5("figure5");
+      return F.figure1("figure1");
   }
 }
 
