@@ -17,6 +17,8 @@ import {
   negateAngle,
   Angle,
   recenter,
+  Coords,
+  scaleAngle,
 } from "./node";
 import { range, sum } from "shared/src/swarm/util/math";
 import { distance } from "./collide";
@@ -128,21 +130,23 @@ function moserSpindleAngle(): Angle {
   //
   // given: r1c = (0, 0); r2c = (1, 0); r1o === r2o; o.x = 0.5
   // find angle a
-  const r0 = rhombus60("");
-  // hypotenuse: distance between o and c
-  const hyp = distance(toXY(r0[0].coords), toXY(r0[3].coords));
+  const hyp = distance(toXY(rhombus60Hyp()));
   return radians(Math.asin(0.5 / hyp));
+}
+function rhombus60Hyp(): Coords {
+  const r0 = rhombus60("");
+  return r0[3].coords;
 }
 /**
  * Moser spindle
  */
 export function figure7a(name: string): Node[] {
-  const r0 = rhombus60("");
+  const hyp = rhombus60Hyp();
   const a = moserSpindleAngle();
   const r1 = mapCoords(
     rhombus60(`${name}-0`),
     flow(
-      (c) => recenter(c, r0[3].coords),
+      (c) => recenter(c, hyp),
       (c) => rotate(c, degrees(180)),
       (c) => rotate(c, degrees(60)),
       (c) => rotate(c, negateAngle(a))
@@ -151,7 +155,7 @@ export function figure7a(name: string): Node[] {
   const r2 = mapCoords(
     rhombus60(`${name}-1`),
     flow(
-      (c) => recenter(c, r0[3].coords),
+      (c) => recenter(c, hyp),
       (c) => rotate(c, degrees(180)),
       (c) => rotate(c, degrees(60)),
       (c) => rotate(c, a),
@@ -168,4 +172,17 @@ export function figure7a(name: string): Node[] {
       (c) => rotate(c, degrees(180))
     )
   );
+}
+export function figure7b(name: string): Node[] {
+  const g1 = figure7a(`${name}-0`);
+  const a = moserSpindleAngle();
+  const g2 = mapCoords(
+    figure7a(`${name}-1`),
+    flow((c) => rotate(c, negateAngle(a)))
+  );
+  const g3 = mapCoords(
+    figure7a(`${name}-2`),
+    flow((c) => rotate(c, a))
+  );
+  return [...g1, ...g2, ...g3];
 }

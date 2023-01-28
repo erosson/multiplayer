@@ -75,7 +75,7 @@ export function collide(fig0: N.Node[]): Collide {
 
 const tolerance = 0.0000000000001;
 
-export function distance(axy: XY, bxy: XY): number {
+export function distance(axy: XY, bxy: XY = { x: 0, y: 0 }): number {
   const dx = axy.x - bxy.x;
   const dy = axy.y - bxy.y;
   return Math.sqrt(dx * dx + dy * dy);

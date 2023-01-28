@@ -67,6 +67,8 @@ function loadFigure(figure: string | undefined): N.Node[] {
       return F.figure5("figure5");
     case "figure7a":
       return F.figure7a("figure7a");
+    case "figure7b":
+      return F.figure7b("figure7b");
     default:
       return F.figure5("figure5");
   }
@@ -104,6 +106,9 @@ export default function ChromaticGraph(): JSX.Element {
             <Link to={Route.chromGraph("figure7a")}>
               figure 7a (moser spindle)
             </Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figure7b")}>figure 7b</Link>
           </li>
         </ul>
       </nav>
