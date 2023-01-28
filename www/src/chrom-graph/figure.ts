@@ -248,3 +248,12 @@ export function figure8(name: string): Node[] {
     })
     .flat();
 }
+
+export function figureN(name: string): Node[] {
+  // "graph N as the union of 52 copies of M, translated and rotated so that each instance of H in L coincides with the central H of a copy of M"
+  // TODO: uh, I don't get it. translate and rotate figure 8 in the same way we constructed figure 5, but what's the part about H?
+  // oh - not *every* point in figure 5, just the *central* point of each copy of figure 1 we used to construct it? I think that makes sense.
+  // Gotta refactor all those early figures to make that possible though - shouldn't be too bad.
+  // though, we're too slow to run it right now anyway...
+  throw new Error("TODO");
+}

@@ -130,10 +130,12 @@ export default function ChromaticGraph(): JSX.Element {
             <Link to={Route.chromGraph("figure7c")}>figure 7c</Link>
           </li>
           <li>
-            <Link to={Route.chromGraph("figureW")}>graph W</Link>
+            <Link to={Route.chromGraph("figureW")}>graph W (slow!)</Link>
           </li>
           <li>
-            <Link to={Route.chromGraph("figure8")}>figure 8/graph M</Link>
+            <Link to={Route.chromGraph("figure8")}>
+              figure 8/graph M (slow!)
+            </Link>
           </li>
         </ul>
       </nav>
