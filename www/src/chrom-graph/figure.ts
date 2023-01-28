@@ -207,6 +207,7 @@ export function figureW(name: string): Node[] {
   // "Let W be the 301-vertex graph consisting of all points at distance ≤√3 from the origin that are the sum of two edges of V (interpreted as vectors)"
   const graphV = figure7c("");
   const byId = keyBy(graphV, (n) => n.id);
+  // const collide = C.collide(graphV, "naive");
   const collide = C.collide(graphV);
   const threshold = Math.sqrt(3);
   const nodes = collide.uniqueEdges
@@ -239,6 +240,7 @@ export function figure8(name: string): Node[] {
   // After adding this one: "node generation in 340ms, collision detection (edges/duplicates) in 2383ms"
   // TODO: this won't be enough for the 20k-node final result, I think. Probably going to need bucketing.
   // And even then, rendering will be slow!
+  // const wCollide = C.collide(w0, "naive");
   const wCollide = C.collide(w0);
   return figure1("")
     .map((o, i) => {

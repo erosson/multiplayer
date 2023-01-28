@@ -1429,6 +1429,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/d3-quadtree@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@types/d3-quadtree@npm:3.0.2"
+  checksum: 2a831a80590df125b07bc573c081449823e85159bb8fafbfee9f211dbe402840aeb01f4b04b4b47b0f28394daee29c8a10185f9acf17b6a8be649a377aff006b
+  languageName: node
+  linkType: hard
+
 "@types/emscripten@npm:^1.39.6":
   version: 1.39.6
   resolution: "@types/emscripten@npm:1.39.6"
@@ -3383,6 +3390,13 @@ __metadata:
   version: 3.1.1
   resolution: "csstype@npm:3.1.1"
   checksum: 1f7b4f5fdd955b7444b18ebdddf3f5c699159f13e9cf8ac9027ae4a60ae226aef9bbb14a6e12ca7dba3358b007cee6354b116e720262867c398de6c955ea451d
+  languageName: node
+  linkType: hard
+
+"d3-quadtree@d3/d3-quadtree#find-filter":
+  version: 1.0.7
+  resolution: "d3-quadtree@https://github.com/d3/d3-quadtree.git#commit=c37374c369ddc55179f54eebb99d64c6844a9cc0"
+  checksum: 80d0e009ec2a1ff584c3902a53ebbc033f123f4f4c342872369ee2e2202222c0b86e73bb1cb32b68f16d41998a9e953a348c371d9ed64f3d1279ba2df6cc751a
   languageName: node
   linkType: hard
 
@@ -9568,11 +9582,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "www@workspace:www"
   dependencies:
+    "@types/d3-quadtree": ^3.0.2
     "@types/react": ^18.0.26
     "@types/react-dom": ^18.0.10
     "@types/sigmajs": ^1.0.28
     "@webpack-cli/generators": ^3.0.1
     css-loader: ^6.7.3
+    d3-quadtree: "d3/d3-quadtree#find-filter"
     fp-ts: ^2.13.1
     graphology: ^0.25.1
     graphology-canvas: ^0.4.1

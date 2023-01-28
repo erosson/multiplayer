@@ -2007,6 +2007,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/d3-quadtree", [\
+        ["npm:3.0.2", {\
+          "packageLocation": "./.yarn/cache/@types-d3-quadtree-npm-3.0.2-3f2f06169f-2a831a8059.zip/node_modules/@types/d3-quadtree/",\
+          "packageDependencies": [\
+            ["@types/d3-quadtree", "npm:3.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/emscripten", [\
         ["npm:1.39.6", {\
           "packageLocation": "./.yarn/cache/@types-emscripten-npm-1.39.6-c9c4021365-437f2f9cdf.zip/node_modules/@types/emscripten/",\
@@ -4399,6 +4408,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/csstype-npm-3.1.1-3857baf48b-1f7b4f5fdd.zip/node_modules/csstype/",\
           "packageDependencies": [\
             ["csstype", "npm:3.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["d3-quadtree", [\
+        ["https://github.com/d3/d3-quadtree.git#commit=c37374c369ddc55179f54eebb99d64c6844a9cc0", {\
+          "packageLocation": "./.yarn/cache/d3-quadtree-https-91d1a17afc-80d0e009ec.zip/node_modules/d3-quadtree/",\
+          "packageDependencies": [\
+            ["d3-quadtree", "https://github.com/d3/d3-quadtree.git#commit=c37374c369ddc55179f54eebb99d64c6844a9cc0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -11801,11 +11819,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./www/",\
           "packageDependencies": [\
             ["www", "workspace:www"],\
+            ["@types/d3-quadtree", "npm:3.0.2"],\
             ["@types/react", "npm:18.0.26"],\
             ["@types/react-dom", "npm:18.0.10"],\
             ["@types/sigmajs", "npm:1.0.28"],\
             ["@webpack-cli/generators", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:3.0.1"],\
             ["css-loader", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:6.7.3"],\
+            ["d3-quadtree", "https://github.com/d3/d3-quadtree.git#commit=c37374c369ddc55179f54eebb99d64c6844a9cc0"],\
             ["fp-ts", "npm:2.13.1"],\
             ["graphology", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.25.1"],\
             ["graphology-canvas", "virtual:87a776541200b2f0bf25242fbd1bf9acbd1274b34ecbea0a057dd38fb0d3271fa71ce0ac4d6e9f3d2d7b4e93c66cd0afdc27b430c60a4b8bffbb6fb6df59144b#npm:0.4.1"],\
