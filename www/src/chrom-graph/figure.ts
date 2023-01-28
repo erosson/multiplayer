@@ -29,6 +29,7 @@ import { keyBy } from "shared/src/swarm/util/schema";
 export function figure1(name: string): Node[] {
   const origin = {
     id: `${name}-0`,
+    label: "origin-H",
     coords: xy(0, 0),
     // color: Color.a
   };
@@ -42,17 +43,22 @@ export function figure1(name: string): Node[] {
 
 export function figure2(name: string): Node[] {
   const origin = figure1(`${name}-0`);
-  const orbit = range(6).map((i) => {
-    return figure1(`${name}-${i + 1}`).map((n) => ({
-      ...n,
-      coords: sumCoords([
-        n.coords,
-        polar(1, degrees(i * 60)),
-        polar(1, degrees((i + 1) * 60)),
-      ]),
-    }));
+  const orbit1 = range(6).map((i) => {
+    return mapCoords(
+      figure1(`${name}-${i + 1}`),
+      flow((c) => translate(c, polar(1, degrees(i * 60))))
+    );
   });
-  return [...origin, ...orbit.flat()];
+  const orbit2 = range(6).map((i) => {
+    return mapCoords(
+      figure1(`${name}-${i + 7}`),
+      flow(
+        (c) => translate(c, polar(1, degrees(i * 60))),
+        (c) => translate(c, polar(1, degrees((i + 1) * 60)))
+      )
+    );
+  });
+  return [...origin, ...orbit1.flat(), ...orbit2.flat()];
 }
 
 export function _figure4(name: string): Node[] {
@@ -249,6 +255,18 @@ export function figure8(name: string): Node[] {
     .flat();
 }
 
+export function figurePreN2(name: string): Node[] {
+  const ns = figure2(name);
+  return ns.filter((n) => n.label === "origin-H");
+}
+export function figurePreN4(name: string): Node[] {
+  const ns = figure4(name);
+  return ns.filter((n) => n.label === "origin-H");
+}
+export function figurePreN5(name: string): Node[] {
+  const ns = figure5(name);
+  return ns.filter((n) => n.label === "origin-H");
+}
 export function figureN(name: string): Node[] {
   // "graph N as the union of 52 copies of M, translated and rotated so that each instance of H in L coincides with the central H of a copy of M"
   // TODO: uh, I don't get it. translate and rotate figure 8 in the same way we constructed figure 5, but what's the part about H?

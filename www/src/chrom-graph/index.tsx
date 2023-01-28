@@ -75,6 +75,12 @@ function loadFigure(figure: string | undefined): N.Node[] {
       return F.figureW("figureW");
     case "figure8":
       return F.figure8("figure8");
+    case "figurePreN2":
+      return F.figurePreN2("figurePreN2");
+    case "figurePreN4":
+      return F.figurePreN4("figurePreN4");
+    case "figurePreN5":
+      return F.figurePreN5("figurePreN5");
     default:
       return F.figure1("figure1");
   }
@@ -136,6 +142,15 @@ export default function ChromaticGraph(): JSX.Element {
             <Link to={Route.chromGraph("figure8")}>
               figure 8/graph M (slow!)
             </Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figurePreN2")}>figure 2-preN</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figurePreN4")}>figure 4-preN</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figurePreN5")}>figure 5-preN</Link>
           </li>
         </ul>
       </nav>
