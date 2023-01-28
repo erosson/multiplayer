@@ -2,6 +2,11 @@ import { sum } from "shared/src/swarm/util/math";
 
 export type ID = string;
 
+export interface Figure {
+  nodes: Node[];
+  edges: Edge[];
+}
+
 export interface Node {
   id: ID;
   label?: string;

@@ -44,7 +44,7 @@ function renderNode(node: N.Node): Partial<CT.NodeDisplayData> {
   };
 }
 
-function toGraph(d: F.Figure): G.default {
+function toGraph(d: N.Figure): G.default {
   const g = empty();
   for (let node of d.nodes) {
     g.addNode(node.id, renderNode(node));
@@ -69,6 +69,12 @@ function loadFigure(figure: string | undefined): N.Node[] {
       return F.figure7a("figure7a");
     case "figure7b":
       return F.figure7b("figure7b");
+    case "figure7c":
+      return F.figure7c("figure7c");
+    case "figureW":
+      return F.figureW("figureW");
+    case "figure8":
+      return F.figure8("figure8");
     default:
       return F.figure5("figure5");
   }
@@ -76,8 +82,13 @@ function loadFigure(figure: string | undefined): N.Node[] {
 
 export default function ChromaticGraph(): JSX.Element {
   const params = useParams();
+  const tsA = Date.now();
   const fig0 = loadFigure(params.figure);
+  const tsB = Date.now();
   const collide = Collide.collide(fig0);
+  const tsC = Date.now();
+  const elapsedLoad = tsB - tsA;
+  const elapsedCollide = tsC - tsB;
   const graph = toGraph(collide.fig);
   const canvas = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
@@ -89,6 +100,11 @@ export default function ChromaticGraph(): JSX.Element {
   return (
     <div>
       <nav>
+        <div>
+          <a target="_blank" href="https://arxiv.org/abs/1804.02385">
+            arXiv:1804.02385
+          </a>
+        </div>
         <ul>
           <li>
             <Link to={Route.chromGraph("figure1")}>figure 1</Link>
@@ -110,6 +126,15 @@ export default function ChromaticGraph(): JSX.Element {
           <li>
             <Link to={Route.chromGraph("figure7b")}>figure 7b</Link>
           </li>
+          <li>
+            <Link to={Route.chromGraph("figure7c")}>figure 7c</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figureW")}>graph W</Link>
+          </li>
+          <li>
+            <Link to={Route.chromGraph("figure8")}>figure 8/graph M</Link>
+          </li>
         </ul>
       </nav>
       <ul>
@@ -122,6 +147,10 @@ export default function ChromaticGraph(): JSX.Element {
           {collide.intersectingEdges.length} generated edges;{" "}
           {collide.intersectingEdges.length - collide.fig.edges.length}{" "}
           collisions removed)
+        </li>
+        <li>
+          node generation in {elapsedLoad}ms, collision detection
+          (edges/duplicates) in {elapsedCollide}ms
         </li>
       </ul>
       <div style={style.canvas} ref={canvas}></div>

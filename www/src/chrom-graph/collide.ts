@@ -25,7 +25,7 @@ export interface Collide {
   /**
    * Updated figure
    */
-  fig: F.Figure;
+  fig: N.Figure;
 }
 
 interface XY {

@@ -23,11 +23,8 @@ import {
 import { range, sum } from "shared/src/swarm/util/math";
 import { distance } from "./collide";
 import { flow, pipe } from "fp-ts/lib/function";
-
-export interface Figure {
-  nodes: Node[];
-  edges: Edge[];
-}
+import * as C from "./collide";
+import { keyBy } from "shared/src/swarm/util/schema";
 
 export function figure1(name: string): Node[] {
   const origin = {
@@ -102,7 +99,10 @@ export function figure5(name: string): Node[] {
   }));
 }
 
-export function rhombus60(name: string): Node[] {
+/**
+ * Equilateral triangle; 60 degree angles
+ */
+export function triangle60(name: string): Node[] {
   const o = {
     id: `${name}-0`,
     label: "O",
@@ -116,6 +116,10 @@ export function rhombus60(name: string): Node[] {
     id: `${name}-2`,
     coords: polar(1, degrees(60)),
   };
+  return [o, a, b];
+}
+export function rhombus60(name: string): Node[] {
+  const [o, a, b] = triangle60(name);
   const c = {
     id: `${name}-3`,
     label: "C",
@@ -185,4 +189,51 @@ export function figure7b(name: string): Node[] {
     flow((c) => rotate(c, a))
   );
   return [...g1, ...g2, ...g3];
+}
+
+export function figure7c(name: string): Node[] {
+  // "The angles of the edges relative to the vector (1,0) are i arcsin(√3/2) + j arcsin(1/√12), i ∈ 0 ... 5, j ∈ −2 ... 2}."
+  const ai = Math.asin(Math.sqrt(3) / 2);
+  const aj = Math.asin(1 / Math.sqrt(12));
+  const angles: Angle[] = range(0, 5 + 1)
+    .map((i) => range(-2, 2 + 1).map((j) => radians(i * ai + j * aj)))
+    .flat();
+  return angles.flatMap((a, i) =>
+    mapCoords(triangle60(`${name}-${i}`), (c) => rotate(c, a))
+  );
+}
+
+export function figureW(name: string): Node[] {
+  // "Let W be the 301-vertex graph consisting of all points at distance ≤√3 from the origin that are the sum of two edges of V (interpreted as vectors)"
+  const graphV = figure7c("");
+  const byId = keyBy(graphV, (n) => n.id);
+  const collide = C.collide(graphV);
+  const threshold = Math.sqrt(3);
+  const nodes = collide.uniqueEdges
+    .map((a, i) => {
+      const an0 = byId[a[0].id];
+      const an1 = byId[a[1].id];
+      const av = recenter(an1.coords, an0.coords);
+      return collide.uniqueEdges.slice(i + 1).map((b) => {
+        const bn0 = byId[b[0].id];
+        const bn1 = byId[b[1].id];
+        const bv = recenter(bn1.coords, bn0.coords);
+        return translate(av, bv);
+      });
+    })
+    .flat()
+    .filter((coords) => distance(toXY(coords)) <= threshold)
+    .map((coords, i) => {
+      return { id: `${name}-${i}`, coords };
+    });
+  return nodes;
+}
+
+export function figure8(name: string): Node[] {
+  // "The 1345-vertex graph shown in Figure 8 is the union of W with six translates of it in which the origin is mapped to a vertex of H"
+  return figure1("")
+    .map((o, i) => {
+      return mapCoords(figureW(`${name}-${i}`), (c) => translate(c, o.coords));
+    })
+    .flat();
 }
