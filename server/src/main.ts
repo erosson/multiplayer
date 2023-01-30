@@ -1,19 +1,19 @@
 import Fastify, { FastifyInstance } from "fastify";
 import FastifyWebsocket from "@fastify/websocket";
 import FastifyCookie from "@fastify/cookie";
-import * as Session from "./session";
-import * as Hello from "./hello";
-import * as Count from "./count";
-import * as Platform from "./platform";
-import * as Env from "./env";
+import * as Session from "./session.js";
+import * as Hello from "./hello.js";
+import * as Count from "./count.js";
+import * as Platform from "./platform.js";
+import * as Env from "./env.js";
 
 async function main() {
   const env = await Env.get();
-  const app: FastifyInstance = Fastify({ logger: false });
+  const app: FastifyInstance = Fastify.default({ logger: false });
   app.register(FastifyCookie, {
     secret: env.COOKIE_SECRET,
   });
-  app.register(FastifyWebsocket);
+  app.register(FastifyWebsocket.default);
   // https://stackoverflow.com/a/74131067/2782048
   app.addHook("preHandler", (req, res, done) => {
     const allowedPaths = new Set(["/auth/guest"]);

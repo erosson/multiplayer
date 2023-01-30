@@ -1,4 +1,4 @@
-import { ID as ID_ } from "../schema";
+import { ID as ID_ } from "../schema.js";
 
 export enum Unit {
   larva = "larva",

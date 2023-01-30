@@ -1,5 +1,5 @@
 import React from "react";
-import { Env } from "./env";
+import { Env } from "./env.js";
 
 type Tick = { type: "tick"; now: number };
 

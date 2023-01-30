@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import Hello from "./hello";
-import Count from "./count";
-import Platform from "./platform";
-import Swarm from "./swarm";
-import SwarmGraph from "./swarm-graph";
-import Nav from "./nav";
-import * as Route from "./route";
-import * as Env from "./env";
+import Hello from "./hello.js";
+import Count from "./count.js";
+import Platform from "./platform.js";
+import Swarm from "./swarm.js";
+import SwarmGraph from "./swarm-graph.js";
+import Nav from "./nav.js";
+import * as Route from "./route.js";
+import * as Env from "./env.js";
 
 function App(): JSX.Element {
   const [env, setEnv] = React.useState<Env.Env | null>(null);

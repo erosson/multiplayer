@@ -1,6 +1,6 @@
 import { FastifyRequest } from "fastify";
 import { SocketStream } from "@fastify/websocket";
-import * as Session from "./session";
+import * as Session from "./session.js";
 import type { WebSocket } from "ws";
 
 export function handler(connection: SocketStream, req: FastifyRequest): void {

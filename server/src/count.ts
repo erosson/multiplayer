@@ -1,11 +1,11 @@
 import { FastifyRequest } from "fastify";
 import { SocketStream } from "@fastify/websocket";
-import * as Session from "./session";
+import * as Session from "./session.js";
 import type { WebSocket } from "ws";
-import { Duration } from "shared/dist/google/protobuf/duration";
-import * as Proto from "shared/dist/count";
-import * as Game from "shared/src/count";
-import { Timestamp } from "shared/dist/google/protobuf/timestamp";
+import { Duration } from "shared/dist/google/protobuf/duration.js";
+import * as Proto from "shared/dist/count.js";
+import * as Game from "shared/src/count.js";
+import { Timestamp } from "shared/dist/google/protobuf/timestamp.js";
 
 export function createHandler() {
   const server: { [s: Session.Id]: Proto.State } = {};

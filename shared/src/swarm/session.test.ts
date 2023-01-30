@@ -1,6 +1,6 @@
-import * as S from "./session";
-import * as Schema from "./schema";
-import * as Data from "./data";
+import * as S from "./session.js";
+import * as Schema from "./schema.js";
+import * as Data from "./data/index.js";
 
 test("session basics: linear count", () => {
   const d = Data.create();

@@ -1,4 +1,4 @@
-import * as Proto from "../dist/platform";
+import * as Proto from "../dist/platform.js";
 
 export const input = {
   control(control: Proto.ControlState): Proto.Input {

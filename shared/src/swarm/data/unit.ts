@@ -1,5 +1,5 @@
-import * as S from "../schema";
-import { ID, Unit, Upgrade } from "./id";
+import * as S from "../schema.js";
+import { ID, Unit, Upgrade } from "./id.js";
 
 /**
  * All unit definitions

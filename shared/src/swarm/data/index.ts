@@ -1,8 +1,8 @@
-import { keyBy, tagBy } from "../util/schema";
-import * as G from "./graph";
-import * as S from "../schema";
-import { ID } from "./id";
-import unitData from "./unit";
+import { keyBy, tagBy } from "../util/schema.js";
+import * as G from "./graph.js";
+import * as S from "../schema.js";
+import { ID } from "./id.js";
+import unitData from "./unit.js";
 
 export interface Data<I extends S.AnyID> {
   id: I;

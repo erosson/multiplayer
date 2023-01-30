@@ -1,5 +1,5 @@
-import list from "./unit";
-import { Unit } from "./id";
+import list from "./unit.js";
+import { Unit } from "./id.js";
 
 test("all unit ids are defined", () => {
   expect(new Set(list.map((u) => u.id))).toEqual(new Set(Object.values(Unit)));

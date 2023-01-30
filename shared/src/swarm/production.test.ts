@@ -1,5 +1,5 @@
-import * as P from "./production";
-import { Polynomial } from "./polynomial";
+import * as P from "./production.js";
+import { Polynomial } from "./polynomial.js";
 
 type Case = {
   c: number;

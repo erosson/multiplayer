@@ -4424,7 +4424,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^8.0.1":
+"glob@npm:^8.0.1, glob@npm:^8.1.0":
   version: 8.1.0
   resolution: "glob@npm:8.1.0"
   dependencies:
@@ -8196,6 +8196,7 @@ __metadata:
     "@protobuf-ts/plugin": ^2.8.2
     "@protobuf-ts/runtime": ^2.8.2
     fp-ts: ^2.13.1
+    glob: ^8.1.0
     graphology: ^0.25.1
     graphology-shortest-path: ^2.0.1
     graphology-traversal: ^0.3.1

@@ -1,4 +1,4 @@
-import * as P from "./polynomial";
+import * as P from "./polynomial.js";
 
 type Case = { p: P.Polynomial; t: number; o: number };
 const cases: Case[] = [

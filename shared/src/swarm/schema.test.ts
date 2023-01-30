@@ -1,4 +1,4 @@
-import * as S from "./schema";
+import * as S from "./schema.js";
 
 test("ID types", () => {
   enum X {

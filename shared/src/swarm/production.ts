@@ -1,5 +1,5 @@
-import * as P from "./polynomial";
-import { range, product, fact } from "./util/math";
+import * as P from "./polynomial.js";
+import { range, product, fact } from "./util/math.js";
 
 export interface ProductionUnit {
   count: number;

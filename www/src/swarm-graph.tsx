@@ -4,7 +4,7 @@ import * as S from "shared/src/swarm";
 import * as G from "graphology";
 // import * as C from "graphology-canvas";
 import * as C from "sigma";
-import * as CT from "sigma/types";
+import * as CT from "sigma/types.js";
 import * as GL from "graphology-layout";
 import forceAtlas2 from "graphology-layout-forceatlas2";
 
@@ -45,7 +45,7 @@ export default function SwarmProduction(): JSX.Element {
       })
     );
     GL.circular.assign(rendered, { scale: 1 });
-    forceAtlas2.assign(rendered, { iterations: 50 });
+    forceAtlas2.default.assign(rendered, { iterations: 50 });
     console.log("setup graph", rendered);
     setGraph(rendered);
     return () => rendered.clear();

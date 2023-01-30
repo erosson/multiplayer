@@ -5,8 +5,9 @@
     "strict": true,
     "noImplicitAny": true,
     "module": "esnext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
     "allowJs": true
   },
-  "files": ["src/main.ts"]
+  "include": ["dist/**/*.ts"]
 }

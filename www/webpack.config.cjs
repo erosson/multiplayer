@@ -75,6 +75,11 @@ const config = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
+    // to support the node16 esm resolver's screwy rules
+    extensionAlias: {
+      ".js": [".ts", ".js", ".tsx", ".jsx"],
+      ".mjs": [".mts", ".mjs"],
+    },
   },
 };
 

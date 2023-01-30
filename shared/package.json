@@ -1,6 +1,7 @@
 {
   "name": "shared",
   "packageManager": "yarn@3.3.1",
+  "type": "module",
   "main": "src/main.ts",
   "scripts": {
     "build": "sh ./scripts/build.sh",
@@ -15,6 +16,7 @@
   "dependencies": {
     "@protobuf-ts/runtime": "^2.8.2",
     "fp-ts": "^2.13.1",
+    "glob": "^8.1.0",
     "graphology": "^0.25.1",
     "graphology-shortest-path": "^2.0.1",
     "graphology-traversal": "^0.3.1",

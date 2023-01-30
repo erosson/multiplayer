@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import * as Route from "./route";
+import * as Route from "./route.js";
 
 const style = {
   list: { listStyleType: "none", margin: 0, padding: 0 },

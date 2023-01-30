@@ -1,6 +1,7 @@
 {
   "name": "www",
   "packageManager": "yarn@3.3.1",
+  "type": "module",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",

@@ -1,5 +1,5 @@
-import * as G from "./graph";
-import * as D from "./index";
+import * as G from "./graph.js";
+import * as D from "./index.js";
 
 test("prod graph", () => {
   const d = D.create();

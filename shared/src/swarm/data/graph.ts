@@ -1,6 +1,6 @@
 import * as G from "graphology";
 import { AbstractGraph } from "graphology-types";
-import { Unit, Prod, AnyID, UnitID } from "../schema";
+import { Unit, Prod, AnyID, UnitID } from "../schema.js";
 import { singleSource, edgePathFromNodePath } from "graphology-shortest-path";
 
 export interface ProducerGraph<I extends AnyID> {

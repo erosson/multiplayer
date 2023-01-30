@@ -1,5 +1,5 @@
 import React from "react";
-import { Env } from "./env";
+import { Env } from "./env.js";
 import * as S from "shared/src/swarm";
 
 function inputInt(inputS: string, default_: number): number {

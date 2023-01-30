@@ -10180,6 +10180,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@protobuf-ts/plugin", "npm:2.8.2"],\
             ["@protobuf-ts/runtime", "npm:2.8.2"],\
             ["fp-ts", "npm:2.13.1"],\
+            ["glob", "npm:8.1.0"],\
             ["graphology", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.25.1"],\
             ["graphology-shortest-path", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:2.0.1"],\
             ["graphology-traversal", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.3.1"],\

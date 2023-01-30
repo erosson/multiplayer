@@ -1,4 +1,4 @@
-import * as Proto from "../dist/count";
+import * as Proto from "../dist/count.js";
 
 export const input = {
   incr(): Proto.Input {

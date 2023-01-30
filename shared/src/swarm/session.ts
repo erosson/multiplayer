@@ -1,11 +1,11 @@
 import * as IO from "io-ts";
 import { Newtype } from "newtype-ts";
-import * as S from "./schema";
-import { isoCodec } from "./util/schema";
-import * as Data from "./data";
-import * as Prod from "./production";
-import * as Poly from "./polynomial";
-import { product } from "./util/math";
+import * as S from "./schema.js";
+import { isoCodec } from "./util/schema.js";
+import * as Data from "./data/index.js";
+import * as Prod from "./production.js";
+import * as Poly from "./polynomial.js";
+import { product } from "./util/math.js";
 
 export interface Session<I extends S.AnyID> {
   data: Data.Data<I>;
