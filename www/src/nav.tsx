@@ -28,9 +28,6 @@ export default function Nav(): JSX.Element {
         <li style={style.li}>
           <Link to={Route.Route.swarmGraph}>swarm graph</Link>
         </li>
-        <li style={style.li}>
-          <Link to={Route.chromGraph()}>chromatic graph</Link>
-        </li>
       </ul>
     </nav>
   );
