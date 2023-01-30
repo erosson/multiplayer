@@ -6,7 +6,6 @@ import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
 import SwarmGraph from "./swarm-graph";
-import ChromGraph from "./chrom-graph";
 import Nav from "./nav";
 import * as Route from "./route";
 import * as Env from "./env";
@@ -69,10 +68,6 @@ function Router(props: { env: Env.Env }): JSX.Element {
         {
           path: Route.Route.swarmGraph,
           element: <SwarmGraph />,
-        },
-        {
-          path: Route.Route.chromGraph,
-          element: <ChromGraph />,
         },
       ],
     },
