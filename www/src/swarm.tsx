@@ -40,7 +40,7 @@ export default function Swarm(): JSX.Element {
     return () => {
       if (handle !== null) cancelAnimationFrame(handle);
     };
-  }, [paused]);
+  }, [paused, start]);
 
   function reify() {
     setTimeMs(0);
