@@ -5,6 +5,7 @@ import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
+import Swarm2 from "./swarm2";
 import SwarmGraph from "./swarm-graph";
 import Nav from "./nav";
 import * as Route from "./route";
@@ -64,6 +65,10 @@ function Router(props: { env: Env.Env }): JSX.Element {
         {
           path: Route.Route.swarm,
           element: <Swarm />,
+        },
+        {
+          path: Route.Route.swarm2,
+          element: <Swarm2 />,
         },
         {
           path: Route.Route.swarmGraph,

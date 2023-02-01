@@ -43,16 +43,20 @@ export function create<I extends S.AnyID>(
   now?: Date
 ): Session<I> {
   now = now ?? new Date();
-  return {
+  const session = {
     data,
     started: now,
     reified: ElapsedMs.iso.wrap(0),
     updated: ElapsedMs.iso.wrap(0),
     // TODO we should omit units that aren't yet in play, right?
     unit: Object.fromEntries(
-      Object.values<S.UnitID<I>>(data.id.Unit).map((id) => [id, createUnit(id)])
+      Object.values<S.UnitID<I>>(data.unit.list).map((u) => [
+        u.id,
+        createUnit(u),
+      ])
     ),
   };
+  return session;
 }
 
 function createUnit<I extends S.AnyID>(unit: S.Unit<I>): Unit<I> {
@@ -62,18 +66,53 @@ function createUnit<I extends S.AnyID>(unit: S.Unit<I>): Unit<I> {
   };
 }
 
+export function getUnit<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>
+): Unit<I> {
+  return id in session.unit
+    ? session.unit[id]
+    : createUnit(session.data.unit[id]);
+}
+
+export function setUnit<I extends S.AnyID>(
+  session: Session<I>,
+  val: Unit<I>
+): Session<I>;
+export function setUnit<I extends S.AnyID>(
+  session: Session<I>,
+  id: S.UnitID<I>,
+  val: (v: S.Unit<I>) => Unit<I>
+): Session<I>;
+export function setUnit<I extends S.AnyID>(
+  session: Session<I>,
+  idOrVal: S.UnitID<I> | Unit<I>,
+  fn?: (v: Unit<I>) => Unit<I>
+): Session<I> {
+  if (fn) {
+    const id = idOrVal as S.UnitID<I>;
+    return {
+      ...session,
+      unit: { ...session.unit, [id]: fn(getUnit(session, id)) },
+    };
+  } else {
+    const val = idOrVal as S.Unit<I>;
+    return { ...session, unit: { ...session.unit, [val.id]: val } };
+  }
+}
+
 export function unitCount0<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>
 ): number {
-  return session.unit[id].count;
+  return getUnit(session, id).count;
 }
 
 export function unitProduction<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>
 ): Prod.Production {
-  const ppaths = session.data.unit.producerGraph.childPaths[id];
+  const ppaths = session.data.unit.producerGraph.childPaths[id] ?? [];
   return ppaths.map((ppath) => {
     const count = unitCount0(session, ppath.producer.id);
     const production = product(ppath.path.map((path) => path.prod.value));
@@ -142,14 +181,23 @@ export function reify<I extends S.AnyID>(
 ): Session<I> {
   const reified = toElapsed({ before: session.started, after: now });
   const dt = subElapsed(reified, session.reified);
+  return reifyElapsed(session, dt);
+}
+
+export function reifyElapsed<I extends S.AnyID>(
+  session: Session<I>,
+  dt: ElapsedMs
+): Session<I> {
+  const session1: Session<I> = session.data.unit.list.reduce(
+    (s, { id }) =>
+      setUnit(s, id, (u) => ({
+        ...u,
+        count: unitCountElapsed(session, id, dt),
+      })),
+    session
+  );
   return {
-    ...session,
-    reified,
-    unit: Object.fromEntries(
-      Object.values<Unit<I>>(session.unit).map((u) => [
-        u.id,
-        { ...u, count: unitCountElapsed(session, u.id, dt) },
-      ])
-    ),
+    ...session1,
+    reified: addElapsed(session.reified, dt),
   };
 }

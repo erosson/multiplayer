@@ -1,12 +1,11 @@
 import React from "react";
-import { Env } from "./env";
 import * as S from "shared/src/swarm";
 
-function inputInt(inputS: string, default_: number): number {
+export function inputInt(inputS: string, default_: number): number {
   const input = parseInt(inputS);
   return Math.max(0, isNaN(input) ? default_ : input);
 }
-function inputFloat(inputS: string, default_: number): number {
+export function inputFloat(inputS: string, default_: number): number {
   const input = parseFloat(inputS);
   return Math.max(0, isNaN(input) ? default_ : input);
 }
@@ -218,7 +217,7 @@ export default function Swarm(): JSX.Element {
   );
 }
 
-function ViewPolynomial(props: { poly: S.Polynomial }): JSX.Element {
+export function ViewPolynomial(props: { poly: S.Polynomial }): JSX.Element {
   return (
     <>
       {intersperseI(
