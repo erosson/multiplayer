@@ -33,11 +33,11 @@ test("session basics: 4 count", () => {
   session.unit.nest.count = 10;
   session.unit.mineral.count = 0;
   expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
-    0, 0, 0, 20,
+    0, 0, 0, 10,
   ]);
   expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(0);
-  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(1000))).toBe(20);
-  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(2000))).toBe(160);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(1000))).toBe(10);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(2000))).toBe(80);
 });
 
 test("session id types", () => {

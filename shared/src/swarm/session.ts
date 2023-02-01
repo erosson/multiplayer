@@ -113,21 +113,20 @@ export function unitProduction<I extends S.AnyID>(
   id: S.UnitID<I>
 ): Prod.Production {
   const ppaths = session.data.unit.producerGraph.childPaths[id] ?? [];
-  return ppaths.map((ppath) => {
+  const units = ppaths.map((ppath) => {
     const count = unitCount0(session, ppath.producer.id);
-    const production = product(ppath.path.map((path) => path.prod.value));
+    const production = ppath.path.map((path) => path.prod.value);
     return { count, production };
   });
+  // TODO velocities
+  return { units, velocitys: [] };
 }
 
 export function unitPolynomial<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>
 ): Poly.Polynomial {
-  return Prod.toPolynomial(
-    unitCount0(session, id),
-    unitProduction(session, id)
-  );
+  return Prod.toPolynomial(unitProduction(session, id));
 }
 
 export function toElapsed(d: { before: Date; after: Date }): ElapsedMs {

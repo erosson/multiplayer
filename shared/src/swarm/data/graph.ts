@@ -14,6 +14,13 @@ export interface Edge<I extends AnyID> {
   prod: Prod<I>;
 }
 
+/**
+ * Production path between two units.
+ *
+ * examples:
+ * - `{producer: drone, child: mineral, path: [[drone,mineral]]}`
+ * - `{producer: queen, child: mineral, path: [[queen,drone], [drone,mineral]]}`
+ */
 export interface ProducerPath<I extends AnyID> {
   producer: Unit<I>;
   child: Unit<I>;
@@ -41,7 +48,6 @@ export function producer<I extends AnyID>(
   const childPaths = Object.fromEntries(
     all.mapNodes((childId: string) => {
       const nodePaths = singleSource(all, childId);
-      delete nodePaths[childId]; // ignore path between a node and itself
       const prodPaths = Object.entries(nodePaths).map(
         ([producerId, nodePath]): ProducerPath<I> => {
           const path = edgePathFromNodePath(all, nodePath).map((edgeId) =>

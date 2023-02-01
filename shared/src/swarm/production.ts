@@ -1,45 +1,68 @@
-import { Polynomial } from ".";
 import * as P from "./polynomial";
 import { range, product, fact } from "./util/math";
 
+export interface Production {
+  units: ProductionUnit[];
+  velocitys: ProductionVelocity[];
+}
+
+export interface ProductionVelocity {
+  velocity: number;
+  degree: number;
+}
 export interface ProductionUnit {
   count: number;
-  production: number;
+  production: number[];
 }
-export type Production = ProductionUnit[];
+export interface ConstantUnit {
+  count: number;
+  production: [];
+}
+export interface ConstantVelocity {
+  count: number;
+  degree: 0;
+}
 
 export function toPolynomial(
-  c: number,
-  p: Production,
+  prod: Production,
   index: number = 0
 ): P.Polynomial {
-  const r = [...p.slice(index)];
-  return Polynomial.normalize(
-    [index === 0 ? c : p[index - 1].count].concat(
-      r.map(
-        (u, i) =>
-          (u.count * product(r.slice(0, i + 1).map((cu) => cu.production))) /
-          fact(i + 1)
-      )
-    )
+  const prod0 = prod;
+  if (index > 0) {
+    prod = {
+      units: prod.units
+        .filter((p) => p.production.length >= index)
+        .map((p) => ({ ...p, production: p.production.slice(index) })),
+      velocitys: prod.velocitys
+        .filter((p) => p.degree >= index)
+        .map((p) => ({ ...p, degree: p.degree - index })),
+    };
+  }
+  const polyDegree = degree(prod);
+  const ret = range(polyDegree + 1).map((_) => 0);
+  for (let p of prod.units) {
+    const degree = p.production.length;
+    ret[degree] += (p.count * product(p.production)) / fact(degree);
+  }
+  for (let p of prod.velocitys) {
+    ret[p.degree + 1] += p.velocity;
+  }
+  return P.normalize(ret);
+}
+export function degree(prod: Production): number {
+  return Math.max(
+    ...prod.units.map((p) => p.production.length),
+    ...prod.velocitys.map((p) => p.degree)
   );
 }
-export function toPolynomials(c: number, p: Production): P.Polynomial[] {
-  return range(p.length + 1).map((i) => toPolynomial(c, p, i));
+export function toPolynomials(p: Production): P.Polynomial[] {
+  return range(degree(p) + 1).map((i) => toPolynomial(p, i));
 }
 
-export function calc(
-  c: number,
-  p: Production,
-  t: number,
-  index: number = 0
-): number {
-  const poly =
-    index <= 0
-      ? toPolynomial(c, p)
-      : toPolynomial(p[index - 1].count, p.slice(index, p.length));
+export function calc(p: Production, t: number, index: number = 0): number {
+  const poly = toPolynomial(p, index);
   return P.calc(poly, t);
 }
-export function calcs(c: number, p: Production, t: number): number[] {
-  return range(p.length + 1).map((i) => calc(c, p, t, i));
+export function calcs(p: Production, t: number): number[] {
+  return range(degree(p) + 1).map((i) => calc(p, t, i));
 }

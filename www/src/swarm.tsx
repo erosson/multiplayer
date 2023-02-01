@@ -21,10 +21,13 @@ export default function Swarm(): JSX.Element {
   const [start, setStart] = React.useState(Date.now());
   const [timeMs, setTimeMs] = React.useState(0);
   const [minerals, setMinerals] = React.useState(0);
+  // TODO broken since ProductionUnit redesign
   const [prods, setProds] = React.useState<S.ProductionUnit[]>([]);
   const [paused, setPaused] = React.useState(false);
-  const polys = S.Production.toPolynomials(minerals, prods);
-  const counts = S.Production.calcs(minerals, prods, timeMs / 1000);
+  const c = { count: minerals, production: [] };
+  const prod: S.Production.Production = { units: [c, ...prods], velocitys: [] };
+  const polys = S.Production.toPolynomials(prod);
+  const counts = S.Production.calcs(prod, timeMs / 1000);
 
   React.useEffect(() => {
     let handle: number | null = null;
@@ -142,12 +145,13 @@ export default function Swarm(): JSX.Element {
                   <input
                     type="number"
                     style={style.input}
-                    value={prod.production}
+                    value={prod.production[0]}
                     onInput={(e) => {
                       const value = e.currentTarget.value;
                       setProds((prods) => {
                         prods = [...prods];
-                        prods[i].production = inputInt(value, prod.production);
+                        // TODO this is broken since ProductionUnit redesign
+                        // prods[i].production = inputInt(value, prod.production);
                         return prods;
                       });
                     }}
@@ -182,7 +186,8 @@ export default function Swarm(): JSX.Element {
                       : prods.concat([
                           {
                             count,
-                            production: 1,
+                            // TODO this is broken since ProductionUnit redesign
+                            production: [1],
                           },
                         ]);
                   });
@@ -203,7 +208,8 @@ export default function Swarm(): JSX.Element {
                       : prods.concat([
                           {
                             count: 1,
-                            production,
+                            // TODO this is broken since ProductionUnit redesign
+                            production: [production],
                           },
                         ]);
                   });

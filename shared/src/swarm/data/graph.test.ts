@@ -7,7 +7,8 @@ test("prod graph", () => {
   expect(g).toBeTruthy();
   // are paths built? are they going the right direction?
   expect(Math.max(...g.childPaths.larva.map((p) => p.path.length))).toBe(1);
-  expect(g.childPaths.hatchery.map((p) => p.path.length)).toEqual([]);
+  expect(g.childPaths.larva).toHaveLength(2);
+  expect(g.childPaths.hatchery.map((p) => p.path.length)).toEqual([0]);
   expect(
     Math.max(...g.childPaths.mineral.map((p) => p.path.length))
   ).toBeGreaterThanOrEqual(1);

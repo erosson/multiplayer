@@ -8,11 +8,17 @@ const style = {
   prodList: { padding: 0, margin: 0, listStyleType: "none" },
 };
 export default function Swarm(): JSX.Element {
+  const data = S.Data.create();
+  console.log("data", data);
+  return <_Swarm data={data} />;
+}
+function _Swarm(props: {
+  data: ReturnType<typeof S.Data.create>;
+}): JSX.Element {
+  const { data } = props;
   const [start, setStart] = React.useState(Date.now());
   const [timeMs, setTimeMs] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
-
-  const data = S.Data.create();
   const [session, setSession] = React.useState(() => S.Session.create(data));
 
   React.useEffect(() => {
