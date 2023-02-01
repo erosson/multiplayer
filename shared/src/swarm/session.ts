@@ -147,10 +147,13 @@ export function subElapsed(a: ElapsedMs, b: ElapsedMs): ElapsedMs {
 
 export function reifiedElapsed<I extends S.AnyID>(
   session: Session<I>,
-  now: Date
+  nowOrElapsed: Date | ElapsedMs
 ): ElapsedMs {
-  const total = toElapsed({ before: session.started, after: now });
-  return subElapsed(total, session.reified);
+  if (nowOrElapsed instanceof Date) {
+    const total = toElapsed({ before: session.started, after: nowOrElapsed });
+    return subElapsed(total, session.reified);
+  }
+  return nowOrElapsed;
 }
 export function elapsedSeconds(a: ElapsedMs): number {
   return ElapsedMs.iso.unwrap(a) / 1000;
@@ -159,16 +162,19 @@ export function elapsedSeconds(a: ElapsedMs): number {
 export function unitCount<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>,
-  now: Date
+  nowOrElapsed: Date | ElapsedMs
 ): number {
-  return unitCountElapsed(session, id, reifiedElapsed(session, now));
+  const t: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
+  return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t));
 }
-export function unitCountElapsed<I extends S.AnyID>(
+
+export function unitVelocity<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>,
-  t: ElapsedMs
+  nowOrElapsed: Date | ElapsedMs
 ): number {
-  return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t));
+  const t: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
+  return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t), 1);
 }
 
 export function elapsedMs(ms: number): ElapsedMs {
@@ -177,22 +183,14 @@ export function elapsedMs(ms: number): ElapsedMs {
 
 export function reify<I extends S.AnyID>(
   session: Session<I>,
-  now: Date
+  nowOrElapsed: Date | ElapsedMs
 ): Session<I> {
-  const reified = toElapsed({ before: session.started, after: now });
-  const dt = subElapsed(reified, session.reified);
-  return reifyElapsed(session, dt);
-}
-
-export function reifyElapsed<I extends S.AnyID>(
-  session: Session<I>,
-  dt: ElapsedMs
-): Session<I> {
+  const dt: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
   const session1: Session<I> = session.data.unit.list.reduce(
     (s, { id }) =>
       setUnit(s, id, (u) => ({
         ...u,
-        count: unitCountElapsed(session, id, dt),
+        count: unitCount(session, id, dt),
       })),
     session
   );
@@ -200,4 +198,42 @@ export function reifyElapsed<I extends S.AnyID>(
     ...session1,
     reified: addElapsed(session.reified, dt),
   };
+}
+
+export function costBuyable<I extends S.AnyID>(
+  session: Session<I>,
+  cost: S.Cost<I>,
+  elapsed: ElapsedMs
+): number {
+  const bank = unitCount(session, cost.unit, elapsed);
+  if (cost.factor == null) {
+    return bank / cost.value;
+  } else {
+    // https://en.wikipedia.org/wiki/Geometric_progression#Geometric_series
+    // unit.count = cost.val (1 - cost.factor ^ maxAffordable) / (1 - cost.factor)
+    // solve for maxAffordable:
+    // unit.count * (1 - cost.factor) = cost.val (1 - cost.factor ^ maxAffordable)
+    // unit.count * (1 - cost.factor) / cost.val = 1 - cost.factor ^ maxAffordable
+    // cost.factor ^ maxAffordable = 1 - unit.count * (1 - cost.factor) / cost.val
+    // maxAffordable * ln cost.factor = ln (1 - unit.count * (1 - cost.factor) / cost.val)
+    // maxAffordable = (log (1 - (unit.count * (1 - cost.factor) / cost.val))) / (log cost.factor)
+    return (
+      Math.log(1 - (bank * (1 - cost.factor)) / cost.value) /
+      Math.log(cost.factor)
+    );
+  }
+}
+
+export function costBuyableVelocity<I extends S.AnyID>(
+  session: Session<I>,
+  cost: S.Cost<I>,
+  elapsed: ElapsedMs
+): number {
+  const velocity = unitVelocity(session, cost.unit, elapsed);
+  if (cost.factor == null) {
+    return velocity / cost.value;
+  } else {
+    // exponential costs are not compatible with continuous purchasing
+    return 0;
+  }
 }

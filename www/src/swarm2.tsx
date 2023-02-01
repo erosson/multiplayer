@@ -1,6 +1,5 @@
 import React from "react";
 import * as S from "shared/src/swarm";
-import { elapsedMs } from "shared/src/swarm/session";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
 
 const style = {
@@ -37,7 +36,7 @@ export default function Swarm(): JSX.Element {
   function reify() {
     setTimeMs(0);
     setStart(Date.now());
-    setSession((session) => S.Session.reifyElapsed(session, elapsed()));
+    setSession((session) => S.Session.reify(session, elapsed()));
   }
 
   return (
@@ -77,19 +76,21 @@ export default function Swarm(): JSX.Element {
           <tr>
             <th>Name</th>
             <th>Count(0)</th>
-            <th>Production</th>
+            <th>Produces</th>
+            <th>Prod Rate</th>
             <th>Count(t)</th>
             <th>Polynomial</th>
+            <th>Degree</th>
+            <th>Cost</th>
+            <th>Buyable</th>
+            <th>Buy Rate</th>
           </tr>
         </thead>
         <tbody>
           {data.unit.list.map((unit, i) => {
             const count0 = S.Session.unitCount0(session, unit.id);
-            const count = S.Session.unitCountElapsed(
-              session,
-              unit.id,
-              elapsed()
-            );
+            const count = S.Session.unitCount(session, unit.id, elapsed());
+            const poly = S.Session.unitPolynomial(session, unit.id);
             return (
               <tr key={unit.id}>
                 <th>{unit.id}</th>
@@ -119,17 +120,63 @@ export default function Swarm(): JSX.Element {
                   </ul>
                 </td>
                 <td>
+                  {S.Session.unitVelocity(
+                    session,
+                    unit.id,
+                    elapsed()
+                  ).toPrecision(3)}
+                  /s
+                </td>
+                <td>
                   <input
                     readOnly={true}
                     type="number"
                     style={style.readonlyInput}
-                    value={count}
+                    value={count.toPrecision(3)}
                   />
                 </td>
                 <td>
-                  <ViewPolynomial
-                    poly={S.Session.unitPolynomial(session, unit.id)}
-                  />
+                  <ViewPolynomial poly={poly} />
+                </td>
+                <td>{S.Polynomial.degree(poly)}</td>
+                <td>
+                  <ul style={style.prodList}>
+                    {(unit.cost ?? []).map((cost) => (
+                      <li key={`${unit.id} $$ ${cost.unit}`}>
+                        {cost.unit} &times;
+                        {cost.value *
+                          (cost.factor ? Math.pow(cost.factor, count0) : 1)}
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+                <td>
+                  <ul style={style.prodList}>
+                    {(unit.cost ?? []).map((cost) => (
+                      <li key={`${unit.id} $$$ ${cost.unit}`}>
+                        {S.Session.costBuyable(
+                          session,
+                          cost,
+                          elapsed()
+                        ).toPrecision(3)}{" "}
+                        buyable
+                      </li>
+                    ))}
+                  </ul>
+                </td>
+                <td>
+                  <ul style={style.prodList}>
+                    {(unit.cost ?? []).map((cost) => (
+                      <li key={`${unit.id} $$$ ${cost.unit}`}>
+                        {S.Session.costBuyableVelocity(
+                          session,
+                          cost,
+                          elapsed()
+                        ).toPrecision(3)}
+                        /s
+                      </li>
+                    ))}
+                  </ul>
                 </td>
               </tr>
             );

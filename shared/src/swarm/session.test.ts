@@ -8,13 +8,9 @@ test("session basics: linear count", () => {
   session.unit.hatchery.count = 10;
   session.unit.larva.count = 0;
   expect(S.unitPolynomial(session, d.id.Unit.larva)).toEqual([0, 10]);
-  expect(S.unitCountElapsed(session, d.id.Unit.larva, S.elapsedMs(0))).toBe(0);
-  expect(S.unitCountElapsed(session, d.id.Unit.larva, S.elapsedMs(1000))).toBe(
-    10
-  );
-  expect(S.unitCountElapsed(session, d.id.Unit.larva, S.elapsedMs(2000))).toBe(
-    20
-  );
+  expect(S.unitCount(session, d.id.Unit.larva, S.elapsedMs(0))).toBe(0);
+  expect(S.unitCount(session, d.id.Unit.larva, S.elapsedMs(1000))).toBe(10);
+  expect(S.unitCount(session, d.id.Unit.larva, S.elapsedMs(2000))).toBe(20);
 });
 
 test("session basics: cubic count", () => {
@@ -26,15 +22,9 @@ test("session basics: cubic count", () => {
   expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
     0, 0, 10, 0,
   ]);
-  expect(S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(
-    0
-  );
-  expect(
-    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(1000))
-  ).toBe(10);
-  expect(
-    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(2000))
-  ).toBe(40);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(0);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(1000))).toBe(10);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(2000))).toBe(40);
 });
 
 test("session basics: 4 count", () => {
@@ -45,15 +35,9 @@ test("session basics: 4 count", () => {
   expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
     0, 0, 0, 20,
   ]);
-  expect(S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(
-    0
-  );
-  expect(
-    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(1000))
-  ).toBe(20);
-  expect(
-    S.unitCountElapsed(session, d.id.Unit.mineral, S.elapsedMs(2000))
-  ).toBe(160);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(0);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(1000))).toBe(20);
+  expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(2000))).toBe(160);
 });
 
 test("session id types", () => {

@@ -5,6 +5,17 @@ import { sum } from "./util/math";
  */
 export type Polynomial = number[];
 
+export function normalize(p: Polynomial): Polynomial {
+  p = [...p];
+  // remove leading zeros
+  while (p[p.length - 1] === 0 && p.length >= 2) {
+    p.pop();
+  }
+  return p;
+}
+export function degree(p: Polynomial): number {
+  return normalize(p).length - 1;
+}
 export function calc(p: Polynomial, t: number, degree: number = 0): number {
   if (degree > 0) {
     p = p.slice(degree);

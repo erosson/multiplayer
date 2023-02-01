@@ -1,3 +1,4 @@
+import { Polynomial } from ".";
 import * as P from "./polynomial";
 import { range, product, fact } from "./util/math";
 
@@ -13,11 +14,13 @@ export function toPolynomial(
   index: number = 0
 ): P.Polynomial {
   const r = [...p.slice(index)];
-  return [index === 0 ? c : p[index - 1].count].concat(
-    r.map(
-      (u, i) =>
-        (u.count * product(r.slice(0, i + 1).map((cu) => cu.production))) /
-        fact(i + 1)
+  return Polynomial.normalize(
+    [index === 0 ? c : p[index - 1].count].concat(
+      r.map(
+        (u, i) =>
+          (u.count * product(r.slice(0, i + 1).map((cu) => cu.production))) /
+          fact(i + 1)
+      )
     )
   );
 }
