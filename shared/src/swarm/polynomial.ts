@@ -8,8 +8,11 @@ export type Polynomial = number[];
 export function normalize(p: Polynomial): Polynomial {
   p = [...p];
   // remove leading zeros
-  while (p[p.length - 1] === 0 && p.length >= 2) {
+  while (p[p.length - 1] === 0 && p.length > 1) {
     p.pop();
+  }
+  if (p.length <= 0) {
+    p.push(0);
   }
   return p;
 }

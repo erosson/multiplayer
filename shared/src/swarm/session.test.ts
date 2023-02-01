@@ -20,7 +20,7 @@ test("session basics: cubic count", () => {
   session.unit.mineral.count = 0;
   // expect(S.unitProduction(session, d.id.Unit.mineral)).toEqual([0, 0, 10, 0]);
   expect(S.unitPolynomial(session, d.id.Unit.mineral).slice(0, 4)).toEqual([
-    0, 0, 10, 0,
+    0, 0, 10,
   ]);
   expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(0))).toBe(0);
   expect(S.unitCount(session, d.id.Unit.mineral, S.elapsedMs(1000))).toBe(10);

@@ -2,7 +2,7 @@ import * as P from "./polynomial";
 
 type Case = { p: P.Polynomial; t: number; o: number };
 const cases: Case[] = [
-  { p: [], t: 0, o: 0 },
+  { p: [0], t: 0, o: 0 },
   { p: [0], t: 0, o: 0 },
   { p: [2], t: 0, o: 2 },
   { p: [2], t: 1, o: 2 },
@@ -18,6 +18,15 @@ const cases: Case[] = [
 ];
 test.each(cases)("simple polys: calc($p, $t) === $o", ({ p, t, o }) => {
   expect(P.calc(p, t)).toEqual(o);
+});
+test.each(cases)("simple polys: normalize([0, ...$p]) === $p", ({ p }) => {
+  expect(P.normalize(p)).toEqual(p);
+  expect(P.normalize([...p, 0])).toEqual(p);
+  expect(P.normalize([...p, 0, 0, 0, 0])).toEqual(p);
+  expect(P.normalize([...p, 0, 1, 0, 0])).toEqual([...p, 0, 1]);
+});
+test("normalize([]) === [0]", () => {
+  expect(P.normalize([])).toEqual([0]);
 });
 
 // const ArbPolynomial = F.array(F.integer({ min: -1e10, max: 1e10 }));
