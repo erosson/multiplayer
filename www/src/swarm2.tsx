@@ -1,5 +1,6 @@
 import React from "react";
 import * as S from "shared/src/swarm";
+import { keyBy } from "shared/src/swarm/util/schema";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
 
 const style = {
@@ -33,29 +34,28 @@ function _Swarm(props: {
         <thead>
           <Timer timeMs={timeMs} setTimeMs={setTimeMs} reify={reify} />
           <tr>
-            <th>Name</th>
-            <th>Count(0)</th>
-            <th>Produces</th>
-            <th>Prod Rate</th>
-            <th>Count(t)</th>
-            <th>Polynomial</th>
-            <th>Degree</th>
-            <th>Cost</th>
-            <th>Buyable</th>
-            <th>Buy Rate</th>
+            {columns.map((c) => (
+              <th key={c.name}>
+                <ColumnLabel column={c} />
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {data.unit.list.map((unit, i) => {
-            return (
-              <Unit
-                key={unit.id}
-                unit={unit}
-                elapsed={elapsed}
-                session={session}
-                setSession={setSession}
-              />
-            );
+            const count0 = S.Session.unitCount0(session, unit.id);
+            const poly = S.Session.unitPolynomial(session, unit.id);
+            const count = S.Session.unitCount(session, unit.id, elapsed());
+            const props = {
+              unit,
+              elapsed,
+              session,
+              setSession,
+              count0,
+              count,
+              poly,
+            };
+            return <Unit key={unit.id} {...props} />;
           })}
         </tbody>
       </table>
@@ -63,22 +63,51 @@ function _Swarm(props: {
   );
 }
 
-function Unit<I extends S.Schema.AnyID>(props: {
+interface UnitProps<I extends S.Schema.AnyID> {
   unit: S.Schema.Unit<I>;
   session: S.Session.Session<I>;
   setSession: React.Dispatch<React.SetStateAction<S.Session.Session<I>>>;
   elapsed: () => S.Session.ElapsedMs;
-}): JSX.Element {
-  // TODO this is huge, break down more
-  const { unit, session, setSession, elapsed } = props;
-  const count0 = S.Session.unitCount0(session, unit.id);
-  const count = S.Session.unitCount(session, unit.id, elapsed());
-  const poly = S.Session.unitPolynomial(session, unit.id);
-
+  // redundant/cached
+  count: number;
+  count0: number;
+  poly: number[];
+}
+function Unit<I extends S.Schema.AnyID>(props: UnitProps<I>): JSX.Element {
   return (
-    <tr key={unit.id}>
-      <th>{unit.id}</th>
-      <td>
+    <tr key={props.unit.id}>
+      {columns.map((c, i) =>
+        i === 0 ? (
+          <th key={c.name}>
+            <c.element {...props} />
+          </th>
+        ) : (
+          <td key={c.name}>
+            <c.element {...props} />
+          </td>
+        )
+      )}
+    </tr>
+  );
+}
+
+interface Column {
+  name: string;
+  label?: JSX.Element;
+  element<I extends S.Schema.AnyID>(props: UnitProps<I>): JSX.Element;
+}
+const columns: readonly Column[] = [
+  {
+    name: "name",
+    element(props) {
+      return <>{props.unit.id}</>;
+    },
+  },
+  {
+    name: "count(0)",
+    element(props) {
+      const { unit, setSession, count0 } = props;
+      return (
         <input
           type="number"
           style={style.input}
@@ -93,8 +122,29 @@ function Unit<I extends S.Schema.AnyID>(props: {
             );
           }}
         />
-      </td>
-      <td>
+      );
+    },
+  },
+  {
+    name: "count",
+    label: <>Count(t)</>,
+    element(props) {
+      const { count } = props;
+      return (
+        <input
+          readOnly={true}
+          type="number"
+          style={style.readonlyInput}
+          value={count.toPrecision(3)}
+        />
+      );
+    },
+  },
+  {
+    name: "produces",
+    element(props) {
+      const { unit } = props;
+      return (
         <ul style={style.prodList}>
           {(unit.prod ?? []).map((prod) => (
             <li key={`${unit.id} -> ${prod.unit}`}>
@@ -102,24 +152,35 @@ function Unit<I extends S.Schema.AnyID>(props: {
             </li>
           ))}
         </ul>
-      </td>
-      <td>
-        {S.Session.unitVelocity(session, unit.id, elapsed()).toPrecision(3)}
-        /s
-      </td>
-      <td>
-        <input
-          readOnly={true}
-          type="number"
-          style={style.readonlyInput}
-          value={count.toPrecision(3)}
-        />
-      </td>
-      <td>
-        <ViewPolynomial poly={poly} />
-      </td>
-      <td>{S.Polynomial.degree(poly)}</td>
-      <td>
+      );
+    },
+  },
+  {
+    name: "prod rate",
+    element(props) {
+      const { session, unit, elapsed } = props;
+      return (
+        <>
+          {S.Session.unitVelocity(session, unit.id, elapsed()).toPrecision(3)}/s
+        </>
+      );
+    },
+  },
+  {
+    name: "polynomial",
+    element: ViewPolynomial,
+  },
+  {
+    name: "degree",
+    element(props) {
+      return <>{S.Polynomial.degree(props.poly)}</>;
+    },
+  },
+  {
+    name: "cost",
+    element(props) {
+      const { unit, count0 } = props;
+      return (
         <ul style={style.prodList}>
           {(unit.cost ?? []).map((cost) => (
             <li key={`${unit.id} $$ ${cost.unit}`}>
@@ -128,8 +189,14 @@ function Unit<I extends S.Schema.AnyID>(props: {
             </li>
           ))}
         </ul>
-      </td>
-      <td>
+      );
+    },
+  },
+  {
+    name: "buyable",
+    element(props) {
+      const { unit, session, elapsed } = props;
+      return (
         <ul style={style.prodList}>
           {(unit.cost ?? []).map((cost) => (
             <li key={`${unit.id} $$$ ${cost.unit}`}>
@@ -138,8 +205,14 @@ function Unit<I extends S.Schema.AnyID>(props: {
             </li>
           ))}
         </ul>
-      </td>
-      <td>
+      );
+    },
+  },
+  {
+    name: "buy rate",
+    element(props) {
+      const { unit, session, elapsed } = props;
+      return (
         <ul style={style.prodList}>
           {(unit.cost ?? []).map((cost) => (
             <li key={`${unit.id} $$$ ${cost.unit}`}>
@@ -152,8 +225,19 @@ function Unit<I extends S.Schema.AnyID>(props: {
             </li>
           ))}
         </ul>
-      </td>
-    </tr>
+      );
+    },
+  },
+];
+
+function ColumnLabel(props: { column: Column }): JSX.Element {
+  const { column } = props;
+  return (
+    <th>
+      {column.label ?? (
+        <span style={{ textTransform: "capitalize" }}>{column.name}</span>
+      )}
+    </th>
   );
 }
 
