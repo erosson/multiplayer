@@ -21,7 +21,7 @@ function _Swarm(props: {
   const [timeMs, setTimeMs] = React.useState(0);
 
   function elapsed() {
-    return S.Session.elapsedMs(timeMs);
+    return S.Duration.fromMillis(timeMs);
   }
   function reify() {
     setSession((session) => S.Session.reify(session, elapsed()));
@@ -67,7 +67,7 @@ interface UnitProps<I extends S.Schema.AnyID> {
   unit: S.Schema.Unit<I>;
   session: S.Session.Session<I>;
   setSession: React.Dispatch<React.SetStateAction<S.Session.Session<I>>>;
-  elapsed: () => S.Session.ElapsedMs;
+  elapsed: () => S.Duration.T;
   // redundant/cached
   count: number;
   count0: number;

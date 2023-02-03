@@ -1,23 +1,16 @@
-import * as IO from "io-ts";
-import { Newtype } from "newtype-ts";
 import * as S from "./schema";
-import { isoCodec } from "./util/schema";
 import * as Data from "./data";
 import * as Prod from "./production";
 import * as Poly from "./polynomial";
-import { product } from "./util/math";
+import * as Duration from "./duration";
 
 export interface Session<I extends S.AnyID> {
   data: Data.Data<I>;
   started: Date;
-  reified: ElapsedMs;
-  updated: ElapsedMs;
+  reified: Duration.T;
+  updated: Duration.T;
   unit: { [K in S.UnitID<I>]: Unit<I> };
 }
-
-export interface ElapsedMs
-  extends Newtype<{ readonly ElapsedMs: unique symbol }, number> {}
-export const ElapsedMs = isoCodec<ElapsedMs>(IO.string);
 
 export interface Unit<I extends S.AnyID> {
   id: S.UnitID<I>;
@@ -46,8 +39,8 @@ export function create<I extends S.AnyID>(
   const session = {
     data,
     started: now,
-    reified: ElapsedMs.iso.wrap(0),
-    updated: ElapsedMs.iso.wrap(0),
+    reified: Duration.zero,
+    updated: Duration.zero,
     // TODO we should omit units that aren't yet in play, right?
     unit: Object.fromEntries(
       Object.values<S.UnitID<I>>(data.unit.list).map((u) => [
@@ -129,62 +122,43 @@ export function unitPolynomial<I extends S.AnyID>(
   return Prod.toPolynomial(unitProduction(session, id));
 }
 
-export function toElapsed(d: { before: Date; after: Date }): ElapsedMs {
-  return ElapsedMs.iso.wrap(d.after.getTime() - d.before.getTime());
-}
-
-export function sinceElapsed(date: Date, elapsed: ElapsedMs): Date {
-  return new Date(date.getTime() + ElapsedMs.iso.unwrap(elapsed));
-}
-
-export function addElapsed(a: ElapsedMs, b: ElapsedMs): ElapsedMs {
-  return ElapsedMs.iso.wrap(ElapsedMs.iso.unwrap(a) + ElapsedMs.iso.unwrap(b));
-}
-export function subElapsed(a: ElapsedMs, b: ElapsedMs): ElapsedMs {
-  return ElapsedMs.iso.wrap(ElapsedMs.iso.unwrap(a) - ElapsedMs.iso.unwrap(b));
-}
-
 export function reifiedElapsed<I extends S.AnyID>(
   session: Session<I>,
-  nowOrElapsed: Date | ElapsedMs
-): ElapsedMs {
+  nowOrElapsed: Date | Duration.T
+): Duration.T {
   if (nowOrElapsed instanceof Date) {
-    const total = toElapsed({ before: session.started, after: nowOrElapsed });
-    return subElapsed(total, session.reified);
+    const total = Duration.between({
+      before: session.started,
+      after: nowOrElapsed,
+    });
+    return Duration.sub(total, session.reified);
   }
   return nowOrElapsed;
-}
-export function elapsedSeconds(a: ElapsedMs): number {
-  return ElapsedMs.iso.unwrap(a) / 1000;
 }
 
 export function unitCount<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>,
-  nowOrElapsed: Date | ElapsedMs
+  nowOrElapsed: Date | Duration.T
 ): number {
-  const t: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
-  return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t));
+  const t: Duration.T = reifiedElapsed(session, nowOrElapsed);
+  return Poly.calc(unitPolynomial(session, id), Duration.toSeconds(t));
 }
 
 export function unitVelocity<I extends S.AnyID>(
   session: Session<I>,
   id: S.UnitID<I>,
-  nowOrElapsed: Date | ElapsedMs
+  nowOrElapsed: Date | Duration.T
 ): number {
-  const t: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
-  return Poly.calc(unitPolynomial(session, id), elapsedSeconds(t), 1);
-}
-
-export function elapsedMs(ms: number): ElapsedMs {
-  return ElapsedMs.iso.wrap(ms);
+  const t: Duration.T = reifiedElapsed(session, nowOrElapsed);
+  return Poly.calc(unitPolynomial(session, id), Duration.toSeconds(t), 1);
 }
 
 export function reify<I extends S.AnyID>(
   session: Session<I>,
-  nowOrElapsed: Date | ElapsedMs
+  nowOrElapsed: Date | Duration.T
 ): Session<I> {
-  const dt: ElapsedMs = reifiedElapsed(session, nowOrElapsed);
+  const dt: Duration.T = reifiedElapsed(session, nowOrElapsed);
   const session1: Session<I> = session.data.unit.list.reduce(
     (s, { id }) =>
       setUnit(s, id, (u) => ({
@@ -195,14 +169,14 @@ export function reify<I extends S.AnyID>(
   );
   return {
     ...session1,
-    reified: addElapsed(session.reified, dt),
+    reified: Duration.add(session.reified, dt),
   };
 }
 
 export function costBuyable<I extends S.AnyID>(
   session: Session<I>,
   cost: S.Cost<I>,
-  elapsed: ElapsedMs
+  elapsed: Duration.T
 ): number {
   const bank = unitCount(session, cost.unit, elapsed);
   if (cost.factor == null) {
@@ -226,7 +200,7 @@ export function costBuyable<I extends S.AnyID>(
 export function costBuyableVelocity<I extends S.AnyID>(
   session: Session<I>,
   cost: S.Cost<I>,
-  elapsed: ElapsedMs
+  elapsed: Duration.T
 ): number {
   const velocity = unitVelocity(session, cost.unit, elapsed);
   if (cost.factor == null) {
