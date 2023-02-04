@@ -1,7 +1,9 @@
 import React from "react";
 import * as S from "shared/src/swarm";
+import { omit } from "lodash";
 import { keyBy } from "shared/src/swarm/util/schema";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
+import { AnyID } from "shared/src/swarm/schema";
 
 const style = {
   input: { width: "5em" },
@@ -17,14 +19,20 @@ function _Swarm(props: {
   data: ReturnType<typeof S.Data.create>;
 }): JSX.Element {
   const { data } = props;
-  const [session, setSession] = React.useState(() => S.Session.create(data));
+  const [session, setSession] = React.useState(() => S.Session.empty(data));
   const [timeMs, setTimeMs] = React.useState(0);
 
   function elapsed() {
     return S.Duration.fromMillis(timeMs);
   }
+  function now() {
+    const d = S.Duration.fromMillis(timeMs);
+    return S.Duration.dateAdd(session.session.reified, d);
+  }
   function reify() {
-    setSession((session) => S.Session.reify(session, elapsed()));
+    setSession((session) => {
+      return omit(S.Session.reify({ ...session, now: now() }), "now");
+    });
   }
 
   return (
@@ -43,10 +51,12 @@ function _Swarm(props: {
         </thead>
         <tbody>
           {data.unit.list.map((unit, i) => {
-            const count0 = S.Session.unitCount0(session, unit.id);
-            const poly = S.Session.unitPolynomial(session, unit.id);
-            const count = S.Session.unitCount(session, unit.id, elapsed());
+            const ctx = { ...session, unitId: unit.id, now: now() };
+            const count0 = S.Session.Unit.count0(ctx);
+            const poly = S.Session.Unit.polynomial(ctx);
+            const count = S.Session.Unit.count(ctx);
             const props = {
+              ctx,
               unit,
               elapsed,
               session,
@@ -64,9 +74,10 @@ function _Swarm(props: {
 }
 
 interface UnitProps<I extends S.Schema.AnyID> {
+  ctx: S.Session.Unit.SnapshotCtx<I>;
   unit: S.Schema.Unit<I>;
-  session: S.Session.Session<I>;
-  setSession: React.Dispatch<React.SetStateAction<S.Session.Session<I>>>;
+  session: S.Session.Ctx<I>;
+  setSession: React.Dispatch<React.SetStateAction<S.Session.Ctx<I>>>;
   elapsed: () => S.Duration.T;
   // redundant/cached
   count: number;
@@ -106,7 +117,7 @@ const columns: readonly Column[] = [
   {
     name: "count(0)",
     element(props) {
-      const { unit, setSession, count0 } = props;
+      const { ctx, count0, setSession } = props;
       return (
         <input
           type="number"
@@ -114,11 +125,16 @@ const columns: readonly Column[] = [
           value={count0}
           onInput={(e) => {
             const value = e.currentTarget.value;
-            setSession((session) =>
-              S.Session.setUnit(session, unit.id, (u) => ({
-                ...u,
+            setSession(
+              S.Session.Unit.set(ctx, {
+                ...S.Session.Unit.get(ctx),
                 count: inputInt(value ?? "", count0),
-              }))
+              })
+              // TODO why does type inference not work right here?
+              // S.Session.Unit.map(ctx, (u, x) => ({
+              // ...u,
+              // count: inputInt(value ?? "", count0),
+              // }))
             );
           }}
         />
@@ -158,10 +174,10 @@ const columns: readonly Column[] = [
   {
     name: "prod rate",
     element(props) {
-      const { session, unit, elapsed } = props;
       return (
         <>
-          {S.Session.unitVelocity(session, unit.id, elapsed()).toPrecision(3)}/s
+          {S.Session.Unit.velocity(props.ctx).toPrecision(3)}
+          /s
         </>
       );
     },
@@ -195,13 +211,11 @@ const columns: readonly Column[] = [
   {
     name: "buyable",
     element(props) {
-      const { unit, session, elapsed } = props;
       return (
         <ul style={style.prodList}>
-          {(unit.cost ?? []).map((cost) => (
-            <li key={`${unit.id} $$$ ${cost.unit}`}>
-              {S.Session.costBuyable(session, cost, elapsed()).toPrecision(3)}{" "}
-              buyable
+          {S.Session.Unit.costBuyable(props.ctx)?.map((res) => (
+            <li key={`${props.ctx.unitId} $$ ${res.cost.unit}`}>
+              {res.buyable.toPrecision(3)}
             </li>
           ))}
         </ul>
@@ -211,17 +225,11 @@ const columns: readonly Column[] = [
   {
     name: "buy rate",
     element(props) {
-      const { unit, session, elapsed } = props;
       return (
         <ul style={style.prodList}>
-          {(unit.cost ?? []).map((cost) => (
-            <li key={`${unit.id} $$$ ${cost.unit}`}>
-              {S.Session.costBuyableVelocity(
-                session,
-                cost,
-                elapsed()
-              ).toPrecision(3)}
-              /s
+          {S.Session.Unit.costBuyableVelocity(props.ctx)?.map((res) => (
+            <li key={`${props.ctx.unitId} v$$ ${res.cost.unit}`}>
+              {res.velocity.toPrecision(3)}/s
             </li>
           ))}
         </ul>
