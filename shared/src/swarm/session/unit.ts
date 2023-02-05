@@ -113,6 +113,7 @@ export function velocity<I extends S.AnyID>(ctx: SnapshotCtx<I>): number {
 export interface Buyable<I extends S.AnyID> {
   cost: CostBuyable<I>[];
   buyable: number;
+  isBuyable: boolean;
 }
 export type CostBuyable<I extends S.AnyID> = {
   cost: S.Cost<I>;
@@ -141,7 +142,9 @@ export function buyable<I extends S.AnyID>(ctx: SnapshotCtx<I>): Buyable<I> {
       };
     }
   });
-  return { cost, buyable: Math.min(...cost.map((c) => c.buyable)) };
+  const buyable = Math.min(...cost.map((c) => c.buyable));
+  const isBuyable = cost.length > 0 && buyable >= 1;
+  return { cost, isBuyable, buyable };
 }
 
 export interface BuyableVelocity<I extends S.AnyID> {
@@ -175,4 +178,26 @@ export function buyableVelocity<I extends S.AnyID>(
     return { cost, velocity: Math.min(...cost.map((c) => c.velocity)) };
   }
   return null;
+}
+
+export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
+  ctx0: X,
+  count_: number
+): X {
+  const b = buyable(ctx0);
+  if (!b.isBuyable) {
+    throw new Error(`!isBuyable: ${ctx0.unitId}`);
+  }
+  // cap at max buyable, and ensure integer
+  count_ = Math.min(Math.floor(count_), Math.floor(b.buyable));
+  // subtract cost units
+  const ctx = (schema(ctx0).cost ?? []).reduce((ctx, cost): X => {
+    if (cost.factor != null) {
+      throw new Error("cost.factor not implemented");
+    }
+    ctx = { ...ctx, unitId: cost.unit };
+    return mapCount<I, X>(ctx, (c) => c - cost.value * count_);
+  }, ctx0);
+  // add bought units
+  return mapCount<I, X>({ ...ctx, unitId: ctx0.unitId }, (c) => c + count_);
 }

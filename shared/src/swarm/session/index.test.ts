@@ -77,3 +77,25 @@ test("session id types", () => {
   // @ts-expect-error
   const ux4: S.Unit<IDX> = { id: "bogus", count: 3 };
 });
+test("simple buy", () => {
+  const data = Data.create();
+  const now = new Date(123);
+  let ctx = { ...S.empty(data, now), unitId: data.id.Unit.drone, now };
+  ctx.session.unit.larva.count = 10;
+  ctx.session.unit.mineral.count = 35;
+  expect(S.Unit.count(ctx)).toBe(0);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.larva })).toBe(10);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.mineral })).toBe(35);
+
+  ctx = S.Unit.buy(ctx, 1);
+  expect(S.Unit.count(ctx)).toBe(1);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.larva })).toBe(9);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.mineral })).toBe(25);
+
+  ctx = S.Unit.buy(ctx, 2);
+  expect(S.Unit.count(ctx)).toBe(3);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.larva })).toBe(7);
+  expect(S.Unit.count({ ...ctx, unitId: data.id.Unit.mineral })).toBe(5);
+
+  expect(() => S.Unit.buy(ctx, 1)).toThrow();
+});
