@@ -213,7 +213,7 @@ const columns: readonly Column[] = [
     element(props) {
       return (
         <ul style={style.prodList}>
-          {S.Session.Unit.costBuyable(props.ctx)?.map((res) => (
+          {S.Session.Unit.buyable(props.ctx).cost.map((res) => (
             <li key={`${props.ctx.unitId} $$ ${res.cost.unit}`}>
               {res.buyable.toPrecision(3)}
             </li>
@@ -225,13 +225,16 @@ const columns: readonly Column[] = [
   {
     name: "buy rate",
     element(props) {
+      const b = S.Session.Unit.buyableVelocity(props.ctx);
       return (
         <ul style={style.prodList}>
-          {S.Session.Unit.costBuyableVelocity(props.ctx)?.map((res) => (
-            <li key={`${props.ctx.unitId} v$$ ${res.cost.unit}`}>
-              {res.velocity.toPrecision(3)}/s
-            </li>
-          ))}
+          {b
+            ? b.cost.map((res) => (
+                <li key={`${props.ctx.unitId} v$$ ${res.cost.unit}`}>
+                  {res.velocity.toPrecision(3)}/s
+                </li>
+              ))
+            : []}
         </ul>
       );
     },

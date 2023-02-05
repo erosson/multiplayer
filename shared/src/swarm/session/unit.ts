@@ -68,6 +68,19 @@ export function map<I extends S.AnyID, X extends Ctx<I>>(
   return set(ctx, fn(get(ctx), ctx));
 }
 
+export function setCount<I extends S.AnyID, X extends Ctx<I>>(
+  ctx: X,
+  count: number
+): X {
+  return map<I, X>(ctx, (unit) => ({ ...unit, count }));
+}
+export function mapCount<I extends S.AnyID, X extends SnapshotCtx<I>>(
+  ctx: X,
+  fn: (c: number, ctx: X) => number
+): X {
+  return setCount<I, X>(ctx, fn(count(ctx), ctx));
+}
+
 export function count0<I extends S.AnyID>(ctx: Ctx<I>): number {
   return get(ctx).count;
 }
@@ -97,14 +110,16 @@ export function velocity<I extends S.AnyID>(ctx: SnapshotCtx<I>): number {
   return Poly.calc(polynomial(ctx), Duration.toSeconds(t), 1);
 }
 
+export interface Buyable<I extends S.AnyID> {
+  cost: CostBuyable<I>[];
+  buyable: number;
+}
 export type CostBuyable<I extends S.AnyID> = {
   cost: S.Cost<I>;
   buyable: number;
 };
-export function costBuyable<I extends S.AnyID>(
-  ctx: SnapshotCtx<I>
-): CostBuyable<I>[] {
-  return (schema(ctx).cost ?? []).map((cost): CostBuyable<I> => {
+export function buyable<I extends S.AnyID>(ctx: SnapshotCtx<I>): Buyable<I> {
+  const cost = (schema(ctx).cost ?? []).map((cost): CostBuyable<I> => {
     const costCtx = { ...ctx, unitId: cost.unit };
     const bank = count(costCtx);
     if (cost.factor == null) {
@@ -126,8 +141,13 @@ export function costBuyable<I extends S.AnyID>(
       };
     }
   });
+  return { cost, buyable: Math.min(...cost.map((c) => c.buyable)) };
 }
 
+export interface BuyableVelocity<I extends S.AnyID> {
+  cost: CostVelocity<I>[];
+  velocity: number;
+}
 export type CostVelocity<I extends S.AnyID> = {
   cost: S.Cost<I>;
   velocity: number;
@@ -137,10 +157,10 @@ export type CostVelocity<I extends S.AnyID> = {
  *
  * `null` means that the unit can't be purchases this way - for example, any nonlinear costs
  */
-export function costBuyableVelocity<I extends S.AnyID>(
+export function buyableVelocity<I extends S.AnyID>(
   ctx: SnapshotCtx<I>
-): null | CostVelocity<I>[] {
-  const vs = (schema(ctx).cost ?? []).map((cost): null | CostVelocity<I> => {
+): null | BuyableVelocity<I> {
+  const cost_ = (schema(ctx).cost ?? []).map((cost): null | CostVelocity<I> => {
     const costCtx = { ...ctx, unitId: cost.unit };
     const v = velocity(costCtx);
     if (cost.factor == null) {
@@ -150,5 +170,9 @@ export function costBuyableVelocity<I extends S.AnyID>(
       return null;
     }
   });
-  return vs.indexOf(null) < 0 ? (vs as CostVelocity<I>[]) : null;
+  if (cost_.indexOf(null) < 0) {
+    const cost = cost_ as CostVelocity<I>[];
+    return { cost, velocity: Math.min(...cost.map((c) => c.velocity)) };
+  }
+  return null;
 }
