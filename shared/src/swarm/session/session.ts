@@ -59,7 +59,7 @@ export function reify<I extends S.AnyID, X extends SnapshotCtx<I>>(ctx0: X): X {
     ctx0
   );
   return {
-    ...ctx1,
+    ...ctx0,
     session: {
       ...ctx1.session,
       reified: Duration.dateAdd(ctx1.session.reified, sinceReified(ctx1)),

@@ -191,7 +191,8 @@ export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
   // cap at max buyable, and ensure integer
   count_ = Math.min(Math.floor(count_), Math.floor(b.buyable));
   // subtract cost units
-  const ctx = (schema(ctx0).cost ?? []).reduce((ctx, cost): X => {
+  ctx0 = Session.reify<X["data"]["id"], X>(ctx0);
+  const ctx = (b.cost.map((c) => c.cost) ?? []).reduce((ctx, cost): X => {
     if (cost.factor != null) {
       throw new Error("cost.factor not implemented");
     }

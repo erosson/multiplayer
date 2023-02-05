@@ -1,9 +1,11 @@
 import React from "react";
 import * as S from "shared/src/swarm";
-import { omit } from "lodash";
+import _, { omit } from "lodash";
 import { keyBy } from "shared/src/swarm/util/schema";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
 import { AnyID } from "shared/src/swarm/schema";
+import { partitionMapWithIndex } from "fp-ts/lib/ReadonlyRecord";
+import { reify } from "shared/src/swarm/session";
 
 const style = {
   input: { width: "5em" },
@@ -21,6 +23,7 @@ function _Swarm(props: {
   const { data } = props;
   const [session, setSession] = React.useState(() => S.Session.empty(data));
   const [timeMs, setTimeMs] = React.useState(0);
+  const [start, setStart] = React.useState(Date.now());
 
   function elapsed() {
     return S.Duration.fromMillis(timeMs);
@@ -40,7 +43,13 @@ function _Swarm(props: {
       <h1>swarm</h1>
       <table>
         <thead>
-          <Timer timeMs={timeMs} setTimeMs={setTimeMs} reify={reify} />
+          <Timer
+            timeMs={timeMs}
+            setTimeMs={setTimeMs}
+            start={start}
+            setStart={setStart}
+            reify={reify}
+          />
           <tr>
             {columns.map((c) => (
               <th key={c.name}>
@@ -61,9 +70,12 @@ function _Swarm(props: {
               elapsed,
               session,
               setSession,
+              setTimeMs,
+              setStart,
               count0,
               count,
               poly,
+              reify,
             };
             return <Unit key={unit.id} {...props} />;
           })}
@@ -79,6 +91,8 @@ interface UnitProps<I extends S.Schema.AnyID> {
   session: S.Session.Ctx<I>;
   setSession: React.Dispatch<React.SetStateAction<S.Session.Ctx<I>>>;
   elapsed: () => S.Duration.T;
+  setTimeMs: (t: number) => void;
+  setStart: (d: number) => void;
   // redundant/cached
   count: number;
   count0: number;
@@ -239,6 +253,43 @@ const columns: readonly Column[] = [
       );
     },
   },
+  {
+    name: "buy-button",
+    element({ ctx, setSession, setTimeMs, setStart }) {
+      const b = S.Session.Unit.buyable(ctx);
+      if (b.isBuyable) {
+        const buttons = _.uniq(
+          [b.buyable * 0.04, b.buyable * 0.2, b.buyable].map((v) =>
+            Math.max(1, Math.floor(v))
+          )
+        );
+        return (
+          <>
+            {buttons.map((count, index) => (
+              <button
+                key={`buy.${ctx.unitId}.${index}`}
+                onClick={() => {
+                  setStart(Date.now());
+                  setTimeMs(0);
+                  setSession(
+                    // TODO there must be a better way to do these types
+                    S.Session.Unit.buy<(typeof ctx)["data"]["id"], typeof ctx>(
+                      ctx,
+                      count
+                    )
+                  );
+                }}
+              >
+                Buy {count}
+              </button>
+            ))}
+          </>
+        );
+      } else {
+        return <></>;
+      }
+    },
+  },
 ];
 
 function ColumnLabel(props: { column: Column }): JSX.Element {
@@ -255,9 +306,11 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
 function Timer(props: {
   timeMs: number;
   setTimeMs: React.Dispatch<React.SetStateAction<number>>;
+  start: number;
+  setStart: React.Dispatch<React.SetStateAction<number>>;
   reify: () => void;
 }): JSX.Element {
-  const [start, setStart] = React.useState(Date.now());
+  const { timeMs, setTimeMs, start, setStart } = props;
   const [paused, setPaused] = React.useState(false);
 
   React.useEffect(() => {
@@ -265,7 +318,7 @@ function Timer(props: {
     function tick() {
       if (!paused) {
         const now = Date.now();
-        props.setTimeMs(now - start);
+        setTimeMs(now - start);
       }
       handle = requestAnimationFrame(tick);
     }
@@ -273,10 +326,10 @@ function Timer(props: {
     return () => {
       if (handle !== null) cancelAnimationFrame(handle);
     };
-  }, [paused, start, props.setTimeMs]);
+  }, [paused, start, setTimeMs]);
 
   function reify() {
-    props.setTimeMs(0);
+    setTimeMs(0);
     setStart(Date.now());
     props.reify();
   }
