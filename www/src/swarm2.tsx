@@ -320,18 +320,24 @@ function Timer(props: {
         <button
           onClick={() => {
             if (paused) {
-              // reify on unpause avoids needing to track how long we were paused
-              setCtx(
-                flow(S.Session.reify, S.Session.tick, (ctx) => ({
-                  ...ctx,
-                  session: { ...ctx.session, reified: ctx.now },
-                }))
-              );
+              setCtx((ctx) => {
+                // add pause duration to reified
+                const now = new Date();
+                const pauseDur = S.Duration.between({
+                  before: ctx.now,
+                  after: now,
+                });
+                const reified = S.Duration.dateAdd(
+                  ctx.session.reified,
+                  pauseDur
+                );
+                return { ...ctx, now, session: { ...ctx.session, reified } };
+              });
             }
             setPaused(!paused);
           }}
         >
-          {paused ? "Reify and Resume" : "Pause"}
+          {paused ? "Resume" : "Pause"}
         </button>
       </td>
       <td>
