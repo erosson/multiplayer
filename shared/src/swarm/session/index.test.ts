@@ -77,6 +77,17 @@ test("session id types", () => {
   // @ts-expect-error
   const ux4: S.Unit<IDX> = { id: "bogus", count: 3 };
 });
+test("reify doesn't affect other context fields", () => {
+  const data = Data.create();
+  const now = new Date(123);
+  let ctx = { ...S.empty(data, now), now };
+  expect(S.reify(ctx)).toEqual(ctx);
+  expect(S.reify({ ...ctx, abc: 123 })).toEqual({ ...ctx, abc: 123 });
+  expect(S.reify({ ...ctx, unitId: data.id.Unit.larva })).toEqual({
+    ...ctx,
+    unitId: data.id.Unit.larva,
+  });
+});
 test("simple buy", () => {
   const data = Data.create();
   const now = new Date(123);
