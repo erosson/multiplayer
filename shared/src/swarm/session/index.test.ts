@@ -110,3 +110,123 @@ test("simple buy", () => {
 
   expect(() => S.Unit.buy(ctx, 1)).toThrow();
 });
+
+test("simple autobuy", () => {
+  const data = Data.create();
+  const u = data.id.Unit;
+  const now = new Date(123);
+  function d(ms: number): Date {
+    return Duration.dateAdd(ctx.session.reified, Duration.fromMillis(ms));
+  }
+  let ctx = { ...S.empty(data, now), unitId: data.id.Unit.drone, now };
+  expect(S.autobuyVelocities(ctx)).toMatchObject({});
+  // neither valid nor autobuyable for non-buyable units
+  expect(S.Unit.autobuyable({ ...ctx, unitId: u.larva })).toMatchObject({
+    isValid: false,
+    isAutobuyable: false,
+  });
+  // neither valid nor autobuyable for units with nonlinear cost
+  expect(S.Unit.autobuyable({ ...ctx, unitId: u.hatchery })).toMatchObject({
+    isValid: false,
+    isAutobuyable: false,
+  });
+  // valid but not autobuyable when we can't afford to autobuy anything
+  ctx.session.unit.hatchery.count = 1;
+  ctx.session.unit.larva.count = 0;
+  ctx.session.unit.drone.count = 0;
+  ctx.session.unit.mineral.count = 0;
+  expect(S.Unit.autobuyable(ctx)).toMatchObject({
+    isValid: true,
+    isAutobuyable: false,
+  });
+
+  // valid and autobuyable
+  ctx.session.unit.drone.count = 3;
+  expect(S.autobuyVelocities(ctx)).toMatchObject({});
+  expect(S.Unit.velocity(ctx)).toBe(0);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.larva })).toBe(1);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.mineral })).toBe(3);
+  expect(S.Unit.count(ctx)).toBe(3);
+  expect(S.Unit.autobuyable(ctx)).toMatchObject({
+    isValid: true,
+    isAutobuyable: true,
+    velocity: 0.3,
+  });
+
+  // look at it go
+  ctx = S.Unit.autobuy(ctx, 0.3);
+  expect(S.Unit.polynomial(ctx)).toEqual([3, 0.3]);
+  expect(S.autobuyVelocities(ctx)).toMatchObject({
+    drone: 0.3,
+    larva: -0.3,
+    mineral: -3,
+  });
+  expect(S.Unit.velocity(ctx)).toBe(0.3);
+  expect(S.Unit.count(ctx)).toBe(3);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.larva })).toBe(0.7);
+  expect(S.Unit.count({ ...ctx, unitId: u.larva })).toBe(0);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.mineral })).toBe(0);
+  expect(S.Unit.count({ ...ctx, unitId: u.mineral })).toBe(0);
+  ctx = S.tick(ctx, d(5000));
+  expect(S.Unit.velocity(ctx)).toBe(0.3);
+  expect(S.Unit.count(ctx)).toBe(4.5);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.larva })).toBe(0.7);
+  expect(S.Unit.count({ ...ctx, unitId: u.larva })).toBe(3.5);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.mineral })).toBe(1.5);
+  // we can autobuy more now. autybuy preview disregards existing autobuys
+  // expect(S.Unit.autobuyable(ctx)).toMatchObject({
+  // isValid: true,
+  // isAutobuyable: true,
+  // velocity: 0.45,
+  // });
+  expect(S.autobuyVelocities(ctx)).toMatchObject({
+    drone: 0.3,
+    larva: -0.3,
+    mineral: -3,
+  });
+
+  ctx = S.tick(ctx, d(10000));
+  expect(S.Unit.velocity(ctx)).toBe(0.3);
+  expect(S.Unit.count(ctx)).toBe(6);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.larva })).toBe(0.7);
+  expect(S.Unit.count({ ...ctx, unitId: u.larva })).toBe(7);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.mineral })).toBe(3);
+  // expect(S.Unit.autobuyable(ctx)).toMatchObject({
+  // isValid: true,
+  // isAutobuyable: true,
+  // velocity: 0.6,
+  // });
+  expect(S.autobuyVelocities(ctx)).toMatchObject({
+    drone: 0.3,
+    larva: -0.3,
+    mineral: -3,
+  });
+
+  ctx = S.tick(ctx, d(15000));
+  expect(S.Unit.velocity(ctx)).toBe(0.3);
+  expect(S.Unit.count(ctx)).toBe(7.5);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.larva })).toBe(0.7);
+  expect(S.Unit.count({ ...ctx, unitId: u.larva })).toBe(10.5);
+  expect(S.Unit.velocity({ ...ctx, unitId: u.mineral })).toBe(4.5);
+  expect(S.Unit.autobuyable(ctx)).toMatchObject({
+    isValid: true,
+    isAutobuyable: true,
+    velocity: 0.75,
+  });
+  expect(S.autobuyVelocities(ctx)).toMatchObject({
+    drone: 0.3,
+    larva: -0.3,
+    mineral: -3,
+  });
+
+  // multiple autobuys overwrite earlier autobuys
+  ctx = S.Unit.autobuy(ctx, 0.75);
+  expect(S.autobuyVelocities(ctx)).toMatchObject({
+    drone: 0.75,
+    larva: -0.75,
+    mineral: -7.5,
+  });
+
+  // too much gets capped
+  // expect(() => S.Unit.autobuy(ctx, 9999)).toThrow();
+});

@@ -3,6 +3,7 @@ import * as Data from "../data";
 import * as Duration from "../duration";
 import * as T from "./type";
 import * as Unit from "./unit";
+import { ordNumber } from "fp-ts/lib/Ord";
 
 export type Ctx<I extends S.AnyID> = T.SessionCtx<I>;
 export type CtxID<X extends Ctx<S.AnyID>> = X["data"]["id"];
@@ -25,6 +26,7 @@ export function empty<I extends S.AnyID>(
         Unit.empty(u),
       ])
     ),
+    autobuy: {} as Record<S.UnitID<I>, T.AutobuyOrder<I>>,
   };
   return { session, data, now };
 }
@@ -79,4 +81,21 @@ export function unitCtxs<X extends Ctx<any>>(
   ctx: X
 ): (X & Unit.Ctx<X["data"]["id"]>)[] {
   return unitIds(ctx).map((unitId, i) => ({ ...ctx, unitId }));
+}
+
+export function autobuyVelocities<I extends S.AnyID>(
+  ctx: Ctx<I>
+): Record<S.UnitID<I>, number> {
+  const accum = {} as Record<S.UnitID<I>, number>;
+  for (let order of Object.values<T.AutobuyOrder<I>>(ctx.session.autobuy)) {
+    // subtract autobuy costs
+    const unit = Unit.schema({ ...ctx, unitId: order.id });
+    for (let cost of unit.cost ?? []) {
+      const c = cost.value * order.count;
+      accum[cost.unit] = (accum[cost.unit] ?? 0) - c;
+    }
+    // add autobuy target
+    accum[order.id] = (accum[order.id] ?? 0) + order.count;
+  }
+  return accum;
 }

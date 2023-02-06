@@ -31,9 +31,7 @@ function _Swarm(props: {
           <Timer {...{ ctx, setCtx }} />
           <tr>
             {columns.map((c) => (
-              <th key={c.name}>
-                <ColumnLabel column={c} />
-              </th>
+              <ColumnLabel key={c.name} column={c} />
             ))}
           </tr>
         </thead>
@@ -196,22 +194,25 @@ const columns: readonly Column[] = [
   {
     name: "buyable",
     element(props) {
-      return (
+      const b = S.Session.Unit.buyable(props.ctx);
+      return b.isBuyable ? (
         <ul style={style.prodList}>
-          {S.Session.Unit.buyable(props.ctx).cost.map((res) => (
+          {b.cost.map((res) => (
             <li key={`${props.ctx.unitId} $$ ${res.cost.unit}`}>
               {res.buyable.toPrecision(3)}
             </li>
           ))}
         </ul>
+      ) : (
+        <></>
       );
     },
   },
   {
     name: "buy rate",
     element(props) {
-      const b = S.Session.Unit.buyableVelocity(props.ctx);
-      return (
+      const b = S.Session.Unit.autobuyable(props.ctx);
+      return b.isAutobuyable ? (
         <ul style={style.prodList}>
           {b
             ? b.cost.map((res) => (
@@ -221,6 +222,8 @@ const columns: readonly Column[] = [
               ))
             : []}
         </ul>
+      ) : (
+        <></>
       );
     },
   },
@@ -250,6 +253,37 @@ const columns: readonly Column[] = [
                 }}
               >
                 Buy {count}
+              </button>
+            ))}
+          </>
+        );
+      } else {
+        return <></>;
+      }
+    },
+  },
+  {
+    name: "autobuy-button",
+    element({ ctx, setSession }) {
+      const b = S.Session.Unit.autobuyable(ctx);
+      if (b.isAutobuyable) {
+        const buttons = [0, b.velocity];
+        return (
+          <>
+            {buttons.map((count, index) => (
+              <button
+                key={`autobuy.${ctx.unitId}.${index}`}
+                onClick={() => {
+                  setSession(
+                    // TODO there must be a better way to do these types
+                    S.Session.Unit.autobuy<
+                      (typeof ctx)["data"]["id"],
+                      typeof ctx
+                    >(ctx, count)
+                  );
+                }}
+              >
+                Autobuy {count.toPrecision(3)}
               </button>
             ))}
           </>

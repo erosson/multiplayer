@@ -6,10 +6,15 @@ export interface Session<I extends S.AnyID> {
   started: Date;
   reified: Date;
   updated: Date;
-  unit: { [K in S.UnitID<I>]: Unit<I> };
+  unit: Record<S.UnitID<I>, Unit<I>>;
+  autobuy: Record<S.UnitID<I>, AutobuyOrder<I>>;
 }
 
 export interface Unit<I extends S.AnyID> {
+  id: S.UnitID<I>;
+  count: number;
+}
+export interface AutobuyOrder<I extends S.AnyID> {
   id: S.UnitID<I>;
   count: number;
 }

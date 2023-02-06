@@ -46,6 +46,11 @@ export function schema<I extends S.AnyID>(ctx: Ctx<I>): Schema<I> {
   }
   return ret;
 }
+export function autobuyOrderOrNull<I extends S.AnyID>(
+  ctx: Ctx<I>
+): T.AutobuyOrder<I> {
+  return ctx.session.autobuy[ctx.unitId] ?? null;
+}
 
 export function set<I extends S.AnyID, X extends Ctx<I>>(
   ctx: X,
@@ -92,8 +97,16 @@ export function production<I extends S.AnyID>(ctx: Ctx<I>): Prod.Production {
     const production = ppath.path.map((path) => path.prod.value);
     return { count, production };
   });
-  // TODO velocities
-  return { units, velocitys: [] };
+  const avs = Session.autobuyVelocities(ctx);
+  const velocitys = ppaths
+    .map((ppath) => {
+      if (!(ppath.producer.id in avs)) return null;
+      const velocity = avs[ppath.producer.id];
+      const degree = ppath.path.length;
+      return { velocity, degree };
+    })
+    .filter((p) => p != null) as Prod.ProductionVelocity[];
+  return { units, velocitys };
 }
 
 export function polynomial<I extends S.AnyID>(ctx: Ctx<I>): Poly.Polynomial {
@@ -110,11 +123,14 @@ export function velocity<I extends S.AnyID>(ctx: SnapshotCtx<I>): number {
   return Poly.calc(polynomial(ctx), Duration.toSeconds(t), 1);
 }
 
-export interface Buyable<I extends S.AnyID> {
-  cost: CostBuyable<I>[];
-  buyable: number;
-  isBuyable: boolean;
-}
+export type Buyable<I extends S.AnyID> =
+  | {
+      cost: CostBuyable<I>[];
+      buyable: number;
+      isValid: true;
+      isBuyable: boolean;
+    }
+  | { isValid: false; isBuyable: false };
 export type CostBuyable<I extends S.AnyID> = {
   cost: S.Cost<I>;
   buyable: number;
@@ -142,42 +158,71 @@ export function buyable<I extends S.AnyID>(ctx: SnapshotCtx<I>): Buyable<I> {
       };
     }
   });
+  const isValid = cost.length > 0;
+  if (!isValid) {
+    return { isValid: false, isBuyable: false };
+  }
   const buyable = Math.min(...cost.map((c) => c.buyable));
-  const isBuyable = cost.length > 0 && buyable >= 1;
-  return { cost, isBuyable, buyable };
+  // unbuyable if no costs listed, or if we can't afford one
+  const isBuyable = isValid && buyable >= 1;
+  return { cost, isValid, isBuyable, buyable };
 }
 
-export interface BuyableVelocity<I extends S.AnyID> {
-  cost: CostVelocity<I>[];
-  velocity: number;
-}
-export type CostVelocity<I extends S.AnyID> = {
+export type Autobuyable<I extends S.AnyID> =
+  | {
+      cost: CostAutobuyableValid<I>[];
+      velocity: number;
+      isValid: true;
+      isAutobuyable: boolean;
+    }
+  | { cost: CostAutobuyable<I>[]; isValid: false; isAutobuyable: false };
+export interface CostAutobuyableValid<I extends S.AnyID> {
   cost: S.Cost<I>;
   velocity: number;
-};
+  isValid: true;
+}
+export interface CostAutobuyableInvalid<I extends S.AnyID> {
+  cost: S.Cost<I>;
+  isValid: false;
+}
+export type CostAutobuyable<I extends S.AnyID> =
+  | CostAutobuyableValid<I>
+  | CostAutobuyableInvalid<I>;
 /**
  * The rate at which we can purchase this unit using only our current income, without any savings
- *
- * `null` means that the unit can't be purchases this way - for example, any nonlinear costs
  */
-export function buyableVelocity<I extends S.AnyID>(
+export function autobuyable<I extends S.AnyID>(
   ctx: SnapshotCtx<I>
-): null | BuyableVelocity<I> {
-  const cost_ = (schema(ctx).cost ?? []).map((cost): null | CostVelocity<I> => {
+): Autobuyable<I> {
+  // how much can we autobuy for each cost?
+  const cost_ = (schema(ctx).cost ?? []).map((cost): CostAutobuyable<I> => {
     const costCtx = { ...ctx, unitId: cost.unit };
     const v = velocity(costCtx);
     if (cost.factor == null) {
-      return { cost, velocity: v / cost.value };
+      return { cost, velocity: v / cost.value, isValid: true };
     } else {
-      // exponential costs are not compatible with continuous purchasing
-      return null;
+      // nonlinear costs are not compatible with autobuy
+      return { cost, isValid: false };
     }
   });
-  if (cost_.indexOf(null) < 0) {
-    const cost = cost_ as CostVelocity<I>[];
-    return { cost, velocity: Math.min(...cost.map((c) => c.velocity)) };
+  if (cost_.find((c) => !c.isValid)) {
+    // no autobuy for units with exponential costs
+    return { cost: [], isAutobuyable: false, isValid: false };
   }
-  return null;
+  const buyable_ = buyable(ctx);
+  const count_ = count(ctx);
+  const cost = cost_ as CostAutobuyableValid<I>[];
+  // autobuyable velocity includes existing autobuy order, because a new autobuy will overwrite it
+  const av = autobuyOrderOrNull(ctx)?.count ?? 0;
+  const v = av + Math.min(...cost.map((c) => c.velocity));
+  // unbuyable if no costs listed, or if we don't have one and can't afford one, or if velocity is too low
+  const isValid = buyable_.isValid && cost.length > 0;
+  if (!isValid) {
+    return { cost, isValid: false, isAutobuyable: false };
+  }
+  const isAutobuyable =
+    isValid && (count_ >= 1 || buyable_.buyable >= 1) && v >= 0.1;
+  return { cost, velocity: v, isAutobuyable, isValid };
 }
 
 export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
@@ -201,4 +246,56 @@ export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
   }, ctx0);
   // add bought units
   return mapCount<I, X>({ ...ctx, unitId: ctx0.unitId }, (c) => c + count_);
+}
+
+/**
+ * TODO autobuy:
+ * - autobuy quantity slider
+ * - autobuying x when you have zero x should actually buy the first one. (unit counts between 0 and 1 are very weird; decimals are possible but less weird for larger numbers)
+ * - autobuy 1 drone/sec. (manual)buy a queen @ 100 drones. you now have 0 drones/0 mineral income, while still spending minerals (autobuying drones). negative minerals possible!
+ *   - prevent buy if it would cause any negative income; increase all relevant purchase requirements
+ *   - buy cancels autobuys if it causes negative income
+ *   - calculate: will this buy cause negative bank? allow only if not
+ * - we really need to trim more decimals in the ui
+ */
+export function autobuy<I extends S.AnyID, X extends SnapshotCtx<I>>(
+  ctx: X,
+  count_: number
+): X {
+  if (count_ <= 0) {
+    return autobuyClear<I, X>(ctx);
+  }
+  const b = autobuyable(ctx);
+  if (!b.isAutobuyable) {
+    throw new Error(`!isAutobuyable: ${ctx.unitId}`);
+  }
+  ctx = Session.reify<I, X>(ctx);
+  // cap at max autobuyable. non-integers are fine
+  count_ = Math.min(count_, b.velocity);
+  // apply autobuy order
+  const order: T.AutobuyOrder<X["data"]["id"]> = {
+    id: ctx.unitId,
+    count: count_,
+  };
+  return {
+    ...ctx,
+    session: {
+      ...ctx.session,
+      autobuy: { ...ctx.session.autobuy, [order.id]: order },
+    },
+  };
+}
+
+export function autobuyClear<I extends S.AnyID, X extends SnapshotCtx<I>>(
+  ctx: X
+): X {
+  ctx = {
+    ...ctx,
+    session: {
+      ...ctx.session,
+      autobuy: { ...ctx.session.autobuy },
+    },
+  };
+  delete ctx.session.autobuy[ctx.unitId];
+  return ctx;
 }
