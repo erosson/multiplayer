@@ -3,9 +3,9 @@ import * as S from "shared/src/swarm";
 import _, { omit } from "lodash";
 import { keyBy } from "shared/src/swarm/util/schema";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
-import { AnyID } from "shared/src/swarm/schema";
 import { partitionMapWithIndex } from "fp-ts/lib/ReadonlyRecord";
 import { reify } from "shared/src/swarm/session";
+import { flow, pipe } from "fp-ts/lib/function";
 
 const style = {
   input: { width: "5em" },
@@ -21,35 +21,14 @@ function _Swarm(props: {
   data: ReturnType<typeof S.Data.create>;
 }): JSX.Element {
   const { data } = props;
-  const [session, setSession] = React.useState(() => S.Session.empty(data));
-  const [timeMs, setTimeMs] = React.useState(0);
-  const [start, setStart] = React.useState(Date.now());
-
-  function elapsed() {
-    return S.Duration.fromMillis(timeMs);
-  }
-  function now() {
-    const d = S.Duration.fromMillis(timeMs);
-    return S.Duration.dateAdd(session.session.reified, d);
-  }
-  function reify() {
-    setSession((session) => {
-      return omit(S.Session.reify({ ...session, now: now() }), "now");
-    });
-  }
+  const [ctx, setCtx] = React.useState(() => S.Session.empty(data));
 
   return (
     <div>
       <h1>swarm</h1>
       <table>
         <thead>
-          <Timer
-            timeMs={timeMs}
-            setTimeMs={setTimeMs}
-            start={start}
-            setStart={setStart}
-            reify={reify}
-          />
+          <Timer {...{ ctx, setCtx }} />
           <tr>
             {columns.map((c) => (
               <th key={c.name}>
@@ -59,25 +38,21 @@ function _Swarm(props: {
           </tr>
         </thead>
         <tbody>
-          {data.unit.list.map((unit, i) => {
-            const ctx = { ...session, unitId: unit.id, now: now() };
+          {S.Session.unitCtxs(ctx).map((ctx, i) => {
+            const unit = S.Session.Unit.schema(ctx);
             const count0 = S.Session.Unit.count0(ctx);
             const poly = S.Session.Unit.polynomial(ctx);
             const count = S.Session.Unit.count(ctx);
             const props = {
               ctx,
+              // different name because ctx references a unit and setSession doesn't
+              setSession: setCtx,
               unit,
-              elapsed,
-              session,
-              setSession,
-              setTimeMs,
-              setStart,
               count0,
               count,
               poly,
-              reify,
             };
-            return <Unit key={unit.id} {...props} />;
+            return <Unit key={ctx.unitId} {...props} />;
           })}
         </tbody>
       </table>
@@ -87,12 +62,8 @@ function _Swarm(props: {
 
 interface UnitProps<I extends S.Schema.AnyID> {
   ctx: S.Session.Unit.SnapshotCtx<I>;
+  setSession: React.Dispatch<React.SetStateAction<S.Session.T.SnapshotCtx<I>>>;
   unit: S.Schema.Unit<I>;
-  session: S.Session.Ctx<I>;
-  setSession: React.Dispatch<React.SetStateAction<S.Session.Ctx<I>>>;
-  elapsed: () => S.Duration.T;
-  setTimeMs: (t: number) => void;
-  setStart: (d: number) => void;
   // redundant/cached
   count: number;
   count0: number;
@@ -255,7 +226,7 @@ const columns: readonly Column[] = [
   },
   {
     name: "buy-button",
-    element({ ctx, setSession, setTimeMs, setStart }) {
+    element({ ctx, setSession }) {
       const b = S.Session.Unit.buyable(ctx);
       if (b.isBuyable) {
         const buttons = _.uniq(
@@ -269,8 +240,6 @@ const columns: readonly Column[] = [
               <button
                 key={`buy.${ctx.unitId}.${index}`}
                 onClick={() => {
-                  setStart(Date.now());
-                  setTimeMs(0);
                   setSession(
                     // TODO there must be a better way to do these types
                     S.Session.Unit.buy<(typeof ctx)["data"]["id"], typeof ctx>(
@@ -304,21 +273,19 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
 }
 
 function Timer(props: {
-  timeMs: number;
-  setTimeMs: React.Dispatch<React.SetStateAction<number>>;
-  start: number;
-  setStart: React.Dispatch<React.SetStateAction<number>>;
-  reify: () => void;
+  ctx: S.Session.T.SnapshotCtx<S.Schema.AnyID>;
+  setCtx: React.Dispatch<
+    React.SetStateAction<S.Session.T.SnapshotCtx<S.Schema.AnyID>>
+  >;
 }): JSX.Element {
-  const { timeMs, setTimeMs, start, setStart } = props;
+  const { ctx, setCtx } = props;
   const [paused, setPaused] = React.useState(false);
 
   React.useEffect(() => {
     let handle: number | null = null;
     function tick() {
       if (!paused) {
-        const now = Date.now();
-        setTimeMs(now - start);
+        setCtx(S.Session.tick);
       }
       handle = requestAnimationFrame(tick);
     }
@@ -326,13 +293,7 @@ function Timer(props: {
     return () => {
       if (handle !== null) cancelAnimationFrame(handle);
     };
-  }, [paused, start, setTimeMs]);
-
-  function reify() {
-    setTimeMs(0);
-    setStart(Date.now());
-    props.reify();
-  }
+  }, [paused, setCtx]);
 
   return (
     <tr>
@@ -341,27 +302,40 @@ function Timer(props: {
         <input
           type="number"
           style={style.input}
-          value={props.timeMs / 1000}
+          value={S.Duration.toSeconds(S.Session.sinceReified(ctx))}
           onInput={(e) => {
             setPaused(true);
-            props.setTimeMs(
-              Math.floor(1000 * inputFloat(e.currentTarget.value, props.timeMs))
-            );
+            setCtx((ctx) => {
+              const s = inputFloat(e.currentTarget.value, 0);
+              const now = S.Duration.dateAdd(
+                ctx.session.reified,
+                S.Duration.fromSeconds(s)
+              );
+              return { ...ctx, now };
+            });
           }}
         />
       </td>
       <td>
         <button
           onClick={() => {
-            setStart(Date.now() - props.timeMs);
+            if (paused) {
+              // reify on unpause avoids needing to track how long we were paused
+              setCtx(
+                flow(S.Session.reify, S.Session.tick, (ctx) => ({
+                  ...ctx,
+                  session: { ...ctx.session, reified: ctx.now },
+                }))
+              );
+            }
             setPaused(!paused);
           }}
         >
-          {paused ? "Resume" : "Pause"}
+          {paused ? "Reify and Resume" : "Pause"}
         </button>
       </td>
       <td>
-        <button onClick={reify}>Reify</button>
+        <button onClick={() => setCtx(S.Session.reify)}>Reify</button>
       </td>
     </tr>
   );

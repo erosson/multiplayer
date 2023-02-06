@@ -12,7 +12,7 @@ export type Value<I extends S.AnyID> = T.Session<I>;
 export function empty<I extends S.AnyID>(
   data: Data.Data<I>,
   now?: Date
-): Ctx<I> {
+): SnapshotCtx<I> {
   now = now ?? new Date();
   const session: T.Session<I> = {
     started: now,
@@ -26,7 +26,7 @@ export function empty<I extends S.AnyID>(
       ])
     ),
   };
-  return { session, data };
+  return { session, data, now };
 }
 
 export function context<I extends S.AnyID>(
@@ -65,4 +65,18 @@ export function reify<I extends S.AnyID, X extends SnapshotCtx<I>>(ctx0: X): X {
       reified: Duration.dateAdd(ctx1.session.reified, sinceReified(ctx1)),
     },
   };
+}
+
+export function tick<X extends SnapshotCtx<any>>(ctx: X, now?: Date): X {
+  now = now ?? new Date();
+  return { ...ctx, now };
+}
+
+export function unitIds<X extends Ctx<any>>(ctx: X): X["data"]["id"]["unit"][] {
+  return Object.values(ctx.session.unit).map((u) => u.id);
+}
+export function unitCtxs<X extends Ctx<any>>(
+  ctx: X
+): (X & Unit.Ctx<X["data"]["id"]>)[] {
+  return unitIds(ctx).map((unitId, i) => ({ ...ctx, unitId }));
 }
