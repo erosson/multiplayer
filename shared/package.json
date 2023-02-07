@@ -18,6 +18,7 @@
     "graphology": "^0.25.1",
     "graphology-shortest-path": "^2.0.1",
     "graphology-traversal": "^0.3.1",
+    "immer": "^9.0.19",
     "io-ts": "^2.2.20",
     "io-ts-types": "^0.5.19",
     "monocle-ts": "^2.3.13",
