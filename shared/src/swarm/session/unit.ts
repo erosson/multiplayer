@@ -1,97 +1,82 @@
 import * as S from "../schema";
-import * as Data from "../data";
 import * as Session from "./session";
 import * as Duration from "../duration";
 import * as Prod from "../production";
 import * as Poly from "../polynomial";
 import * as T from "./type";
+import * as I from "immer";
+I.enableAllPlugins();
 
-export type Ctx<I extends S.AnyID> = T.UnitCtx<I>;
-export type SnapshotCtx<I extends S.AnyID> = Ctx<I> & T.SnapshotCtx<I>;
-export type ID<I extends S.AnyID> = S.UnitID<I>;
-export type Schema<I extends S.AnyID> = S.Unit<I>;
-export type Value<I extends S.AnyID> = T.Unit<I>;
+export type Ctx = T.UnitCtx;
+export type ID = S.UnitID;
+export type Schema = S.Unit;
+export type Value = T.Unit;
 
-export function empty<I extends S.AnyID>(unit: Schema<I>): Value<I> {
+export function empty(unit: Schema): Value {
   return {
     id: unit.id,
     count: unit.init ?? 0,
   };
 }
 
-export function context<I extends S.AnyID, X extends T.SessionCtx<I>>(
-  ctx: X,
-  unitId: ID<I>
-): X & Ctx<I> {
+export function context<X extends T.SessionCtx>(ctx: X, unitId: ID): X & Ctx {
   return { ...ctx, unitId };
 }
 
-export function getOrNull<I extends S.AnyID>(ctx: Ctx<I>): null | Value<I> {
-  return ctx.session.unit[ctx.unitId] ?? null;
+export function getOrNull(ctx: Ctx): null | Value {
+  return ctx.session.unit.get(ctx.unitId) ?? null;
 }
-export function get<I extends S.AnyID>(ctx: Ctx<I>): Value<I> {
+export function get(ctx: Ctx): Value {
   const ret = getOrNull(ctx);
   if (ret == null) {
     throw new Error(`no such unit: ${ctx.unitId}`);
   }
   return ret;
 }
-export function schemaOrNull<I extends S.AnyID>(ctx: Ctx<I>): null | Schema<I> {
-  return ctx.data.unit.byId[ctx.unitId] ?? null;
+export function schemaOrNull(ctx: Ctx): null | Schema {
+  return ctx.data.unit.byId.get(ctx.unitId) ?? null;
 }
-export function schema<I extends S.AnyID>(ctx: Ctx<I>): Schema<I> {
+export function schema(ctx: Ctx): Schema {
   const ret = schemaOrNull(ctx);
   if (ret == null) {
     throw new Error(`no such unit-schema: ${ctx.unitId}`);
   }
   return ret;
 }
-export function autobuyOrderOrNull<I extends S.AnyID>(
-  ctx: Ctx<I>
-): T.AutobuyOrder<I> {
-  return ctx.session.autobuy[ctx.unitId] ?? null;
+export function autobuyOrderOrNull(ctx: Ctx): null | T.AutobuyOrder {
+  return ctx.session.autobuy.get(ctx.unitId) ?? null;
 }
 
-export function set<I extends S.AnyID, X extends Ctx<I>>(
-  ctx: X,
-  val: Value<I>
-): X {
+export function set<X extends Ctx>(ctx: X, val: Value): X {
   if (val.id !== ctx.unitId) {
     throw new Error(
       `unit.set: unit.id "${val.id}" doesn't match ctx.unitId "${ctx.unitId}"`
     );
   }
-  return {
-    ...ctx,
-    session: { ...ctx.session, unit: { ...ctx.session.unit, [val.id]: val } },
-  };
+  return I.produce(ctx, (ctx) => {
+    ctx.session.unit.set(val.id, val);
+  });
 }
-export function map<I extends S.AnyID, X extends Ctx<I>>(
-  ctx: X,
-  fn: (v: Value<I>, ctx: X) => Value<I>
-): X {
+export function map<X extends Ctx>(ctx: X, fn: (v: Value, ctx: X) => Value): X {
   return set(ctx, fn(get(ctx), ctx));
 }
 
-export function setCount<I extends S.AnyID, X extends Ctx<I>>(
-  ctx: X,
-  count: number
-): X {
-  return map<I, X>(ctx, (unit) => ({ ...unit, count }));
+export function setCount<X extends Ctx>(ctx: X, count: number): X {
+  return map(ctx, (unit) => ({ ...unit, count }));
 }
-export function mapCount<I extends S.AnyID, X extends SnapshotCtx<I>>(
+export function mapCount<X extends Ctx>(
   ctx: X,
   fn: (c: number, ctx: X) => number
 ): X {
-  return setCount<I, X>(ctx, fn(count(ctx), ctx));
+  return setCount(ctx, fn(count(ctx), ctx));
 }
 
-export function count0<I extends S.AnyID>(ctx: Ctx<I>): number {
+export function count0(ctx: Ctx): number {
   return get(ctx).count;
 }
 
-export function production<I extends S.AnyID>(ctx: Ctx<I>): Prod.Production {
-  const ppaths = ctx.data.unit.producerGraph.childPaths[ctx.unitId] ?? [];
+export function production(ctx: Ctx): Prod.Production {
+  const ppaths = ctx.data.unit.producerGraph.childPaths.get(ctx.unitId) ?? [];
   const units = ppaths.map((ppath) => {
     const count = count0(context(ctx, ppath.producer.id));
     const production = ppath.path.map((path) => path.prod.value);
@@ -100,8 +85,8 @@ export function production<I extends S.AnyID>(ctx: Ctx<I>): Prod.Production {
   const avs = Session.autobuyVelocities(ctx);
   const velocitys = ppaths
     .map((ppath) => {
-      if (!(ppath.producer.id in avs)) return null;
-      const velocity = avs[ppath.producer.id];
+      const velocity = avs.get(ppath.producer.id);
+      if (velocity === undefined) return null;
       const degree = ppath.path.length;
       return { velocity, degree };
     })
@@ -109,34 +94,34 @@ export function production<I extends S.AnyID>(ctx: Ctx<I>): Prod.Production {
   return { units, velocitys };
 }
 
-export function polynomial<I extends S.AnyID>(ctx: Ctx<I>): Poly.Polynomial {
+export function polynomial(ctx: Ctx): Poly.Polynomial {
   return Prod.toPolynomial(production(ctx));
 }
 
-export function count<I extends S.AnyID>(ctx: SnapshotCtx<I>): number {
+export function count(ctx: Ctx): number {
   const t = Session.sinceReified(ctx);
   return Poly.calc(polynomial(ctx), Duration.toSeconds(t));
 }
 
-export function velocity<I extends S.AnyID>(ctx: SnapshotCtx<I>): number {
+export function velocity(ctx: Ctx): number {
   const t = Session.sinceReified(ctx);
   return Poly.calc(polynomial(ctx), Duration.toSeconds(t), 1);
 }
 
-export type Buyable<I extends S.AnyID> =
+export type Buyable =
   | {
-      cost: CostBuyable<I>[];
+      cost: CostBuyable[];
       buyable: number;
       isValid: true;
       isBuyable: boolean;
     }
   | { isValid: false; isBuyable: false };
-export type CostBuyable<I extends S.AnyID> = {
-  cost: S.Cost<I>;
+export type CostBuyable = {
+  cost: S.Cost;
   buyable: number;
 };
-export function buyable<I extends S.AnyID>(ctx: SnapshotCtx<I>): Buyable<I> {
-  const cost = (schema(ctx).cost ?? []).map((cost): CostBuyable<I> => {
+export function buyable(ctx: Ctx): Buyable {
+  const cost = (schema(ctx).cost ?? []).map((cost): CostBuyable => {
     const costCtx = { ...ctx, unitId: cost.unit };
     const bank = count(costCtx);
     if (cost.factor == null) {
@@ -168,34 +153,30 @@ export function buyable<I extends S.AnyID>(ctx: SnapshotCtx<I>): Buyable<I> {
   return { cost, isValid, isBuyable, buyable };
 }
 
-export type Autobuyable<I extends S.AnyID> =
+export type Autobuyable =
   | {
-      cost: CostAutobuyableValid<I>[];
+      cost: CostAutobuyableValid[];
       velocity: number;
       isValid: true;
       isAutobuyable: boolean;
     }
-  | { cost: CostAutobuyable<I>[]; isValid: false; isAutobuyable: false };
-export interface CostAutobuyableValid<I extends S.AnyID> {
-  cost: S.Cost<I>;
+  | { cost: CostAutobuyable[]; isValid: false; isAutobuyable: false };
+export interface CostAutobuyableValid {
+  cost: S.Cost;
   velocity: number;
   isValid: true;
 }
-export interface CostAutobuyableInvalid<I extends S.AnyID> {
-  cost: S.Cost<I>;
+export interface CostAutobuyableInvalid {
+  cost: S.Cost;
   isValid: false;
 }
-export type CostAutobuyable<I extends S.AnyID> =
-  | CostAutobuyableValid<I>
-  | CostAutobuyableInvalid<I>;
+export type CostAutobuyable = CostAutobuyableValid | CostAutobuyableInvalid;
 /**
  * The rate at which we can purchase this unit using only our current income, without any savings
  */
-export function autobuyable<I extends S.AnyID>(
-  ctx: SnapshotCtx<I>
-): Autobuyable<I> {
+export function autobuyable(ctx: Ctx): Autobuyable {
   // how much can we autobuy for each cost?
-  const cost_ = (schema(ctx).cost ?? []).map((cost): CostAutobuyable<I> => {
+  const cost_ = (schema(ctx).cost ?? []).map((cost): CostAutobuyable => {
     const costCtx = { ...ctx, unitId: cost.unit };
     const v = velocity(costCtx);
     if (cost.factor == null) {
@@ -211,7 +192,7 @@ export function autobuyable<I extends S.AnyID>(
   }
   const buyable_ = buyable(ctx);
   const count_ = count(ctx);
-  const cost = cost_ as CostAutobuyableValid<I>[];
+  const cost = cost_ as CostAutobuyableValid[];
   // autobuyable velocity includes existing autobuy order, because a new autobuy will overwrite it
   const av = autobuyOrderOrNull(ctx)?.count ?? 0;
   const v = av + Math.min(...cost.map((c) => c.velocity));
@@ -225,10 +206,7 @@ export function autobuyable<I extends S.AnyID>(
   return { cost, velocity: v, isAutobuyable, isValid };
 }
 
-export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
-  ctx0: X,
-  count_: number
-): X {
+export function buy<X extends Ctx>(ctx0: X, count_: number): X {
   const b = buyable(ctx0);
   if (!b.isBuyable) {
     throw new Error(`!isBuyable: ${ctx0.unitId}`);
@@ -236,16 +214,16 @@ export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
   // cap at max buyable, and ensure integer
   count_ = Math.min(Math.floor(count_), Math.floor(b.buyable));
   // subtract cost units
-  ctx0 = Session.reify<X["data"]["id"], X>(ctx0);
-  const ctx = (b.cost.map((c) => c.cost) ?? []).reduce((ctx, cost): X => {
-    if (cost.factor != null) {
-      throw new Error("cost.factor not implemented");
+  return I.produce(Session.reify(ctx0), (ctx) => {
+    for (let cost of b.cost ?? []) {
+      if (cost.cost.factor != null) {
+        throw new Error("cost.factor not implemented");
+      }
+      get({ ...ctx, unitId: cost.cost.unit }).count -= cost.cost.value * count_;
     }
-    ctx = { ...ctx, unitId: cost.unit };
-    return mapCount<I, X>(ctx, (c) => c - cost.value * count_);
-  }, ctx0);
-  // add bought units
-  return mapCount<I, X>({ ...ctx, unitId: ctx0.unitId }, (c) => c + count_);
+    // add bought units
+    get({ ...ctx, unitId: ctx.unitId }).count += count_;
+  });
 }
 
 /**
@@ -258,44 +236,29 @@ export function buy<I extends S.AnyID, X extends SnapshotCtx<I>>(
  *   - calculate: will this buy cause negative bank? allow only if not
  * - we really need to trim more decimals in the ui
  */
-export function autobuy<I extends S.AnyID, X extends SnapshotCtx<I>>(
-  ctx: X,
-  count_: number
-): X {
+export function autobuy<X extends Ctx>(ctx: X, count_: number): X {
   if (count_ <= 0) {
-    return autobuyClear<I, X>(ctx);
+    return autobuyClear(ctx);
   }
   const b = autobuyable(ctx);
   if (!b.isAutobuyable) {
     throw new Error(`!isAutobuyable: ${ctx.unitId}`);
   }
-  ctx = Session.reify<I, X>(ctx);
+  ctx = Session.reify(ctx);
   // cap at max autobuyable. non-integers are fine
   count_ = Math.min(count_, b.velocity);
   // apply autobuy order
-  const order: T.AutobuyOrder<X["data"]["id"]> = {
+  const order: T.AutobuyOrder = {
     id: ctx.unitId,
     count: count_,
   };
-  return {
-    ...ctx,
-    session: {
-      ...ctx.session,
-      autobuy: { ...ctx.session.autobuy, [order.id]: order },
-    },
-  };
+  return I.produce(ctx, (ctx) => {
+    ctx.session.autobuy.set(order.id, order);
+  });
 }
 
-export function autobuyClear<I extends S.AnyID, X extends SnapshotCtx<I>>(
-  ctx: X
-): X {
-  ctx = {
-    ...ctx,
-    session: {
-      ...ctx.session,
-      autobuy: { ...ctx.session.autobuy },
-    },
-  };
-  delete ctx.session.autobuy[ctx.unitId];
-  return ctx;
+export function autobuyClear<X extends Ctx>(ctx: X): X {
+  return I.produce(ctx, (ctx) => {
+    ctx.session.autobuy.delete(ctx.unitId);
+  });
 }

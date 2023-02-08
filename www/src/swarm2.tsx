@@ -50,7 +50,7 @@ function _Swarm(props: {
               count,
               poly,
             };
-            return <Unit key={ctx.unitId} {...props} />;
+            return <Unit key={`${ctx.unitId}`} {...props} />;
           })}
         </tbody>
       </table>
@@ -58,18 +58,18 @@ function _Swarm(props: {
   );
 }
 
-interface UnitProps<I extends S.Schema.AnyID> {
-  ctx: S.Session.Unit.SnapshotCtx<I>;
-  setSession: React.Dispatch<React.SetStateAction<S.Session.T.SnapshotCtx<I>>>;
-  unit: S.Schema.Unit<I>;
+interface UnitProps {
+  ctx: S.Session.Unit.Ctx;
+  setSession: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
+  unit: S.Schema.Unit;
   // redundant/cached
   count: number;
   count0: number;
   poly: number[];
 }
-function Unit<I extends S.Schema.AnyID>(props: UnitProps<I>): JSX.Element {
+function Unit(props: UnitProps): JSX.Element {
   return (
-    <tr key={props.unit.id}>
+    <tr key={S.Schema.UnitID.unwrap(props.unit.id)}>
       {columns.map((c, i) =>
         i === 0 ? (
           <th key={c.name}>
@@ -88,7 +88,7 @@ function Unit<I extends S.Schema.AnyID>(props: UnitProps<I>): JSX.Element {
 interface Column {
   name: string;
   label?: JSX.Element;
-  element<I extends S.Schema.AnyID>(props: UnitProps<I>): JSX.Element;
+  element(props: UnitProps): JSX.Element;
 }
 const columns: readonly Column[] = [
   {
@@ -147,7 +147,7 @@ const columns: readonly Column[] = [
         <ul style={style.prodList}>
           {(unit.prod ?? []).map((prod) => (
             <li key={`${unit.id} -> ${prod.unit}`}>
-              {prod.unit} &times;{prod.value}
+              {`${prod.unit}`} &times;{prod.value}
             </li>
           ))}
         </ul>
@@ -183,7 +183,7 @@ const columns: readonly Column[] = [
         <ul style={style.prodList}>
           {(unit.cost ?? []).map((cost) => (
             <li key={`${unit.id} $$ ${cost.unit}`}>
-              {cost.unit} &times;
+              {`${cost.unit}`} &times;
               {cost.value * (cost.factor ? Math.pow(cost.factor, count0) : 1)}
             </li>
           ))}
@@ -243,13 +243,7 @@ const columns: readonly Column[] = [
               <button
                 key={`buy.${ctx.unitId}.${index}`}
                 onClick={() => {
-                  setSession(
-                    // TODO there must be a better way to do these types
-                    S.Session.Unit.buy<(typeof ctx)["data"]["id"], typeof ctx>(
-                      ctx,
-                      count
-                    )
-                  );
+                  setSession(S.Session.Unit.buy(ctx, count));
                 }}
               >
                 Buy {count}
@@ -274,13 +268,7 @@ const columns: readonly Column[] = [
               <button
                 key={`autobuy.${ctx.unitId}.${index}`}
                 onClick={() => {
-                  setSession(
-                    // TODO there must be a better way to do these types
-                    S.Session.Unit.autobuy<
-                      (typeof ctx)["data"]["id"],
-                      typeof ctx
-                    >(ctx, count)
-                  );
+                  setSession(S.Session.Unit.autobuy(ctx, count));
                 }}
               >
                 Autobuy {count.toPrecision(3)}
@@ -307,10 +295,8 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
 }
 
 function Timer(props: {
-  ctx: S.Session.T.SnapshotCtx<S.Schema.AnyID>;
-  setCtx: React.Dispatch<
-    React.SetStateAction<S.Session.T.SnapshotCtx<S.Schema.AnyID>>
-  >;
+  ctx: S.Session.Ctx;
+  setCtx: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
 }): JSX.Element {
   const { ctx, setCtx } = props;
   const [paused, setPaused] = React.useState(false);

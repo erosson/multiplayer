@@ -1,10 +1,10 @@
 import * as S from "../schema";
-import { ID, Unit, Upgrade } from "./id";
+import { Unit } from "./id";
 
 /**
  * All unit definitions
  */
-const list: readonly S.Unit<ID>[] = [
+const list: readonly S.Unit[] = [
   { id: Unit.larva, init: 10, cost: [], prod: [] },
   {
     id: Unit.hatchery,

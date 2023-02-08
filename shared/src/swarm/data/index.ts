@@ -1,50 +1,30 @@
-import { keyBy, tagBy } from "../util/schema";
+import { mapKeyBy, mapTagBy } from "../util/schema";
 import * as G from "./graph";
 import * as S from "../schema";
-import { ID } from "./id";
 import unitData from "./unit";
 
-export interface Data<I extends S.AnyID> {
-  id: I;
-  unit: UnitData<I>;
+export interface Data {
+  unit: UnitData;
 }
 
-export interface UnitData<I extends S.AnyID> {
-  list: readonly S.Unit<I>[];
-  byId: Record<S.UnitID<I>, S.Unit<I>>;
-  byProducers: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
-  producerGraph: G.ProducerGraph<I>;
-  byCost: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
-  byRequire: Record<S.UnitID<I>, readonly S.Unit<I>[]>;
+export interface UnitData {
+  list: readonly S.Unit[];
+  byId: Map<S.UnitID, S.Unit>;
+  byProducers: Map<S.UnitID, readonly S.Unit[]>;
+  producerGraph: G.ProducerGraph;
+  byCost: Map<S.UnitID, readonly S.Unit[]>;
+  byRequire: Map<S.UnitID, readonly S.Unit[]>;
 }
 
-export interface AnyID extends Data<S.AnyID> {}
-export type UnitID<C extends AnyID> = S.UnitID<C["id"]>;
-export type UpgradeID<C extends AnyID> = S.UpgradeID<C["id"]>;
-export type AchievementID<C extends AnyID> = S.AchievementID<C["id"]>;
-
-export function baseCreate<I extends S.AnyID>(
-  id: I,
-  units: readonly S.Unit<I>[]
-): Data<I> {
+export function baseCreate(units: readonly S.Unit[]): Data {
   return {
-    id,
     unit: {
       list: units,
-      byId: keyBy(units, (unit) => unit.id),
-      byProducers: tagBy(
-        Object.values(id.Unit),
-        units,
-        (u) => u.prod?.map((c) => c.unit) ?? []
-      ),
-      producerGraph: G.producer<I>(units),
-      byCost: tagBy(
-        Object.values(id.Unit),
-        units,
-        (u) => u.cost?.map((c) => c.unit) ?? []
-      ),
-      byRequire: tagBy(
-        Object.values(id.Unit),
+      byId: mapKeyBy(units, (u) => u.id),
+      byProducers: mapTagBy(units, (u) => u.prod?.map((c) => c.unit) ?? []),
+      producerGraph: G.producer(units),
+      byCost: mapTagBy(units, (u) => u.cost?.map((c) => c.unit) ?? []),
+      byRequire: mapTagBy(
         units,
         (u) =>
           u.require?.flatMap((r) =>
@@ -55,6 +35,6 @@ export function baseCreate<I extends S.AnyID>(
   };
 }
 
-export function create(): Data<ID> {
-  return baseCreate(ID, unitData);
+export function create(): Data {
+  return baseCreate(unitData);
 }

@@ -1,19 +1,9 @@
-import { ID as ID_ } from "../schema";
+import * as S from "../schema";
+import { idRecord } from "../util/schema";
 
-export enum Unit {
-  larva = "larva",
-  hatchery = "hatchery",
-  mineral = "mineral",
-  drone = "drone",
-  queen = "queen",
-  nest = "nest",
-}
-export enum Upgrade {
-  todo = "",
-}
-export enum Achievement {
-  todo = "",
-}
-
-export type ID = ID_<typeof Unit, typeof Upgrade, typeof Achievement>;
-export const ID: ID = { Unit, Upgrade, Achievement };
+export const Unit = idRecord(
+  ["larva", "hatchery", "mineral", "drone", "queen", "nest"] as const,
+  S.UnitID.wrap
+);
+export const Upgrade = idRecord(["TODO"] as const, S.UpgradeID.wrap);
+export const Achievement = idRecord(["TODO"] as const, S.AchievementID.wrap);

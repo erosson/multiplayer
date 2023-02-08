@@ -1,33 +1,29 @@
 import * as S from "../schema";
-import * as Duration from "../duration";
 import * as Data from "../data";
 
-export interface Session<I extends S.AnyID> {
+export interface Session {
   started: Date;
   reified: Date;
   updated: Date;
-  unit: Record<S.UnitID<I>, Unit<I>>;
-  autobuy: Record<S.UnitID<I>, AutobuyOrder<I>>;
+  unit: Map<S.UnitID, Unit>;
+  autobuy: Map<S.UnitID, AutobuyOrder>;
 }
 
-export interface Unit<I extends S.AnyID> {
-  id: S.UnitID<I>;
+export interface Unit {
+  id: S.UnitID;
   count: number;
 }
-export interface AutobuyOrder<I extends S.AnyID> {
-  id: S.UnitID<I>;
+export interface AutobuyOrder {
+  id: S.UnitID;
   count: number;
 }
 
-export interface DataCtx<I extends S.AnyID> {
-  data: Data.Data<I>;
-}
-export interface SessionCtx<I extends S.AnyID> extends DataCtx<I> {
-  session: Session<I>;
-}
-export interface SnapshotCtx<I extends S.AnyID> extends SessionCtx<I> {
+export interface SessionCtx {
+  data: Data.Data;
+  session: Session;
   now: Date;
 }
-export interface UnitCtx<I extends S.AnyID> extends SessionCtx<I> {
-  unitId: S.UnitID<I>;
+
+export interface UnitCtx extends SessionCtx {
+  unitId: S.UnitID;
 }

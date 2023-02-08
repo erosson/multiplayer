@@ -33,7 +33,11 @@ export default function SwarmProduction(): JSX.Element {
       type: "directed",
     });
     graph.forEachNode((node, unit) =>
-      rendered.addNode(node, { color: "red", size: 5, label: unit.id })
+      rendered.addNode(node, {
+        color: "red",
+        size: 5,
+        label: `${unit.id}`,
+      })
     );
     graph.forEachEdge((edge, prod, source, target) =>
       rendered.addEdge(source, target, {

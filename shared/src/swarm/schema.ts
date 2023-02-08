@@ -1,56 +1,57 @@
-// IDs need codecs, but non-IDs don't. We're hardcoding game data, not decoding
-// from a spreadsheet or file. No real value in a spreadsheet, and simpler types
-export interface ID<UnitID, UpgradeID, AchievementID> {
-  Unit: UnitID;
-  Upgrade: UpgradeID;
-  Achievement: AchievementID;
-}
-export interface AnyID extends ID<any, any, any> {}
-export type UnitID<C extends AnyID> = C["Unit"][keyof C["Unit"]];
-export type UpgradeID<C extends AnyID> = C["Upgrade"][keyof C["Upgrade"]];
-export type AchievementID<C extends AnyID> =
-  C["Achievement"][keyof C["Achievement"]];
+import { Newtype, iso } from "newtype-ts";
 
-export interface Unit<ID extends AnyID> {
-  id: UnitID<ID>;
+export interface UnitID
+  extends Newtype<{ readonly _: unique symbol }, string> {}
+export const UnitID = iso<UnitID>();
+
+export interface UpgradeID
+  extends Newtype<{ readonly _: unique symbol }, string> {}
+export const UpgradeID = iso<UpgradeID>();
+
+export interface AchievementID
+  extends Newtype<{ readonly _: unique symbol }, string> {}
+export const AchievementID = iso<AchievementID>();
+
+export interface Unit {
+  id: UnitID;
   init?: number;
-  cost?: Cost<ID>[];
-  prod?: Prod<ID>[];
-  require?: Require<ID>[];
+  cost?: Cost[];
+  prod?: Prod[];
+  require?: Require[];
 }
 
-export interface Upgrade<ID extends AnyID> {
-  id: UpgradeID<ID>;
-  cost?: Cost<ID>[];
-  require?: Require<ID>[];
+export interface Upgrade {
+  id: UpgradeID;
+  cost?: Cost[];
+  require?: Require[];
 }
 
-export interface Achievement<ID extends AnyID> {
-  id: AchievementID<ID>;
-  visible: Require<ID>[];
+export interface Achievement {
+  id: AchievementID;
+  visible: Require[];
 }
 
-export interface Cost<ID extends AnyID> {
-  unit: UnitID<ID>;
+export interface Cost {
+  unit: UnitID;
   value: number;
   factor?: number;
 }
 
-export interface Prod<ID extends AnyID> {
-  unit: UnitID<ID>;
+export interface Prod {
+  unit: UnitID;
   value: number;
 }
 
-interface UnitIDType<ID extends AnyID> {
+interface UnitIDType {
   type: "unit";
-  unit: UnitID<ID>;
+  unit: UnitID;
 }
-interface UpgradeIDType<ID extends AnyID> {
+interface UpgradeIDType {
   type: "upgrade";
-  upgrade: UpgradeID<ID>;
+  upgrade: UpgradeID;
 }
 
-export interface Require<ID extends AnyID> {
-  id: UnitIDType<ID> | UpgradeIDType<ID>;
+export interface Require {
+  id: UnitIDType | UpgradeIDType;
   value: number;
 }

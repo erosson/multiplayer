@@ -1,17 +1,17 @@
 import * as G from "graphology";
 import { AbstractGraph } from "graphology-types";
-import { Unit, Prod, AnyID, UnitID } from "../schema";
+import { Unit, Prod, UnitID } from "../schema";
 import { singleSource, edgePathFromNodePath } from "graphology-shortest-path";
 
-export interface ProducerGraph<I extends AnyID> {
-  all: AbstractGraph<Unit<I>, Edge<I>>;
-  childPaths: Record<UnitID<I>, ProducerPath<I>[]>;
+export interface ProducerGraph {
+  all: AbstractGraph<Unit, Edge>;
+  childPaths: Map<UnitID, ProducerPath[]>;
 }
 
-export interface Edge<I extends AnyID> {
-  producer: Unit<I>;
-  child: Unit<I>;
-  prod: Prod<I>;
+export interface Edge {
+  producer: Unit;
+  child: Unit;
+  prod: Prod;
 }
 
 /**
@@ -21,16 +21,14 @@ export interface Edge<I extends AnyID> {
  * - `{producer: drone, child: mineral, path: [[drone,mineral]]}`
  * - `{producer: queen, child: mineral, path: [[queen,drone], [drone,mineral]]}`
  */
-export interface ProducerPath<I extends AnyID> {
-  producer: Unit<I>;
-  child: Unit<I>;
-  path: Edge<I>[];
+export interface ProducerPath {
+  producer: Unit;
+  child: Unit;
+  path: Edge[];
 }
 
-export function producer<I extends AnyID>(
-  units: readonly UnitID<I>[]
-): ProducerGraph<I> {
-  const all: AbstractGraph<Unit<I>, Edge<I>> = new G.DirectedGraph({
+export function producer(units: readonly Unit[]): ProducerGraph {
+  const all: AbstractGraph<Unit, Edge> = new G.DirectedGraph({
     type: "directed",
     allowSelfLoops: false,
     multi: false,
@@ -45,11 +43,11 @@ export function producer<I extends AnyID>(
       all.addDirectedEdge(prod.unit, child.id, { producer, child, prod });
     }
   }
-  const childPaths = Object.fromEntries(
+  const childPaths = new Map<UnitID, ProducerPath[]>(
     all.mapNodes((childId: string) => {
       const nodePaths = singleSource(all, childId);
       const prodPaths = Object.entries(nodePaths).map(
-        ([producerId, nodePath]): ProducerPath<I> => {
+        ([producerId, nodePath]): ProducerPath => {
           const path = edgePathFromNodePath(all, nodePath).map((edgeId) =>
             all.getEdgeAttributes(edgeId)
           );
@@ -58,8 +56,8 @@ export function producer<I extends AnyID>(
           return { producer, child, path };
         }
       );
-      return [childId, prodPaths];
+      return [UnitID.wrap(childId), prodPaths];
     })
-  ) as Record<UnitID<I>, ProducerPath<I>[]>;
+  );
   return { all, childPaths };
 }
