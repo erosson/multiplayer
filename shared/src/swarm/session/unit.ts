@@ -206,15 +206,15 @@ export function autobuyable(ctx: Ctx): Autobuyable {
   return { cost, velocity: v, isAutobuyable, isValid };
 }
 
-export function buy<X extends Ctx>(ctx0: X, count_: number): X {
-  const b = buyable(ctx0);
-  if (!b.isBuyable) {
-    throw new Error(`!isBuyable: ${ctx0.unitId}`);
-  }
-  // cap at max buyable, and ensure integer
-  count_ = Math.min(Math.floor(count_), Math.floor(b.buyable));
-  // subtract cost units
-  return I.produce(Session.reify(ctx0), (ctx) => {
+export function buy<X extends Ctx>(ctx: X, count_: number): X {
+  return I.produce(Session.reify(ctx), (ctx) => {
+    const b = buyable(ctx);
+    if (!b.isBuyable) {
+      throw new Error(`!isBuyable: ${ctx.unitId}`);
+    }
+    // cap at max buyable, and ensure integer
+    count_ = Math.min(Math.floor(count_), Math.floor(b.buyable));
+    // subtract cost units
     for (let cost of b.cost ?? []) {
       if (cost.cost.factor != null) {
         throw new Error("cost.factor not implemented");
@@ -237,28 +237,27 @@ export function buy<X extends Ctx>(ctx0: X, count_: number): X {
  * - we really need to trim more decimals in the ui
  */
 export function autobuy<X extends Ctx>(ctx: X, count_: number): X {
-  if (count_ <= 0) {
-    return autobuyClear(ctx);
-  }
-  const b = autobuyable(ctx);
-  if (!b.isAutobuyable) {
-    throw new Error(`!isAutobuyable: ${ctx.unitId}`);
-  }
-  ctx = Session.reify(ctx);
-  // cap at max autobuyable. non-integers are fine
-  count_ = Math.min(count_, b.velocity);
-  // apply autobuy order
-  const order: T.AutobuyOrder = {
-    id: ctx.unitId,
-    count: count_,
-  };
-  return I.produce(ctx, (ctx) => {
+  return I.produce(Session.reify(ctx), (ctx) => {
+    if (count_ <= 0) {
+      return autobuyClear(ctx);
+    }
+    const b = autobuyable(ctx);
+    if (!b.isAutobuyable) {
+      throw new Error(`!isAutobuyable: ${ctx.unitId}`);
+    }
+    // cap at max autobuyable. non-integers are fine
+    count_ = Math.min(count_, b.velocity);
+    // apply autobuy order
+    const order: T.AutobuyOrder = {
+      id: ctx.unitId,
+      count: count_,
+    };
     ctx.session.autobuy.set(order.id, order);
   });
 }
 
 export function autobuyClear<X extends Ctx>(ctx: X): X {
-  return I.produce(ctx, (ctx) => {
+  return I.produce(Session.reify(ctx), (ctx) => {
     ctx.session.autobuy.delete(ctx.unitId);
   });
 }
