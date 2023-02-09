@@ -1,5 +1,6 @@
 import * as Either from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import produce from "immer";
 import _ from "lodash";
 import React from "react";
 import ReactJson, { InteractionProps } from "react-json-view";
@@ -170,6 +171,35 @@ const columns: readonly Column[] = [
           type="number"
           style={style.readonlyInput}
           value={count.toPrecision(3)}
+        />
+      );
+    },
+  },
+  {
+    name: "autobuy",
+    element(props) {
+      const { ctx, setSession, unit } = props;
+      const order = S.Session.Unit.autobuyOrderOrNull(ctx);
+      return (
+        <input
+          type="number"
+          style={style.input}
+          value={order?.count ?? ""}
+          onInput={(e) => {
+            const count = inputInt(
+              e.currentTarget.value ?? "",
+              order?.count ?? 0
+            );
+            setSession(
+              produce((ctx) => {
+                if (count === 0) {
+                  ctx.session.autobuy.delete(unit.id);
+                } else {
+                  ctx.session.autobuy.set(unit.id, { id: unit.id, count });
+                }
+              })
+            );
+          }}
         />
       );
     },

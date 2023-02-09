@@ -9811,6 +9811,7 @@ __metadata:
     graphology-layout-forceatlas2: ^0.10.1
     graphology-types: ^0.24.7
     html-webpack-plugin: ^5.5.0
+    immer: ^9.0.19
     lodash: ^4.17.21
     prettier: ^2.8.3
     react: ^18.2.0
