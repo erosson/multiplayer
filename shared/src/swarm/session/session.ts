@@ -20,7 +20,6 @@ export function empty(data: Data.Data, now?: Date): Ctx {
     unit: new Map(data.unit.list.map((u) => [u.id, Unit.empty(u)])),
     autobuy: new Map(),
   };
-  console.log("session0", session);
   return { session, data, now };
 }
 

@@ -1,22 +1,129 @@
 import * as IO from "io-ts";
 import * as IOT from "io-ts-types";
-import { Iso } from "monocle-ts";
 import { Newtype, iso, CarrierOf } from "newtype-ts";
 import * as MapU from "./map";
+import { JsonValue, MessageType } from "@protobuf-ts/runtime";
 import * as I from "immer";
+import { Ord } from "fp-ts/Ord";
+import { PathReporter } from "io-ts/lib/PathReporter";
+import * as Either from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 I.enableAllPlugins();
 
-export interface IsoCodec<A extends Newtype<any, any>> {
-  iso: Iso<A, CarrierOf<A>>;
-  codec: IO.Type<A, CarrierOf<A>, IO.OutputOf<CarrierOf<A>>>;
+export interface IsoCodec<A extends Newtype<unknown, unknown>> {
+  codec: ReturnType<typeof IOT.fromNewtype<A>>;
+  iso: ReturnType<typeof iso<A>>;
+  // alias the most common iso methods for easy iso -> isocodec refactoring
+  wrap: ReturnType<typeof iso<A>>["wrap"];
+  unwrap: ReturnType<typeof iso<A>>["unwrap"];
 }
-export function isoCodec<A extends Newtype<any, any>>(
-  wrappedCodec: IO.Type<any, any, any>
+export function isoCodec<A extends Newtype<unknown, unknown>>(
+  wrappedCodec: Parameters<typeof IOT.fromNewtype<A>>[0]
 ): IsoCodec<A> {
+  const iso_ = iso<A>();
   return {
-    iso: iso<A>(),
     codec: IOT.fromNewtype<A>(wrappedCodec),
+    iso: iso_,
+    wrap(a) {
+      return iso_.wrap(a);
+    },
+    unwrap(a) {
+      return iso_.unwrap(a);
+    },
   };
+}
+
+export interface ProtoCodec<IO, P extends object> {
+  codec: IO.Type<IO, P>;
+  proto: MessageType<P>;
+  jsonString: IO.Type<IO, string>;
+  jsonStringF: IO.Type<IO, string>;
+  json: IO.Type<IO, JsonValue>;
+  binary: IO.Type<IO, Uint8Array>;
+}
+export function protoCodec<I, P extends object>(
+  codec: IO.Type<I, P>,
+  proto: MessageType<P>
+): ProtoCodec<I, P> {
+  const jsonString: IO.Type<I, string> = protoCodecFn(
+    IO.string.is,
+    proto,
+    (s) => proto.fromJsonString(s),
+    (o) => proto.toJsonString(o),
+    "jsonString"
+  ).pipe(codec);
+
+  const jsonStringF: IO.Type<I, string> = protoCodecFn(
+    IO.string.is,
+    proto,
+    (s) => proto.fromJsonString(s),
+    (o) => proto.toJsonString(o, { prettySpaces: 2 }),
+    "jsonStringF"
+  ).pipe(codec);
+
+  const json: IO.Type<I, JsonValue> = protoCodecFn(
+    IO.any.is,
+    proto,
+    (s) => proto.fromJson(s),
+    (o) => proto.toJson(o),
+    "json"
+  ).pipe(codec);
+
+  const binary: IO.Type<I, Uint8Array> = protoCodecFn(
+    (v): v is Uint8Array => v instanceof Uint8Array,
+    proto,
+    (s) => proto.fromBinary(s),
+    (o) => proto.toBinary(o),
+    "binary"
+  ).pipe(codec);
+  return {
+    codec,
+    proto,
+    jsonString,
+    jsonStringF,
+    json,
+    binary,
+  };
+}
+
+function ioTryCatch<A>(fn: () => A, ctx: IO.Context): IO.Validation<A> {
+  try {
+    return IO.success(fn());
+  } catch (err) {
+    return IO.failure(err, ctx);
+  }
+}
+function protoCodecFn<A extends object, O>(
+  is: IO.Is<O>,
+  proto: MessageType<A>,
+  from: (o: O) => A,
+  to: (p: A) => O,
+  name: string
+): IO.Type<A, O> {
+  return new IO.Type(
+    `Proto.${proto.typeName}:${name}`,
+    (val): val is A => proto.is(val),
+    (s, ctx) =>
+      is(s)
+        ? ioTryCatch(() => from(s), ctx)
+        : IO.failure(`${proto.typeName}: expected input type ${name}`, ctx),
+    (p) => to(p)
+  );
+}
+
+export function mapFromValues<K, V>(
+  toKey: (v: V) => K,
+  name: string = "mapFromValues"
+): IO.Type<Map<K, V>, V[]> {
+  return new IO.Type(
+    name,
+    (val): val is Map<K, V> => val instanceof Map,
+    (array, ctx) =>
+      Array.isArray(array)
+        ? IO.success(new Map((array as V[]).map((v) => [toKey(v), v])))
+        : IO.failure(array, ctx),
+    (map) => Array.from(map.values())
+  );
 }
 
 /**

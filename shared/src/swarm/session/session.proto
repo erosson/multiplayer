@@ -1,0 +1,25 @@
+syntax = "proto3";
+package mp.swarm.session;
+// import "google/protobuf/timestamp.proto";
+
+message Session {
+  // TODO bigints in Timestamp make Jest upset
+  //   google.protobuf.Timestamp started = 1;
+  //   google.protobuf.Timestamp reified = 2;
+  //   google.protobuf.Timestamp updated = 3;
+  string started = 1;
+  string reified = 2;
+  string updated = 3;
+  repeated Unit unit = 4;
+  repeated AutobuyOrder autobuy = 5;
+}
+
+message Unit {
+  string id = 1;
+  double count = 2;
+}
+
+message AutobuyOrder {
+  string id = 1;
+  double count = 2;
+}

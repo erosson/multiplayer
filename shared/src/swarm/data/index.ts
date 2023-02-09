@@ -1,9 +1,15 @@
 import { mapKeyBy, mapTagBy } from "../util/schema";
 import * as G from "./graph";
 import * as S from "../schema";
-import unitData from "./unit";
+import Unit from "./unit";
 
+/**
+ * Game data. Unit types, etc.
+ *
+ * Lots of redundancy. Lots of indexes for efficient data access.
+ */
 export interface Data {
+  raw: Raw;
   unit: UnitData;
 }
 
@@ -16,8 +22,21 @@ export interface UnitData {
   byRequire: Map<S.UnitID, readonly S.Unit[]>;
 }
 
-export function baseCreate(units: readonly S.Unit[]): Data {
+/**
+ * Raw game data, with no indexes. Used to create `Data` and its indexes.
+ */
+export interface Raw {
+  units: readonly S.Unit[];
+}
+
+export const raw: Readonly<Raw> = {
+  units: Unit,
+};
+
+export function baseCreate(raw: Readonly<Raw>): Data {
+  const { units } = raw;
   return {
+    raw,
     unit: {
       list: units,
       byId: mapKeyBy(units, (u) => u.id),
@@ -36,5 +55,5 @@ export function baseCreate(units: readonly S.Unit[]): Data {
 }
 
 export function create(): Data {
-  return baseCreate(unitData);
+  return baseCreate(raw);
 }

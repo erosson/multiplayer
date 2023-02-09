@@ -1,11 +1,9 @@
 import React from "react";
 import * as S from "shared/src/swarm";
-import _, { omit } from "lodash";
-import { keyBy } from "shared/src/swarm/util/schema";
+import _ from "lodash";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
-import { partitionMapWithIndex } from "fp-ts/lib/ReadonlyRecord";
-import { reify } from "shared/src/swarm/session";
-import { flow, pipe } from "fp-ts/lib/function";
+import * as Either from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 
 const style = {
   input: { width: "5em" },
@@ -54,6 +52,24 @@ function _Swarm(props: {
           })}
         </tbody>
       </table>
+      <div>
+        <label>
+          <div>JSON state</div>
+          <textarea
+            value={S.Session.T.Session.jsonStringF.encode(ctx.session)}
+            onChange={(e) =>
+              pipe(
+                e.currentTarget.value,
+                S.Session.T.Session.jsonStringF.decode,
+                Either.fold(
+                  (err) => console.error(err),
+                  (session) => setCtx((ctx) => ({ ...ctx, session }))
+                )
+              )
+            }
+          />
+        </label>
+      </div>
     </div>
   );
 }
