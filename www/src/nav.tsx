@@ -23,7 +23,7 @@ export default function Nav(): JSX.Element {
           <Link to={Route.Route.platform}>platform</Link>
         </li>
         <li style={style.li}>
-          <Link to={Route.Route.swarm2}>swarm math</Link>
+          <Link to={Route.Route.swarm}>swarm math</Link>
         </li>
         <li style={style.li}>
           <Link to={Route.Route.swarmGraph}>swarm graph</Link>

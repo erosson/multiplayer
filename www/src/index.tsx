@@ -4,7 +4,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
-import Swarm2 from "./swarm2";
+import Swarm from "./swarm";
 import SwarmGraph from "./swarm-graph";
 import Nav from "./nav";
 import * as Route from "./route";
@@ -62,8 +62,8 @@ function Router(props: { env: Env.Env }): JSX.Element {
           element: <Platform env={props.env} />,
         },
         {
-          path: Route.Route.swarm2,
-          element: <Swarm2 />,
+          path: Route.Route.swarm,
+          element: <Swarm />,
         },
         {
           path: Route.Route.swarmGraph,

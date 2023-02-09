@@ -3,6 +3,6 @@ export enum Route {
   hello = "/hello",
   count = "/count",
   platform = "/platform",
-  swarm2 = "/swarm2",
+  swarm = "/swarm",
   swarmGraph = "/swarm-graph",
 }
