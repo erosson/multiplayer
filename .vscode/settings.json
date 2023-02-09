@@ -7,6 +7,11 @@
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
   "vs-kubernetes": {
     "vs-kubernetes.kubectl-path.linux": "vendor/bin/kubectl"
   },

@@ -1,5 +1,5 @@
 import * as P from "./polynomial";
-import { range, product, fact } from "./util/math";
+import { fact, product, range } from "./util/math";
 
 export interface Production {
   units: ProductionUnit[];

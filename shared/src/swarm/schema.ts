@@ -1,7 +1,7 @@
-import * as IO from "io-ts";
-import { Newtype, getOrd } from "newtype-ts";
-import { isoCodec } from "./util/schema";
 import { Ord as StringOrd } from "fp-ts/string";
+import * as IO from "io-ts";
+import { getOrd, Newtype } from "newtype-ts";
+import { isoCodec } from "./util/schema";
 
 // id types
 

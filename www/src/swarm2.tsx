@@ -1,10 +1,10 @@
-import React from "react";
-import * as S from "shared/src/swarm";
-import _ from "lodash";
-import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
 import * as Either from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import _ from "lodash";
+import React from "react";
 import ReactJson, { InteractionProps } from "react-json-view";
+import * as S from "shared/src/swarm";
+import { inputFloat, inputInt, ViewPolynomial } from "./swarm";
 
 const style = {
   input: { width: "5em" },

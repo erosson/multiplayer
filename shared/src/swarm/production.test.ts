@@ -1,5 +1,5 @@
-import * as P from "./production";
 import { Polynomial } from "./polynomial";
+import * as P from "./production";
 
 type Case = {
   c: P.ConstantUnit;

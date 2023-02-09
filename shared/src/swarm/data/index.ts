@@ -1,6 +1,6 @@
+import * as S from "../schema";
 import { mapKeyBy, mapTagBy } from "../util/schema";
 import * as G from "./graph";
-import * as S from "../schema";
 import Unit from "./unit";
 
 /**

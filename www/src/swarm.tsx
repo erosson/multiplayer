@@ -22,7 +22,7 @@ export default function Swarm(): JSX.Element {
   const [timeMs, setTimeMs] = React.useState(0);
   const [minerals, setMinerals] = React.useState(0);
   // TODO broken since ProductionUnit redesign
-  const [prods, setProds] = React.useState<S.ProductionUnit[]>([]);
+  const [prods, setProds] = React.useState<S.Production.ProductionUnit[]>([]);
   const [paused, setPaused] = React.useState(false);
   const c = { count: minerals, production: [] };
   const prod: S.Production.Production = { units: [c, ...prods], velocitys: [] };

@@ -1,7 +1,7 @@
-import * as Data from "../data";
-import * as T from "./type";
 import * as S from ".";
 import * as Proto from "../../../dist/swarm/session/session";
+import * as Data from "../data";
+import * as T from "./type";
 
 test("encode/decode runtime", () => {
   const data = Data.create();

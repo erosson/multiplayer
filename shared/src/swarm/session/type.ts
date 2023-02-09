@@ -1,10 +1,10 @@
-import * as S from "../schema";
-import * as Data from "../data";
 import * as Proto from "../../../dist/swarm/session/session";
+import * as Data from "../data";
+import * as S from "../schema";
 // import { Timestamp as ProtoTimestamp } from "../../../dist/google/protobuf/timestamp";
 import * as IO from "io-ts";
-import { mapFromValues, protoCodec } from "../util/schema";
 import { DateFromISOString } from "io-ts-types";
+import { mapFromValues, protoCodec } from "../util/schema";
 
 export const Unit = protoCodec(
   IO.type({

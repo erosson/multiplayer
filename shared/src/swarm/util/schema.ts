@@ -1,13 +1,9 @@
-import * as IO from "io-ts";
-import * as IOT from "io-ts-types";
-import { Newtype, iso, CarrierOf } from "newtype-ts";
-import * as MapU from "./map";
 import { JsonValue, MessageType } from "@protobuf-ts/runtime";
 import * as I from "immer";
-import { Ord } from "fp-ts/Ord";
-import { PathReporter } from "io-ts/lib/PathReporter";
-import * as Either from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
+import * as IO from "io-ts";
+import * as IOT from "io-ts-types";
+import { iso, Newtype } from "newtype-ts";
+import * as MapU from "./map";
 I.enableAllPlugins();
 
 export interface IsoCodec<A extends Newtype<unknown, unknown>> {

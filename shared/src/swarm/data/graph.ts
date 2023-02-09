@@ -1,7 +1,7 @@
 import * as G from "graphology";
+import { edgePathFromNodePath, singleSource } from "graphology-shortest-path";
 import { AbstractGraph } from "graphology-types";
-import { Unit, Prod, UnitID } from "../schema";
-import { singleSource, edgePathFromNodePath } from "graphology-shortest-path";
+import { Prod, Unit, UnitID } from "../schema";
 
 export interface ProducerGraph {
   all: AbstractGraph<Unit, Edge>;
