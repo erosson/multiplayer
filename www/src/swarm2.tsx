@@ -5,7 +5,6 @@ import _ from "lodash";
 import React from "react";
 import ReactJson, { InteractionProps } from "react-json-view";
 import * as S from "shared/src/swarm";
-import { inputFloat, inputInt, ViewPolynomial } from "./swarm";
 
 const style = {
   input: { width: "5em" },
@@ -452,5 +451,46 @@ function Timer(props: {
         <Undo {...props} />
       </td>
     </tr>
+  );
+}
+
+export function inputInt(inputS: string, default_: number): number {
+  const input = parseInt(inputS);
+  return Math.max(0, isNaN(input) ? default_ : input);
+}
+export function inputFloat(inputS: string, default_: number): number {
+  const input = parseFloat(inputS);
+  return Math.max(0, isNaN(input) ? default_ : input);
+}
+
+function intersperseI<A>(els: A[], join: (i: number) => A): A[] {
+  const ret = els.map((el, i) => [el, join(i)]).flat();
+  ret.pop();
+  return ret;
+}
+
+export function ViewPolynomial(props: { poly: S.Polynomial }): JSX.Element {
+  return (
+    <>
+      {intersperseI(
+        S.Polynomial.format(props.poly).map(([c, i]) => {
+          switch (i) {
+            case 0:
+              return <span key={i}>{c}</span>;
+            case 1:
+              return <span key={i}>{c} t</span>;
+            default:
+              return (
+                <span key={i}>
+                  {c} t <sup>{i}</sup>
+                </span>
+              );
+          }
+        }),
+        (i) => (
+          <span key={`${i}+`}> + </span>
+        )
+      )}
+    </>
   );
 }
