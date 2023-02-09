@@ -369,7 +369,7 @@ function Undo(props: {
   ]);
 
   React.useEffect(() => {
-    console.log("setCtx.session", props.ctx.session);
+    // console.log("setCtx.session", props.ctx.session);
     setUndo([next, props.ctx.session]);
   }, [props.ctx.session]);
 
