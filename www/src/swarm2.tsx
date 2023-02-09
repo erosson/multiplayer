@@ -359,6 +359,26 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
   );
 }
 
+function Undo(props: {
+  ctx: S.Session.Ctx;
+  setCtx: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
+}): JSX.Element {
+  const [[undo, next], setUndo] = React.useState([
+    props.ctx.session,
+    props.ctx.session,
+  ]);
+
+  React.useEffect(() => {
+    console.log("setCtx.session", props.ctx.session);
+    setUndo([next, props.ctx.session]);
+  }, [props.ctx.session]);
+
+  return (
+    <button onClick={() => props.setCtx({ ...props.ctx, session: undo })}>
+      Undo
+    </button>
+  );
+}
 function Timer(props: {
   ctx: S.Session.Ctx;
   setCtx: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
@@ -427,6 +447,9 @@ function Timer(props: {
       </td>
       <td>
         <button onClick={() => setCtx(S.Session.reify)}>Reify</button>
+      </td>
+      <td>
+        <Undo {...props} />
       </td>
     </tr>
   );
