@@ -4,6 +4,7 @@ import _ from "lodash";
 import { ViewPolynomial, inputInt, inputFloat } from "./swarm";
 import * as Either from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import ReactJson, { InteractionProps } from "react-json-view";
 
 const style = {
   input: { width: "5em" },
@@ -20,6 +21,18 @@ function _Swarm(props: {
 }): JSX.Element {
   const { data } = props;
   const [ctx, setCtx] = React.useState(() => S.Session.empty(data));
+
+  function onChange(event: InteractionProps): void {
+    console.log("json:onchange", event);
+    pipe(
+      event.updated_src,
+      S.Session.T.Session.json.decode,
+      Either.fold(
+        (err) => console.error(err),
+        (session) => setCtx((ctx) => ({ ...ctx, session }))
+      )
+    );
+  }
 
   return (
     <div>
@@ -55,6 +68,12 @@ function _Swarm(props: {
       <div>
         <label>
           <div>JSON state</div>
+          <ReactJson
+            src={S.Session.T.Session.json.encode(ctx.session) as object}
+            onEdit={onChange}
+            onAdd={onChange}
+            onDelete={onChange}
+          />
           <textarea
             value={S.Session.T.Session.jsonStringF.encode(ctx.session)}
             onChange={(e) =>
