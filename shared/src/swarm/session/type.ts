@@ -59,9 +59,45 @@ export interface Session extends IO.TypeOf<typeof Session.codec> {}
 export interface SessionCtx {
   data: Data.Data;
   session: Session;
+  undo: Session;
   now: Date;
 }
 
 export interface UnitCtx extends SessionCtx {
   unitId: S.UnitID;
+}
+
+// actions
+
+export type Action =
+  | TickAction
+  | BuyAction
+  | AutobuyAction
+  | UndoAction
+  | DebugSetSessionAction;
+
+export interface TickAction {
+  type: "tick";
+}
+
+export interface BuyAction {
+  type: "buy";
+  unitId: S.UnitID;
+  count: number;
+}
+
+export interface AutobuyAction {
+  type: "autobuy";
+  unitId: S.UnitID;
+  count: number;
+}
+
+export interface UndoAction {
+  type: "undo";
+}
+
+export interface DebugSetSessionAction {
+  type: "debug-set-session";
+  session: Session;
+  now?: Date;
 }

@@ -2,12 +2,12 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import * as S from "shared/src/swarm";
 import * as Route from "../route";
-import { UseStateT } from "../util";
+import { UseReducerT } from "../util";
 
 export default function View(props: {
-  ctx: UseStateT<S.Session.Ctx>;
+  ctx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
-  const [sctx, setCtx] = props.ctx;
+  const [sctx, dispatch] = props.ctx;
   const params = useParams();
   if (!params.unitId) throw new Error("no unitid");
   const unitId = S.Schema.UnitID.wrap(params.unitId);

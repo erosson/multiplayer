@@ -12,6 +12,7 @@ import * as S from "shared/src/swarm";
 import Nav from "./nav";
 import * as Route from "./route";
 import * as Env from "./env";
+import { UseReducerT } from "./util";
 
 function App(): JSX.Element {
   const [env, setEnv] = React.useState<Env.Env | null>(null);
@@ -26,7 +27,10 @@ function App(): JSX.Element {
     );
   }, []);
 
-  const swarmCtx = React.useState(S.Session.empty(S.Data.create()));
+  const swarmCtx = React.useReducer(
+    S.Session.reducer,
+    S.Session.empty(S.Data.create())
+  );
 
   return env ? (
     <Router env={env} swarmCtx={swarmCtx} />
@@ -46,10 +50,7 @@ function Layout(props: { children?: React.ReactNode }) {
 }
 function Router(props: {
   env: Env.Env;
-  swarmCtx: [
-    S.Session.Ctx,
-    React.Dispatch<React.SetStateAction<S.Session.Ctx>>
-  ];
+  swarmCtx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
   // https://reactrouter.com/en/main/start/tutorial
   const router = createBrowserRouter([

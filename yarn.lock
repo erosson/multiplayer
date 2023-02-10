@@ -8382,6 +8382,7 @@ __metadata:
   dependencies:
     "@protobuf-ts/plugin": ^2.8.2
     "@protobuf-ts/runtime": ^2.8.2
+    "@types/lodash": ^4.14.191
     fp-ts: ^2.13.1
     graphology: ^0.25.1
     graphology-shortest-path: ^2.0.1
@@ -8390,6 +8391,7 @@ __metadata:
     immer: ^9.0.19
     io-ts: ^2.2.20
     io-ts-types: ^0.5.19
+    lodash: ^4.17.21
     monocle-ts: ^2.3.13
     newtype-ts: ^0.3.5
     prettier: ^2.8.3

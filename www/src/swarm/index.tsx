@@ -4,7 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import * as S from "shared/src/swarm";
 import * as Route from "../route";
-import { UseStateT } from "../util";
+import { UseReducerT } from "../util";
 
 const style = {
   input: { width: "5em" },
@@ -12,16 +12,16 @@ const style = {
   prodList: { padding: 0, margin: 0, listStyleType: "none" },
 };
 export default function Swarm(props: {
-  ctx: UseStateT<S.Session.Ctx>;
+  ctx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
-  const [ctx, setCtx] = props.ctx;
+  const [ctx, dispatch] = props.ctx;
 
   return (
     <div>
       <h1>swarm</h1>
       <table>
         <thead>
-          <Timer {...{ ctx, setCtx }} />
+          <Timer ctx={props.ctx} />
           <tr>
             {columns.map((c) => (
               <ColumnLabel key={c.name} column={c} />
@@ -36,8 +36,7 @@ export default function Swarm(props: {
             const count = S.Session.Unit.count(ctx);
             const props = {
               ctx,
-              // different name because ctx references a unit and setSession doesn't
-              setSession: setCtx,
+              dispatch,
               unit,
               count0,
               count,
@@ -53,7 +52,7 @@ export default function Swarm(props: {
 
 interface UnitProps {
   ctx: S.Session.Unit.Ctx;
-  setSession: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
+  dispatch: React.Dispatch<S.Session.T.Action>;
   unit: S.Schema.Unit;
   // redundant/cached
   count: number;
@@ -95,25 +94,20 @@ const columns: readonly Column[] = [
   {
     name: "count(0)",
     element(props) {
-      const { ctx, count0, setSession } = props;
+      const { ctx, count0, dispatch } = props;
       return (
         <input
           type="number"
           style={style.input}
           value={count0}
           onInput={(e) => {
-            const value = e.currentTarget.value;
-            setSession(
-              S.Session.Unit.set(ctx, {
-                ...S.Session.Unit.get(ctx),
-                count: inputInt(value ?? "", count0),
-              })
-              // TODO why does type inference not work right here?
-              // S.Session.Unit.map(ctx, (u, x) => ({
-              // ...u,
-              // count: inputInt(value ?? "", count0),
-              // }))
-            );
+            const count = inputInt(e.currentTarget.value ?? "", count0);
+            dispatch({
+              type: "debug-set-session",
+              session: produce(ctx.session, (s) => {
+                s.unit.set(ctx.unitId, { id: ctx.unitId, count });
+              }),
+            });
           }}
         />
       );
@@ -137,7 +131,7 @@ const columns: readonly Column[] = [
   {
     name: "autobuy",
     element(props) {
-      const { ctx, setSession, unit } = props;
+      const { ctx, dispatch, unit } = props;
       const order = S.Session.Unit.autobuyOrderOrNull(ctx);
       return (
         <input
@@ -149,15 +143,16 @@ const columns: readonly Column[] = [
               e.currentTarget.value ?? "",
               order?.count ?? 0
             );
-            setSession(
-              produce((ctx) => {
+            dispatch({
+              type: "debug-set-session",
+              session: produce(ctx.session, (s) => {
                 if (count === 0) {
-                  ctx.session.autobuy.delete(unit.id);
+                  s.autobuy.delete(unit.id);
                 } else {
-                  ctx.session.autobuy.set(unit.id, { id: unit.id, count });
+                  s.autobuy.set(unit.id, { id: unit.id, count });
                 }
-              })
-            );
+              }),
+            });
           }}
         />
       );
@@ -253,7 +248,7 @@ const columns: readonly Column[] = [
   },
   {
     name: "buy-button",
-    element({ ctx, setSession }) {
+    element({ ctx, dispatch }) {
       const b = S.Session.Unit.buyable(ctx);
       if (b.isBuyable) {
         const buttons = _.uniq(
@@ -267,7 +262,7 @@ const columns: readonly Column[] = [
               <button
                 key={`buy.${ctx.unitId}.${index}`}
                 onClick={() => {
-                  setSession(S.Session.Unit.buy(ctx, count));
+                  dispatch({ type: "buy", unitId: ctx.unitId, count });
                 }}
               >
                 Buy {count}
@@ -282,7 +277,7 @@ const columns: readonly Column[] = [
   },
   {
     name: "autobuy-button",
-    element({ ctx, setSession }) {
+    element({ ctx, dispatch }) {
       const b = S.Session.Unit.autobuyable(ctx);
       if (b.isAutobuyable) {
         const buttons = [0, b.velocity];
@@ -292,7 +287,7 @@ const columns: readonly Column[] = [
               <button
                 key={`autobuy.${ctx.unitId}.${index}`}
                 onClick={() => {
-                  setSession(S.Session.Unit.autobuy(ctx, count));
+                  dispatch({ type: "autobuy", unitId: ctx.unitId, count });
                 }}
               >
                 Autobuy {count.toPrecision(3)}
@@ -318,38 +313,17 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
   );
 }
 
-function Undo(props: {
-  ctx: S.Session.Ctx;
-  setCtx: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
-}): JSX.Element {
-  const [[undo, next], setUndo] = React.useState([
-    props.ctx.session,
-    props.ctx.session,
-  ]);
-
-  React.useEffect(() => {
-    // console.log("setCtx.session", props.ctx.session);
-    setUndo([next, props.ctx.session]);
-  }, [props.ctx.session]);
-
-  return (
-    <button onClick={() => props.setCtx({ ...props.ctx, session: undo })}>
-      Undo
-    </button>
-  );
-}
 function Timer(props: {
-  ctx: S.Session.Ctx;
-  setCtx: React.Dispatch<React.SetStateAction<S.Session.Ctx>>;
+  ctx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
-  const { ctx, setCtx } = props;
+  const [ctx, dispatch] = props.ctx;
   const [paused, setPaused] = React.useState(false);
 
   React.useEffect(() => {
     let handle: number | null = null;
     function tick() {
       if (!paused) {
-        setCtx(S.Session.tick);
+        dispatch({ type: "tick" });
       }
       handle = requestAnimationFrame(tick);
     }
@@ -357,7 +331,7 @@ function Timer(props: {
     return () => {
       if (handle !== null) cancelAnimationFrame(handle);
     };
-  }, [paused, setCtx]);
+  }, [paused, dispatch]);
 
   return (
     <tr>
@@ -368,15 +342,14 @@ function Timer(props: {
           style={style.input}
           value={S.Duration.toSeconds(S.Session.sinceReified(ctx))}
           onInput={(e) => {
+            const s = inputFloat(e.currentTarget.value, 0);
+            const reified = S.Duration.dateSub(
+              ctx.now,
+              S.Duration.fromSeconds(s)
+            );
+            const session = { ...ctx.session, reified };
+            dispatch({ type: "debug-set-session", session });
             setPaused(true);
-            setCtx((ctx) => {
-              const s = inputFloat(e.currentTarget.value, 0);
-              const now = S.Duration.dateAdd(
-                ctx.session.reified,
-                S.Duration.fromSeconds(s)
-              );
-              return { ...ctx, now };
-            });
           }}
         />
       </td>
@@ -384,19 +357,15 @@ function Timer(props: {
         <button
           onClick={() => {
             if (paused) {
-              setCtx((ctx) => {
-                // add pause duration to reified
-                const now = new Date();
-                const pauseDur = S.Duration.between({
-                  before: ctx.now,
-                  after: now,
-                });
-                const reified = S.Duration.dateAdd(
-                  ctx.session.reified,
-                  pauseDur
-                );
-                return { ...ctx, now, session: { ...ctx.session, reified } };
+              // add pause duration to reified
+              const now = new Date();
+              const pauseDur = S.Duration.between({
+                before: ctx.now,
+                after: now,
               });
+              const reified = S.Duration.dateAdd(ctx.session.reified, pauseDur);
+              const session = { ...ctx.session, reified };
+              dispatch({ type: "debug-set-session", session, now });
             }
             setPaused(!paused);
           }}
@@ -405,10 +374,19 @@ function Timer(props: {
         </button>
       </td>
       <td>
-        <button onClick={() => setCtx(S.Session.reify)}>Reify</button>
+        <button
+          onClick={() =>
+            dispatch({
+              type: "debug-set-session",
+              session: S.Session.reify(ctx).session,
+            })
+          }
+        >
+          Reify
+        </button>
       </td>
       <td>
-        <Undo {...props} />
+        <button onClick={() => dispatch({ type: "undo" })}>Undo</button>
       </td>
     </tr>
   );

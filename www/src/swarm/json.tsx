@@ -5,12 +5,12 @@ import ReactJson, { InteractionProps } from "react-json-view";
 import { Link } from "react-router-dom";
 import * as S from "shared/src/swarm";
 import * as Route from "../route";
-import { UseStateT } from "../util";
+import { UseReducerT } from "../util";
 
 export default function View(props: {
-  ctx: UseStateT<S.Session.Ctx>;
+  ctx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
-  const [ctx, setCtx] = props.ctx;
+  const [ctx, dispatch] = props.ctx;
   function onChange(event: InteractionProps): void {
     console.log("json:onchange", event);
     pipe(
@@ -18,7 +18,7 @@ export default function View(props: {
       S.Session.T.Session.json.decode,
       Either.fold(
         (err) => console.error(err),
-        (session) => setCtx((ctx) => ({ ...ctx, session }))
+        (session) => dispatch({ type: "debug-set-session", session })
       )
     );
   }
@@ -41,7 +41,7 @@ export default function View(props: {
             S.Session.T.Session.jsonStringF.decode,
             Either.fold(
               (err) => console.error(err),
-              (session) => setCtx((ctx) => ({ ...ctx, session }))
+              (session) => dispatch({ type: "debug-set-session", session })
             )
           )
         }

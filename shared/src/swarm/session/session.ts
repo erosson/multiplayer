@@ -1,4 +1,5 @@
 import * as I from "immer";
+import { omit } from "lodash";
 import * as Data from "../data";
 import * as Duration from "../duration";
 import * as S from "../schema";
@@ -20,11 +21,11 @@ export function empty(data: Data.Data, now?: Date): Ctx {
     unit: new Map(data.unit.list.map((u) => [u.id, Unit.empty(u)])),
     autobuy: new Map(),
   };
-  return { session, data, now };
+  return { session, undo: session, data, now };
 }
 
 export function context(data: Data.Data, session: Value, now: Date): Ctx {
-  return { data, session, now };
+  return { data, session, undo: session, now };
 }
 
 export function since(ctx: Ctx, before: Date): Duration.T {
@@ -81,4 +82,39 @@ export function autobuyVelocities(ctx: Ctx): Map<S.UnitID, number> {
       MapU.update(accum, order.id, (v) => (v ?? 0) + order.count);
     }
   });
+}
+
+export function reducer(ctx: Ctx, action: T.Action): Ctx {
+  if (action.type !== "tick") {
+    console.log("reducer", { ctx, action });
+  }
+  switch (action.type) {
+    case "tick": {
+      const now = new Date();
+      return { ...ctx, now };
+    }
+    case "debug-set-session": {
+      ctx = { ...ctx, undo: ctx.session };
+      const { session } = action;
+      return { ...ctx, session, now: action.now ?? ctx.now };
+    }
+    case "buy": {
+      ctx = { ...ctx, undo: ctx.session };
+      const { unitId, count } = action;
+      const uctx: Unit.Ctx = { ...ctx, unitId };
+      return omit(Unit.buy(uctx, count), "unitId");
+    }
+    case "autobuy": {
+      ctx = { ...ctx, undo: ctx.session };
+      const { unitId, count } = action;
+      const uctx: Unit.Ctx = { ...ctx, unitId };
+      return omit(Unit.autobuy(uctx, count), "unitId");
+    }
+    case "undo": {
+      return { ...ctx, session: ctx.undo, undo: ctx.session };
+    }
+    default: {
+      return ctx;
+    }
+  }
 }

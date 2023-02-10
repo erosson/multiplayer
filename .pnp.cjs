@@ -10438,6 +10438,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["shared", "workspace:shared"],\
             ["@protobuf-ts/plugin", "npm:2.8.2"],\
             ["@protobuf-ts/runtime", "npm:2.8.2"],\
+            ["@types/lodash", "npm:4.14.191"],\
             ["fp-ts", "npm:2.13.1"],\
             ["graphology", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.25.1"],\
             ["graphology-shortest-path", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:2.0.1"],\
@@ -10446,6 +10447,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["immer", "npm:9.0.19"],\
             ["io-ts", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:2.2.20"],\
             ["io-ts-types", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.5.19"],\
+            ["lodash", "npm:4.17.21"],\
             ["monocle-ts", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:2.3.13"],\
             ["newtype-ts", "virtual:d10100d960b1b73f8c74718d4637dfe2c18d098bafef09afa646f6b4f65cd1a5ad77d7941e2a1def095bb77eb2ac82d00bec47774003ea2f130a251bc51e4c5b#npm:0.3.5"],\
             ["prettier", "npm:2.8.3"],\
