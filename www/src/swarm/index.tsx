@@ -4,24 +4,20 @@ import produce from "immer";
 import _ from "lodash";
 import React from "react";
 import ReactJson, { InteractionProps } from "react-json-view";
+import { UseStateT } from "../util";
 import * as S from "shared/src/swarm";
+import { Link } from "react-router-dom";
+import * as Route from "../route";
 
 const style = {
   input: { width: "5em" },
   readonlyInput: { width: "5em", border: "none" },
   prodList: { padding: 0, margin: 0, listStyleType: "none" },
 };
-export default function Swarm(): JSX.Element {
-  const data = S.Data.create();
-  console.log("data", data);
-  return <_Swarm data={data} />;
-}
-function _Swarm(props: {
-  data: ReturnType<typeof S.Data.create>;
+export default function Swarm(props: {
+  ctx: UseStateT<S.Session.Ctx>;
 }): JSX.Element {
-  const { data } = props;
-  const [ctx, setCtx] = React.useState(() => S.Session.empty(data));
-
+  const [ctx, setCtx] = props.ctx;
   function onChange(event: InteractionProps): void {
     console.log("json:onchange", event);
     pipe(
@@ -129,7 +125,9 @@ const columns: readonly Column[] = [
   {
     name: "name",
     element(props) {
-      return <>{props.unit.id}</>;
+      return (
+        <Link to={Route.swarmUnit(props.unit.id)}>{`${props.unit.id}`}</Link>
+      );
     },
   },
   {

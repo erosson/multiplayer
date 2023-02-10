@@ -5,7 +5,9 @@ import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
-import SwarmGraph from "./swarm-graph";
+import SwarmGraph from "./swarm/graph";
+import * as SwarmUnit from "./swarm/unit";
+import * as S from "shared/src/swarm";
 import Nav from "./nav";
 import * as Route from "./route";
 import * as Env from "./env";
@@ -22,8 +24,11 @@ function App(): JSX.Element {
       }
     );
   }, []);
+
+  const swarmCtx = React.useState(S.Session.empty(S.Data.create()));
+
   return env ? (
-    <Router env={env} />
+    <Router env={env} swarmCtx={swarmCtx} />
   ) : error ? (
     <pre>{error.message}</pre>
   ) : (
@@ -38,7 +43,13 @@ function Layout(props: { children?: React.ReactNode }) {
     </>
   );
 }
-function Router(props: { env: Env.Env }): JSX.Element {
+function Router(props: {
+  env: Env.Env;
+  swarmCtx: [
+    S.Session.Ctx,
+    React.Dispatch<React.SetStateAction<S.Session.Ctx>>
+  ];
+}): JSX.Element {
   // https://reactrouter.com/en/main/start/tutorial
   const router = createBrowserRouter([
     {
@@ -63,7 +74,12 @@ function Router(props: { env: Env.Env }): JSX.Element {
         },
         {
           path: Route.Route.swarm,
-          element: <Swarm />,
+          element: <Swarm ctx={props.swarmCtx} />,
+        },
+        {
+          path: Route.Route.swarmUnit,
+          element: <SwarmUnit.default ctx={props.swarmCtx} />,
+          loader: SwarmUnit.createLoader(props.swarmCtx[0]),
         },
         {
           path: Route.Route.swarmGraph,
