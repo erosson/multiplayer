@@ -1,11 +1,11 @@
-import React from "react";
-import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
-import { Link, useParams } from "react-router-dom";
+import { pipe } from "fp-ts/lib/function";
+import React from "react";
+import ReactJson, { InteractionProps } from "react-json-view";
+import { Link } from "react-router-dom";
 import * as S from "shared/src/swarm";
 import * as Route from "../route";
 import { UseStateT } from "../util";
-import ReactJson, { InteractionProps } from "react-json-view";
 
 export default function View(props: {
   ctx: UseStateT<S.Session.Ctx>;

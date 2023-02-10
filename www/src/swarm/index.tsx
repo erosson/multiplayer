@@ -1,12 +1,10 @@
-import * as Either from "fp-ts/lib/Either";
-import { pipe } from "fp-ts/lib/function";
 import produce from "immer";
 import _ from "lodash";
 import React from "react";
-import { UseStateT } from "../util";
-import * as S from "shared/src/swarm";
 import { Link } from "react-router-dom";
+import * as S from "shared/src/swarm";
 import * as Route from "../route";
+import { UseStateT } from "../util";
 
 const style = {
   input: { width: "5em" },
