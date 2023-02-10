@@ -50,7 +50,7 @@ export default function Swarm(props: {
   );
 }
 
-interface UnitProps {
+export interface UnitProps {
   ctx: S.Session.Unit.Ctx;
   dispatch: React.Dispatch<S.Session.T.Action>;
   unit: S.Schema.Unit;
@@ -82,7 +82,7 @@ interface Column {
   label?: JSX.Element;
   element(props: UnitProps): JSX.Element;
 }
-const columns: readonly Column[] = [
+export const columns: readonly Column[] = [
   {
     name: "name",
     element(props) {
@@ -313,7 +313,7 @@ function ColumnLabel(props: { column: Column }): JSX.Element {
   );
 }
 
-function Timer(props: {
+export function Timer(props: {
   ctx: UseReducerT<S.Session.Ctx, S.Session.T.Action>;
 }): JSX.Element {
   const [ctx, dispatch] = props.ctx;
