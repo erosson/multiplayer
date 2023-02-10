@@ -6,7 +6,7 @@ import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
 import SwarmGraph from "./swarm/graph";
-import * as SwarmUnit from "./swarm/unit";
+import SwarmUnit from "./swarm/unit";
 import * as S from "shared/src/swarm";
 import Nav from "./nav";
 import * as Route from "./route";
@@ -78,8 +78,7 @@ function Router(props: {
         },
         {
           path: Route.Route.swarmUnit,
-          element: <SwarmUnit.default ctx={props.swarmCtx} />,
-          loader: SwarmUnit.createLoader(props.swarmCtx[0]),
+          element: <SwarmUnit ctx={props.swarmCtx} />,
         },
         {
           path: Route.Route.swarmGraph,
