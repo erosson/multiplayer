@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  useParams,
-  LoaderFunctionArgs,
-  useLoaderData,
-  Link,
-} from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import * as S from "shared/src/swarm";
 import * as Route from "../route";
 import { UseStateT } from "../util";

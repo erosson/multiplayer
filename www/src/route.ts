@@ -6,6 +6,7 @@ export enum Route {
   count = "/count",
   platform = "/platform",
   swarm = "/swarm",
+  swarmJson = "/swarm/json",
   swarmGraph = "/swarm/graph",
   swarmUnit = "/swarm/unit/:unitId",
 }

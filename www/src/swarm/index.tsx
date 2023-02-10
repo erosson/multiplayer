@@ -3,7 +3,6 @@ import { pipe } from "fp-ts/lib/function";
 import produce from "immer";
 import _ from "lodash";
 import React from "react";
-import ReactJson, { InteractionProps } from "react-json-view";
 import { UseStateT } from "../util";
 import * as S from "shared/src/swarm";
 import { Link } from "react-router-dom";
@@ -18,17 +17,6 @@ export default function Swarm(props: {
   ctx: UseStateT<S.Session.Ctx>;
 }): JSX.Element {
   const [ctx, setCtx] = props.ctx;
-  function onChange(event: InteractionProps): void {
-    console.log("json:onchange", event);
-    pipe(
-      event.updated_src,
-      S.Session.T.Session.json.decode,
-      Either.fold(
-        (err) => console.error(err),
-        (session) => setCtx((ctx) => ({ ...ctx, session }))
-      )
-    );
-  }
 
   return (
     <div>
@@ -61,30 +49,6 @@ export default function Swarm(props: {
           })}
         </tbody>
       </table>
-      <div>
-        <label>
-          <div>JSON state</div>
-          <ReactJson
-            src={S.Session.T.Session.json.encode(ctx.session) as object}
-            onEdit={onChange}
-            onAdd={onChange}
-            onDelete={onChange}
-          />
-          <textarea
-            value={S.Session.T.Session.jsonStringF.encode(ctx.session)}
-            onChange={(e) =>
-              pipe(
-                e.currentTarget.value,
-                S.Session.T.Session.jsonStringF.decode,
-                Either.fold(
-                  (err) => console.error(err),
-                  (session) => setCtx((ctx) => ({ ...ctx, session }))
-                )
-              )
-            }
-          />
-        </label>
-      </div>
     </div>
   );
 }
