@@ -34,6 +34,10 @@ export interface Result {
   value: Progress;
   complete: Map<StateID, number>;
 }
+export interface Results {
+  values: Progress[];
+  complete: Map<StateID, number>;
+}
 export function getState(id: StateID): State {
   const st = State.get(id);
   if (!st) throw new Error(`unknown progress-state ${id}`);
@@ -98,4 +102,28 @@ export function tick(p: Progress, t: number): Result {
     throw new Error(`progress bar max exceeded`);
   }
   return { complete, value: p };
+}
+
+export function ticks(ps: Progress[], t: number): Results {
+  const rs = ps.map((p) => tick(p, t));
+  const values = rs.map((r) => r.value);
+  const complete = sumComplete(rs.map((r) => r.complete));
+  return { values, complete };
+}
+export function tickResults(rs0: Results, t: number): Results {
+  const rs = ticks(rs0.values, t);
+  const complete = sumComplete([rs.complete, rs0.complete]);
+  return { ...rs, complete };
+}
+export function sumComplete(
+  completes: Map<StateID, number>[],
+  r?: Map<StateID, number>
+): Map<StateID, number> {
+  r = r ?? new Map<StateID, number>();
+  for (let c of completes) {
+    for (let [k, v] of c.entries()) {
+      r.set(k, (r.get(k) ?? 0) + v);
+    }
+  }
+  return r;
 }

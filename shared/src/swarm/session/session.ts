@@ -4,6 +4,7 @@ import * as Data from "../data";
 import * as Duration from "../duration";
 import * as S from "../schema";
 import * as MapU from "../util/map";
+import * as Progress from "./progress";
 import * as T from "./type";
 import * as Unit from "./unit";
 I.enableAllPlugins();
@@ -21,11 +22,24 @@ export function empty(data: Data.Data, now?: Date): Ctx {
     unit: new Map(data.unit.list.map((u) => [u.id, Unit.empty(u)])),
     autobuy: new Map(),
   };
-  return { session, undo: session, data, now };
+  const progress: Progress.Results = {
+    values: [
+      { id: "a", state: Progress.StateID.test, value: 0 },
+      { id: "b", state: Progress.StateID.test2, value: 0 },
+    ],
+    complete: new Map(),
+  };
+  return { session, undo: session, data, now, progress };
 }
 
 export function context(data: Data.Data, session: Value, now: Date): Ctx {
-  return { data, session, undo: session, now };
+  return {
+    data,
+    session,
+    undo: session,
+    now,
+    progress: { values: [], complete: new Map() },
+  };
 }
 
 export function since(ctx: Ctx, before: Date): Duration.T {
@@ -43,6 +57,7 @@ export function sinceReified(ctx: Ctx): Duration.T {
 
 export function reify<X extends Ctx>(ctx0: X): X {
   return I.produce(ctx0, (ctx) => {
+    ctx.progress = progress(ctx);
     for (let u of units(ctx)) {
       const uctx: Unit.Ctx = { ...ctx, unitId: u.id };
       u.count = Unit.count(uctx);
@@ -84,6 +99,11 @@ export function autobuyVelocities(ctx: Ctx): Map<S.UnitID, number> {
   });
 }
 
+export function progress(ctx: Ctx): Progress.Results {
+  const t = Duration.toSeconds(sinceReified(ctx));
+  return Progress.tickResults(ctx.progress, t);
+}
+
 export function reducer(ctx: Ctx, action: T.Action): Ctx {
   if (action.type !== "tick") {
     console.log("reducer", { ctx, action });
@@ -95,8 +115,12 @@ export function reducer(ctx: Ctx, action: T.Action): Ctx {
     }
     case "debug-set-session": {
       ctx = { ...ctx, undo: ctx.session };
-      const { session } = action;
-      return { ...ctx, session, now: action.now ?? ctx.now };
+      return {
+        ...ctx,
+        session: action.session,
+        progress: action.progress ?? ctx.progress,
+        now: action.now ?? ctx.now,
+      };
     }
     case "buy": {
       ctx = { ...ctx, undo: ctx.session };

@@ -5,6 +5,7 @@ import * as S from "../schema";
 import * as IO from "io-ts";
 import { DateFromISOString } from "io-ts-types";
 import { mapFromValues, protoCodec } from "../util/schema";
+import * as Progress from "./progress";
 
 export const Unit = protoCodec(
   IO.type({
@@ -61,6 +62,7 @@ export interface SessionCtx {
   session: Session;
   undo: Session;
   now: Date;
+  progress: Progress.Results;
 }
 
 export interface UnitCtx extends SessionCtx {
@@ -99,5 +101,6 @@ export interface UndoAction {
 export interface DebugSetSessionAction {
   type: "debug-set-session";
   session: Session;
+  progress?: Progress.Results;
   now?: Date;
 }

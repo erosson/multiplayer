@@ -46,7 +46,40 @@ export default function Swarm(props: {
           })}
         </tbody>
       </table>
+      <Progress ctx={ctx} />
     </div>
+  );
+}
+
+export function Progress(props: { ctx: S.Session.Ctx }): JSX.Element {
+  const rs = S.Session.progress(props.ctx);
+  return (
+    <>
+      <dl>
+        {rs.values.map((p) => {
+          const st = S.Session.Progress.getState(p.state);
+          return (
+            <React.Fragment key={`Progress.${p.id}`}>
+              <dt>{p.id}</dt>
+              <dd>
+                <progress value={p.value} max={st.maximum} />
+                <div>
+                  {`${p.state}`}: {p.value.toPrecision(3)} / {st.maximum}
+                </div>
+              </dd>
+            </React.Fragment>
+          );
+        })}
+      </dl>
+      <dl>
+        {Array.from(rs.complete.entries()).map(([k, v]) => (
+          <React.Fragment key={`Progress.complete.${k}`}>
+            <dt>{`${k}`}</dt>
+            <dd>{v}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </>
   );
 }
 
@@ -379,6 +412,7 @@ export function Timer(props: {
             dispatch({
               type: "debug-set-session",
               session: S.Session.reify(ctx).session,
+              progress: S.Session.reify(ctx).progress,
             })
           }
         >
