@@ -12,6 +12,8 @@ message Session {
   string updated = 3;
   repeated Unit unit = 4;
   repeated AutobuyOrder autobuy = 5;
+  repeated Progress progress = 6;
+  repeated ProgressComplete complete = 7;
 }
 
 message Unit {
@@ -22,4 +24,15 @@ message Unit {
 message AutobuyOrder {
   string id = 1;
   double count = 2;
+}
+
+message Progress {
+  string id = 1;
+  string stateId = 2;
+  double value = 3;
+}
+
+message ProgressComplete {
+  string stateId = 1;
+  int32 count = 2;
 }

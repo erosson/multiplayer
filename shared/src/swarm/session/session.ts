@@ -21,15 +21,13 @@ export function empty(data: Data.Data, now?: Date): Ctx {
     // TODO we should omit units that aren't yet in play, right?
     unit: new Map(data.unit.list.map((u) => [u.id, Unit.empty(u)])),
     autobuy: new Map(),
-  };
-  const progress: Progress.Results = {
-    values: [
-      { id: "a", state: Progress.StateID.test, value: 0 },
-      { id: "b", state: Progress.StateID.test2, value: 0 },
+    progress: [
+      { id: "a", stateId: Progress.StateID.test, value: 0 },
+      { id: "b", stateId: Progress.StateID.test2, value: 0 },
     ],
     complete: new Map(),
   };
-  return { session, undo: session, data, now, progress };
+  return { session, undo: session, data, now };
 }
 
 export function context(data: Data.Data, session: Value, now: Date): Ctx {
@@ -38,7 +36,6 @@ export function context(data: Data.Data, session: Value, now: Date): Ctx {
     session,
     undo: session,
     now,
-    progress: { values: [], complete: new Map() },
   };
 }
 
@@ -57,11 +54,14 @@ export function sinceReified(ctx: Ctx): Duration.T {
 
 export function reify<X extends Ctx>(ctx0: X): X {
   return I.produce(ctx0, (ctx) => {
-    ctx.progress = progress(ctx);
     for (let u of units(ctx)) {
       const uctx: Unit.Ctx = { ...ctx, unitId: u.id };
       u.count = Unit.count(uctx);
     }
+    const r = progress(ctx);
+    ctx.session.progress = r.values;
+    // ctx.session.complete = r.complete;
+    ctx.session.complete = new Map();
     ctx.session.reified = Duration.dateAdd(
       ctx.session.reified,
       sinceReified(ctx)
@@ -101,7 +101,8 @@ export function autobuyVelocities(ctx: Ctx): Map<S.UnitID, number> {
 
 export function progress(ctx: Ctx): Progress.Results {
   const t = Duration.toSeconds(sinceReified(ctx));
-  return Progress.tickResults(ctx.progress, t);
+  const { progress, complete } = ctx.session;
+  return Progress.tickResults({ values: progress, complete }, t);
 }
 
 export function reducer(ctx: Ctx, action: T.Action): Ctx {
@@ -118,7 +119,6 @@ export function reducer(ctx: Ctx, action: T.Action): Ctx {
       return {
         ...ctx,
         session: action.session,
-        progress: action.progress ?? ctx.progress,
         now: action.now ?? ctx.now,
       };
     }

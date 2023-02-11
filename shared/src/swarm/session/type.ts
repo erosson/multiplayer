@@ -1,11 +1,10 @@
+import * as IO from "io-ts";
+import * as IOT from "io-ts-types";
 import * as Proto from "../../../dist/swarm/session/session";
 import * as Data from "../data";
 import * as S from "../schema";
-// import { Timestamp as ProtoTimestamp } from "../../../dist/google/protobuf/timestamp";
-import * as IO from "io-ts";
-import { DateFromISOString } from "io-ts-types";
 import { mapFromValues, protoCodec } from "../util/schema";
-import * as Progress from "./progress";
+import * as P from "./progress";
 
 export const Unit = protoCodec(
   IO.type({
@@ -31,26 +30,20 @@ export interface AutobuyOrder extends IO.TypeOf<typeof AutobuyOrder.codec> {}
 // (proto) => IO.success(ProtoTimestamp.toDate(proto as any)),
 // (date) => ProtoTimestamp.fromDate(date)
 // );
-
-// export interface Session {
-// started: Date;
-// reified: Date;
-// updated: Date;
-// unit: Map<S.UnitID, Unit>;
-// autobuy: Map<S.UnitID, AutobuyOrder>;
-// }
 export const Session = protoCodec(
   IO.type({
     // started: DateFromProto,
     // reified: DateFromProto,
     // updated: DateFromProto,
-    started: DateFromISOString,
-    reified: DateFromISOString,
-    updated: DateFromISOString,
+    started: IOT.DateFromISOString,
+    reified: IOT.DateFromISOString,
+    updated: IOT.DateFromISOString,
     unit: IO.array(Unit.codec).pipe(mapFromValues((v: Unit): S.UnitID => v.id)),
     autobuy: IO.array(AutobuyOrder.codec).pipe(
       mapFromValues((v: AutobuyOrder): S.UnitID => v.id)
     ),
+    progress: IO.array(P.Progress.codec),
+    complete: P.ProgressCompleteMap,
   }),
   Proto.Session
 );
@@ -62,7 +55,6 @@ export interface SessionCtx {
   session: Session;
   undo: Session;
   now: Date;
-  progress: Progress.Results;
 }
 
 export interface UnitCtx extends SessionCtx {
@@ -101,6 +93,5 @@ export interface UndoAction {
 export interface DebugSetSessionAction {
   type: "debug-set-session";
   session: Session;
-  progress?: Progress.Results;
   now?: Date;
 }

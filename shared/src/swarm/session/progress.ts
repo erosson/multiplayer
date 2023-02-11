@@ -1,14 +1,11 @@
 import { Ord as StringOrd } from "fp-ts/string";
 import * as IO from "io-ts";
+import * as IOT from "io-ts-types";
 import { getOrd, Newtype } from "newtype-ts";
+import * as Proto from "../../../dist/swarm/session/session";
 import { sum } from "../util/math";
-import { idRecord, isoCodec, mapKeyBy } from "../util/schema";
+import { idRecord, isoCodec, mapKeyBy, protoCodec } from "../util/schema";
 
-export interface Progress {
-  id: string;
-  state: StateID;
-  value: number;
-}
 export interface State {
   id: StateID;
   next: StateID;
@@ -30,6 +27,57 @@ export const State = mapKeyBy(
   (s) => s.id
 );
 
+export const Progress = protoCodec(
+  IO.type({
+    id: IO.string,
+    stateId: StateIDT.codec,
+    value: IO.number,
+  }),
+  Proto.Progress
+);
+export interface Progress extends IO.TypeOf<typeof Progress.codec> {}
+
+export const ProgressComplete = protoCodec(
+  IO.type({
+    stateId: StateIDT.codec,
+    count: IO.number,
+  }),
+  Proto.ProgressComplete
+);
+export interface ProgressComplete
+  extends IO.TypeOf<typeof ProgressComplete.codec> {}
+
+export const ProgressCompleteEntry: IO.Type<
+  [StateID, number],
+  Proto.ProgressComplete
+> = ProgressComplete.codec.pipe(
+  new IO.Type(
+    "ProgressCompleteEntry",
+    IO.tuple([StateIDT.codec, IO.number]).is,
+    (enc, c) =>
+      ProgressComplete.codec.is(enc)
+        ? IO.success([enc.stateId, enc.count])
+        : IO.failure(`not a ProgressCompleteEntry: ${enc}`, c),
+    (dec) => ({ stateId: dec[0], count: dec[1] })
+  )
+);
+function identityCodec<T>(name?: string): IO.Type<T, T> {
+  return new IO.Type<T, T>(
+    name ?? "identity",
+    IO.any.is,
+    (enc: unknown) => IO.success(enc as any),
+    (dec: T) => dec
+  );
+}
+export interface ProgressCompleteEntry
+  extends IO.TypeOf<typeof ProgressCompleteEntry> {}
+
+export const ProgressCompleteMap = IO.array(ProgressCompleteEntry).pipe(
+  // IOT.mapFromEntries(IO.string, StringOrd, IO.number)
+  // IOT.mapFromEntries(StateIDT.codec, getOrd(StringOrd), IO.number)
+  IOT.mapFromEntries(identityCodec<StateID>(), getOrd(StringOrd), IO.number)
+);
+
 export interface Result {
   value: Progress;
   complete: Map<StateID, number>;
@@ -44,10 +92,10 @@ export function getState(id: StateID): State {
   return st;
 }
 function nextProgress(p: Progress): Progress {
-  return { id: p.id, value: 0, state: getState(p.state).next };
+  return { id: p.id, value: 0, stateId: getState(p.stateId).next };
 }
 export function timeUntilProgressComplete(p: Progress): number {
-  const st = getState(p.state);
+  const st = getState(p.stateId);
   return Math.max((st.maximum - p.value) / st.velocity, 0);
 }
 export function timeUntilStateComplete(st: State): number {
@@ -73,7 +121,7 @@ export function tick(p: Progress, t: number): Result {
   // Complete full progress cycles. cycles (and states) take a consistent amount of time to fill,
   // and this doesn't care how full the current progressbar is, so this is cheap!
   {
-    const st = getState(p.state);
+    const st = getState(p.stateId);
     const cycleT = timeUntilCycleComplete(st);
     const cycles = Math.floor(t / cycleT);
     if (cycles > 0) {
@@ -90,13 +138,13 @@ export function tick(p: Progress, t: number): Result {
   let dt = timeUntilProgressComplete(p);
   while (dt <= t) {
     t -= dt;
-    complete.set(p.state, (complete.get(p.state) ?? 0) + 1);
+    complete.set(p.stateId, (complete.get(p.stateId) ?? 0) + 1);
     p = nextProgress(p);
-    dt = timeUntilStateComplete(getState(p.state));
+    dt = timeUntilStateComplete(getState(p.stateId));
   }
   // Remaining time is guaranteed less than the next/last state.
   // Partially fill what's left.
-  const st = getState(p.state);
+  const st = getState(p.stateId);
   p.value += t * st.velocity;
   if (p.value >= st.maximum) {
     throw new Error(`progress bar max exceeded`);

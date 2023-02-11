@@ -57,20 +57,21 @@ export function Progress(props: { ctx: S.Session.Ctx }): JSX.Element {
     <>
       <dl>
         {rs.values.map((p) => {
-          const st = S.Session.Progress.getState(p.state);
+          const st = S.Session.Progress.getState(p.stateId);
           return (
             <React.Fragment key={`Progress.${p.id}`}>
               <dt>{p.id}</dt>
               <dd>
                 <progress value={p.value} max={st.maximum} />
                 <div>
-                  {`${p.state}`}: {p.value.toPrecision(3)} / {st.maximum}
+                  {`${p.stateId}`}: {p.value.toPrecision(3)} / {st.maximum}
                 </div>
               </dd>
             </React.Fragment>
           );
         })}
       </dl>
+      {/*
       <dl>
         {Array.from(rs.complete.entries()).map(([k, v]) => (
           <React.Fragment key={`Progress.complete.${k}`}>
@@ -79,6 +80,7 @@ export function Progress(props: { ctx: S.Session.Ctx }): JSX.Element {
           </React.Fragment>
         ))}
       </dl>
+      */}
     </>
   );
 }
@@ -412,7 +414,6 @@ export function Timer(props: {
             dispatch({
               type: "debug-set-session",
               session: S.Session.reify(ctx).session,
-              progress: S.Session.reify(ctx).progress,
             })
           }
         >

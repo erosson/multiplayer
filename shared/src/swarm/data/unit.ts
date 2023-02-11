@@ -37,5 +37,6 @@ const list: readonly S.Unit[] = [
     ],
     prod: [{ unit: Unit.queen, value: 3 }],
   },
+  { id: Unit.territory, cost: [], prod: [] },
 ];
 export default list;

@@ -3,6 +3,7 @@ import * as Duration from "../duration";
 import * as Poly from "../polynomial";
 import * as Prod from "../production";
 import * as S from "../schema";
+import { sum } from "../util/math";
 import * as Session from "./session";
 import * as T from "./type";
 I.enableAllPlugins();
@@ -100,6 +101,11 @@ export function polynomial(ctx: Ctx): Poly.Polynomial {
 
 export function count(ctx: Ctx): number {
   const t = Session.sinceReified(ctx);
+  // temporary special-case for progress bars
+  if (S.UnitID.unwrap(ctx.unitId) === "territory") {
+    const r = Session.progress(ctx);
+    return sum(Array.from(r.complete.values()));
+  }
   return Poly.calc(polynomial(ctx), Duration.toSeconds(t));
 }
 
