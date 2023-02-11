@@ -1,0 +1,17 @@
+- remove UnitCtx: better for there to be just one possible Ctx format
+- separate index and unit uis (instead of unit ui just copying the index ui)
+- i18n
+- better buy buttons
+- allow buying hatcheries
+- persistent sessions
+- ctx, session, data all have bad names. rename?
+- bug: autobuying nests breaks
+- bug: autobuy limit is wrong for queens+
+- pause lost when changing screens (make it part of ctx?)
+- run it on the server
+- add mapping (maybe have your swarm explore a graph of planets/zones?) (v1: no combat, just progress bar + location selection)
+- add combat
+- add inventory
+- add crafting/random items
+- add passive tree
+- add atlas
