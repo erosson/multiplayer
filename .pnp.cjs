@@ -48,6 +48,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["concurrently", "npm:7.6.0"],\
             ["fast-check", "npm:3.6.2"],\
             ["fastify", "npm:4.11.0"],\
+            ["husky", "npm:8.0.3"],\
             ["jest", "virtual:136c1ad5d1215f25d904431273fb0a92a8fa4e1c8dcd58384a2dbc06cb439e16aff1f6e0da7f98bec59a01cbb876c04fecda94413f5fae82a286cedc1ef6f223#npm:29.4.0"],\
             ["prettier", "npm:2.8.3"],\
             ["ts-jest", "virtual:136c1ad5d1215f25d904431273fb0a92a8fa4e1c8dcd58384a2dbc06cb439e16aff1f6e0da7f98bec59a01cbb876c04fecda94413f5fae82a286cedc1ef6f223#npm:29.0.5"],\
@@ -6376,6 +6377,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["husky", [\
+        ["npm:8.0.3", {\
+          "packageLocation": "./.yarn/cache/husky-npm-8.0.3-b0b59c5127-837bc7e441.zip/node_modules/husky/",\
+          "packageDependencies": [\
+            ["husky", "npm:8.0.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["iconv-lite", [\
         ["npm:0.4.24", {\
           "packageLocation": "./.yarn/cache/iconv-lite-npm-0.4.24-c5c4ac6695-bd9f120f5a.zip/node_modules/iconv-lite/",\
@@ -8302,6 +8312,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["concurrently", "npm:7.6.0"],\
             ["fast-check", "npm:3.6.2"],\
             ["fastify", "npm:4.11.0"],\
+            ["husky", "npm:8.0.3"],\
             ["jest", "virtual:136c1ad5d1215f25d904431273fb0a92a8fa4e1c8dcd58384a2dbc06cb439e16aff1f6e0da7f98bec59a01cbb876c04fecda94413f5fae82a286cedc1ef6f223#npm:29.4.0"],\
             ["prettier", "npm:2.8.3"],\
             ["ts-jest", "virtual:136c1ad5d1215f25d904431273fb0a92a8fa4e1c8dcd58384a2dbc06cb439e16aff1f6e0da7f98bec59a01cbb876c04fecda94413f5fae82a286cedc1ef6f223#npm:29.0.5"],\
