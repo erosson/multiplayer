@@ -36,3 +36,29 @@ message ProgressComplete {
   string stateId = 1;
   int32 count = 2;
 }
+
+// Actions
+
+message Action {
+  // oneof action {
+  // TickAction tick = 1;
+  // BuyAction buy = 2;
+  // AutobuyAction autobuy = 3;
+  // UndoAction undo = 4;
+  // DebugSetSessionAction debugSetSession = 5;
+  // }
+}
+message TickAction {}
+message BuyAction {
+  string unitId = 1;
+  int32 count = 2;
+}
+message AutobuyAction {
+  string unitId = 1;
+  int32 count = 2;
+}
+message UndoAction {}
+message DebugSetSessionAction {
+  Session session = 1;
+  string now = 2;
+}

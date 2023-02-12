@@ -1,9 +1,15 @@
 import * as IO from "io-ts";
 import * as IOT from "io-ts-types";
+import { omit } from "lodash";
 import * as Proto from "../../../dist/swarm/session/session";
 import * as Data from "../data";
 import * as S from "../schema";
-import { mapFromValues, protoCodec } from "../util/schema";
+import {
+  ioIdentity,
+  ioMapper,
+  mapFromValues,
+  protoCodec,
+} from "../util/schema";
 import * as P from "./progress";
 
 export const Unit = protoCodec(
@@ -70,15 +76,36 @@ export type Action =
   | UndoAction
   | DebugSetSessionAction;
 
-export interface TickAction {
-  type: "tick";
-}
+export const TickAction = protoCodec(
+  ioMapper(
+    IO.type({ type: IO.literal("tick") }),
+    IO.type({}),
+    (dec) => IO.success({ ...dec, type: "tick" as const }),
+    (enc) => omit(enc, "type")
+  ),
+  Proto.TickAction
+);
+export interface TickAction extends IO.TypeOf<typeof TickAction.codec> {}
 
-export interface BuyAction {
-  type: "buy";
-  unitId: S.UnitID;
-  count: number;
-}
+export const BuyAction = protoCodec(
+  ioMapper(
+    IO.type({
+      type: IO.literal("buy"),
+      unitId: ioIdentity(S.UnitID.codec.is),
+      count: IO.number,
+    }),
+    IO.type({ unitId: IO.string, count: IO.number }),
+    (dec) =>
+      IO.success({
+        ...dec,
+        unitId: S.UnitID.wrap(dec.unitId),
+        type: "buy" as const,
+      }),
+    (enc) => omit({ ...enc, unitId: S.UnitID.unwrap(enc.unitId) }, "type")
+  ),
+  Proto.BuyAction
+);
+export interface BuyAction extends IO.TypeOf<typeof BuyAction.codec> {}
 
 export interface AutobuyAction {
   type: "autobuy";

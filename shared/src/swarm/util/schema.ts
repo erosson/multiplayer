@@ -98,6 +98,19 @@ export function ioMapper<A, O>(
   );
 }
 
+export function ioIdentity<A>(
+  is: IO.Is<A>,
+  name: string = is.name
+): IO.Type<A> {
+  return new IO.Type<A>(
+    name,
+    is,
+    (dec, ctx) =>
+      is(dec) ? IO.success(dec) : IO.failure(`wrong type: ${name}`, ctx),
+    IO.identity
+  );
+}
+
 function ioTryCatch<A>(fn: () => A, ctx: IO.Context): IO.Validation<A> {
   try {
     return IO.success(fn());

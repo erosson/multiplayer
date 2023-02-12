@@ -1,6 +1,7 @@
 import * as S from ".";
 import * as Proto from "../../../dist/swarm/session/session";
 import * as Data from "../data";
+import * as Schema from "../schema";
 import * as T from "./type";
 
 test("encode/decode runtime", () => {
@@ -46,4 +47,38 @@ test("encode/decode invalid proto", () => {
   });
   const decR = T.Session.codec.decode(proto);
   expect(decR._tag).toBe("Left");
+});
+
+test("encode/decode tick action", () => {
+  const proto = Proto.TickAction.create({});
+  const decR = T.TickAction.codec.decode(proto);
+  const dec: T.TickAction = decR._tag === "Right" ? decR.right : (null as any);
+  expect(decR._tag).toBe("Right");
+  expect(dec).not.toBeNull();
+  const expected: T.TickAction = { type: "tick" };
+  expect(dec).toEqual(expected);
+  const enc = T.TickAction.codec.encode(dec);
+  expect(Proto.TickAction.is(proto)).toBe(true);
+  expect(Proto.TickAction.is(enc)).toBe(true);
+  expect(proto).toEqual(enc);
+  expect(T.TickAction.codec.is(dec)).toBe(true);
+});
+
+test("encode/decode buy action", () => {
+  const proto = Proto.BuyAction.create({ unitId: "drone", count: 3 });
+  const decR = T.BuyAction.codec.decode(proto);
+  const dec: T.BuyAction = decR._tag === "Right" ? decR.right : (null as any);
+  expect(decR._tag).toBe("Right");
+  expect(dec).not.toBeNull();
+  const expected: T.BuyAction = {
+    type: "buy",
+    unitId: Schema.UnitID.wrap("drone"),
+    count: 3,
+  };
+  expect(dec).toEqual(expected);
+  const enc = T.BuyAction.codec.encode(dec);
+  expect(Proto.BuyAction.is(proto)).toBe(true);
+  expect(Proto.BuyAction.is(enc)).toBe(true);
+  expect(proto).toEqual(enc);
+  expect(T.BuyAction.codec.is(dec)).toBe(true);
 });
