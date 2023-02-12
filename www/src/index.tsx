@@ -5,6 +5,7 @@ import Hello from "./hello";
 import Count from "./count";
 import Platform from "./platform";
 import Swarm from "./swarm";
+import SwarmAtlas from "./swarm/atlas";
 import SwarmGraph from "./swarm/graph";
 import SwarmUnit from "./swarm/unit";
 import SwarmJson from "./swarm/json";
@@ -77,6 +78,10 @@ function Router(props: {
         {
           path: Route.Route.swarm,
           element: <Swarm ctx={props.swarmCtx} />,
+        },
+        {
+          path: Route.Route.swarmAtlas,
+          element: <SwarmAtlas ctx={props.swarmCtx} />,
         },
         {
           path: Route.Route.swarmJson,

@@ -29,7 +29,10 @@ export default function Nav(): JSX.Element {
           <Link to={Route.Route.swarmJson}>swarm json</Link>
         </li>
         <li style={style.li}>
-          <Link to={Route.Route.swarmGraph}>swarm graph</Link>
+          <Link to={Route.swarmAtlas()}>swarm atlas</Link>
+        </li>
+        <li style={style.li}>
+          <Link to={Route.Route.swarmGraph}>swarm production graph</Link>
         </li>
       </ul>
     </nav>
