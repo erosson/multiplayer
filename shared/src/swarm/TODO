@@ -14,4 +14,6 @@
 - add inventory
 - add crafting/random items
 - add passive tree
-- add atlas
+- integrate atlas with session, other swarm stuff
+- integrate atlas with progressbars
+- add atlas exploration
