@@ -82,6 +82,22 @@ export function protoCodec<I, P extends object>(
   };
 }
 
+export function ioMapper<A, O>(
+  a: IO.Type<A>,
+  o: IO.Type<O>,
+  validate: IO.Validate<O, A>,
+  encode: IO.Encode<A, O>,
+  name?: string
+): IO.Type<A, O> {
+  return new IO.Type(
+    name ?? `${a.name} -> ${o.name}`,
+    a.is,
+    (dec, ctx) =>
+      o.is(dec) ? validate(dec, ctx) : IO.failure(`wrong type: ${o.name}`, ctx),
+    encode
+  );
+}
+
 function ioTryCatch<A>(fn: () => A, ctx: IO.Context): IO.Validation<A> {
   try {
     return IO.success(fn());
